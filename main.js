@@ -8,15 +8,11 @@
 
 requirejs.config({
     baseUrl : "./",
-    paths: {
-        Matrix: "Third Party/Matrix",
-        Box2D: "Third Party/Box2d.min"
-    },
     shim: {
-        'Matrix': {
+        'Third Party/Matrix': {
             exports: 'Matrix' // what variable does the library export to the global scope?
         },
-        'Box2D': {
+        'Third Party/Box2D': {
             exports: 'Box2D' // what variable does the library export to the global scope?
         },
         
@@ -25,7 +21,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random','Matrix', 'BorderLightning', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Matrix, BorderLightning, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'BorderLightning', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, BorderLightning, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     

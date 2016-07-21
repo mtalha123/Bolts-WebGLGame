@@ -1,4 +1,4 @@
-define(['DrawPathWithGlow', 'Custom Utility/Random', 'Matrix', 'Custom Utility/Timer'], function(DrawPathWithGlow, Random, Matrix, Timer){
+define(['DrawPathWithGlow', 'Custom Utility/Random', 'Third Party/Matrix', 'Custom Utility/Timer'], function(DrawPathWithGlow, Random, Matrix, Timer){
     
     // Arguements: 
     // - 'canvasWidth' is the width of the actual canvas on which the game is drawn 
