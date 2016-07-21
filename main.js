@@ -9,12 +9,17 @@
 requirejs.config({
     baseUrl : "./",
     paths: {
-        Matrix: "Third Party/Matrix"
+        Matrix: "Third Party/Matrix",
+        Box2D: "Third Party/Box2d.min"
     },
     shim: {
         'Matrix': {
             exports: 'Matrix' // what variable does the library export to the global scope?
-        }
+        },
+        'Box2D': {
+            exports: 'Box2D' // what variable does the library export to the global scope?
+        },
+        
     }
 });
 
