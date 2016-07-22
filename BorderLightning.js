@@ -28,11 +28,11 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         borderLightningPiece = new LightningPiece(canvasWidth, canvasHeight, borderPath, 20, 20, {closePath: true});
         
         var physicsBodyPositions = [ 
-                                     [(margin + (widthOfBlueThing/2)) * Box2DStuff.scale, (margin + (heightOfBlueThing/2)) * Box2DStuff.scale],  
-                                     [(canvasWidth - margin) * Box2DStuff.scale, (margin + (widthOfBlueThing/2)) * Box2DStuff.scale],
-                                     [(margin + (widthOfBlueThing/2)) * Box2DStuff.scale, (canvasHeight - margin) * Box2DStuff.scale],
-                                     [(margin + (heightOfBlueThing/2)) * Box2DStuff.scale, (margin + (widthOfBlueThing/2)) * Box2DStuff.scale]                 
-                                   ]
+                                     [(margin + (widthOfBlueThing/2)) * Box2DStuff.scale, (margin + (heightOfBlueThing/2)) * Box2DStuff.scale], //top 
+                                     [(canvasWidth - margin - (heightOfBlueThing/2)) * Box2DStuff.scale, (margin + ((canvasHeight - margin)/2)) * Box2DStuff.scale], //right
+                                     [(margin + (widthOfBlueThing/2)) * Box2DStuff.scale, (canvasHeight - margin - (heightOfBlueThing/2)) * Box2DStuff.scale], //bottom
+                                     [(margin + (heightOfBlueThing/2)) * Box2DStuff.scale, (margin + ((canvasHeight - margin)/2)) * Box2DStuff.scale] //left                
+                                   ];
         
         
         var bodyDefs = new Box2DStuff.b2BodyDef();     
@@ -41,10 +41,11 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         //some of the following lines are settings that will apply to all the sides and the following lines also create the top side 
         bodyDefs.type = Box2DStuff.b2Body.b2_staticBody;
         bodyDefs.position.Set(physicsBodyPositions[0][0], physicsBodyPositions[0][1]);
-        fixtureDefs.density = 1;
+        fixtureDefs.density = 10;
         fixtureDefs.friction = 0;
         fixtureDefs.resitituation = 1;
-        fixtureDefs.shape = new Box2DStuff.b2PolygonShape.SetAsBox((widthOfBlueThing/2) * Box2DStuff.scale, (heightOfBlueThing/2) * Box2DStuff.scale);
+        fixtureDefs.shape = new Box2DStuff.b2PolygonShape();
+        fixtureDefs.shape.SetAsBox((widthOfBlueThing/2) * Box2DStuff.scale, (heightOfBlueThing/2) * Box2DStuff.scale);
         topSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
         topSide.CreateFixture(fixtureDefs);
         topSide.SetUserData("top");
@@ -57,7 +58,8 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         
         //left side
         bodyDefs.position.Set(physicsBodyPositions[3][0], physicsBodyPositions[3][1]);
-        fixtureDefs.shape = new Box2DStuff.b2PolygonShape.SetAsBox((heightOfBlueThing/2) * Box2DStuff.scale, (widthOfBlueThing/2) * Box2DStuff.scale)
+        fixtureDefs.shape = new Box2DStuff.b2PolygonShape();
+        fixtureDefs.shape.SetAsBox((heightOfBlueThing/2) * Box2DStuff.scale, ((canvasHeight - (margin * 2))/2) * Box2DStuff.scale);
         leftSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
         leftSide.CreateFixture(fixtureDefs);
         leftSide.SetUserData("left");
@@ -67,30 +69,32 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         bodyDefs.position.Set(physicsBodyPositions[1][0], physicsBodyPositions[1][1]);
         rightSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
         rightSide.CreateFixture(fixtureDefs);
-        rightSide.SetUserData("right");        
+        rightSide.SetUserData("right");    
+        
+        console.log(bottomSide.GetPosition().x);
         
     }
     
     function draw(context, interpolation){
         borderLightningPiece.draw(context, interpolation, 0, 0);
-        
     }
     
     function update(){
         borderLightningPiece.update();
+       
     }
     
     function getLeftX(){
-        return margin;
+        return (margin + heightOfBlueThing);
     }
     function getTopY(){
-        return margin;
+        return (margin + heightOfBlueThing);
     }
     function getRightX(){
-        return canvasWidth - margin;
+        return (canvasWidth - margin - heightOfBlueThing);
     }
     function getBottomY(){
-        return canvasHeight - margin;
+        return (canvasHeight - margin - heightOfBlueThing);
     }
     
     function getLeftSidePhysicsBody(){

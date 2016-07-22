@@ -12,16 +12,15 @@ requirejs.config({
         'Third Party/Matrix': {
             exports: 'Matrix' // what variable does the library export to the global scope?
         },
-        'Third Party/Box2D': {
+        'Third Party/Box2d.min': {
             exports: 'Box2D' // what variable does the library export to the global scope?
-        },
-        
+        }        
     }
 });
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'BorderLightning', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, BorderLightning, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'BorderLightning', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'Box2DStuff'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, BorderLightning, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, Box2DStuff){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -71,12 +70,33 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     //var BIG_TEST = new LightningPiece(canvasWidth, canvasHeight, [[300, 200, 80, 80], [300, 200, 250, 50],  [300, 200, 500, 100]], 10, 30, {lineWidth: 1});
     BorderLightning.initialize(canvasWidth, canvasHeight);
     TargetsController.initialize(canvasWidth, canvasHeight);
-    CollisionSystem.initialize();
+   // CollisionSystem.initialize();
     
     //BackgroundLines.initialize(canvasWidth, canvasHeight, 15, 100);
     
-    var target2 = new Target(canvasWidth, canvasHeight, 40, 8, 100, 100);
+    //var target2 = new Target(canvasWidth, canvasHeight, 40, 8, 100, 100);
     var TESTX,TESTY;
+    
+    
+    
+    var debugDraw = new Box2DStuff.b2DebugDraw();
+    debugDraw.SetSprite (context);
+    debugDraw.SetDrawScale(100);
+    debugDraw.SetFillAlpha(0.3);
+    debugDraw.SetLineThickness(1.0);
+    debugDraw.SetFlags(Box2DStuff.b2DebugDraw.e_shapeBit | Box2DStuff.b2DebugDraw.e_jointBit);
+    Box2DStuff.physicsWorld.SetDebugDraw(debugDraw)
+    
+    
+    //var testtarget = new Target(50, canvasWidth, canvasHeight, 40, 6, 100, 100, 15, 12, 1);
+    //var testtarget2 = new Target(50, canvasWidth, canvasHeight, 40, 6, 200, 200, 45, 3, 50);
+    
+    
+    
+    
+    
+    
+    
     function gameLoop(){
         
         //set to 0 each time game loop runs so that it can be utilized for the next set of updates
@@ -154,22 +174,30 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
 //
 //        context.stroke();
         
-        
-        //BIG_TEST.draw(context, interpolation);
+
         BorderLightning.draw(context, interpolation);
         TargetsController.draw(context, interpolation);
-        //context.drawImage(image, -400, -20, 2800, 120);
         //BackgroundLines.draw(context, interpolation);
         Cursor.draw(context, interpolation, 0.01 * canvasWidth);
+        
+//        Box2DStuff.physicsWorld.Step(1 / 25, 10, 6);
+//        //Box2DStuff.physicsWorld.DrawDebugData();
+//        Box2DStuff.physicsWorld.ClearForces();
+        //testtarget.draw(context, interpolation);
+        //testtarget2.draw(context, interpolation);
                 
     }
     
     function update(){
         //BIG_TEST.incrementAnimationFrame();
-        EventSystem.update();
+        //EventSystem.update();
+        Box2DStuff.physicsWorld.Step(1 / 25, 10, 6);
+        //Box2DStuff.physicsWorld.ClearForces();
         BorderLightning.update();
+        //testtarget.update();
+        //testtarget2.update();
         TargetsController.update();
-        CollisionSystem.checkBorderCollision();
+       // CollisionSystem.checkBorderCollision();
     }
     
     function getPixelsFromPercent(widthOrHeight, percentage){

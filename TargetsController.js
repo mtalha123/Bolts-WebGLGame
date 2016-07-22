@@ -2,12 +2,13 @@ define(['Target', 'Custom Utility/Timer', 'BorderLightning', 'Custom Utility/Ran
     var targetsPool = [];
     var targetsActivated = [];
     var spawnTimer = new Timer();
+    var numTargets = 10;
     
     function initialize(canvasWidth, canvasHeight){
         var targetIds = 1;
         
-        for(var i = 0; i < 10; i++){
-            targetsPool[i] = new Target(targetIds, canvasWidth, canvasHeight, 60, 8, 0, 0, 0, 10);
+        for(var i = 0; i < numTargets; i++){
+            targetsPool[i] = new Target(targetIds, canvasWidth, canvasHeight, 60, 8, 0, 0, 0, 5);
             targetIds++;
         }
         spawnTimer.start();
@@ -35,10 +36,11 @@ define(['Target', 'Custom Utility/Timer', 'BorderLightning', 'Custom Utility/Ran
     }
     
     function spawn(){
-        var random = 3;//Random.getRandomIntInclusive(1, 4);
+        var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         
         var newlyActivatedTarget = targetsPool.shift();        
+        newlyActivatedTarget.addToPhysicsSimulation();
         
         switch(random){
             case 1:
@@ -56,7 +58,7 @@ define(['Target', 'Custom Utility/Timer', 'BorderLightning', 'Custom Utility/Ran
             case 3:
                 spawnX = BorderLightning.getRightX() - (newlyActivatedTarget.getRadius() * 2);
                 spawnY = Random.getRandomInt(BorderLightning.getTopY(), BorderLightning.getBottomY());
-                newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(170, 180));//90, 270
+                newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(90, 270));
                 break;
 
             case 4:
@@ -81,7 +83,7 @@ define(['Target', 'Custom Utility/Timer', 'BorderLightning', 'Custom Utility/Ran
         //console.log("SIDE: " + eventInfo.getSide());
         switch(eventInfo.getSide()){
             case "left":
-                eventInfo.getEntity().setMovementAngle(Random.getRandomIntInclusive(-90, 90));
+                //eventInfo.getEntity().setMovementAngle(Random.getRandomIntInclusive(-90, 90));
                 break;
             
             case "top":

@@ -1,4 +1,4 @@
-define(['LightningPiece.js'], function(LightningPiece){
+define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
 
     function Target(id, canvasWidth, canvasHeight, p_radius, numbolts, x, y, movementangle, speed){
         this._id = id;
@@ -9,12 +9,24 @@ define(['LightningPiece.js'], function(LightningPiece){
         var lightningCoordinates = [];
         var xOnCircle;
         var yOnCircle;
+        this._x = x; 
+        this._y = y;
+        this._targetBody;
         
-        this._x = x, this._y = y;
+        this._bodyDef = new Box2DStuff.b2BodyDef();
+        this._bodyDef.position.Set((x * Box2DStuff.scale) + (p_radius * Box2DStuff.scale), (y * Box2DStuff.scale) + (p_radius * Box2DStuff.scale));
+        this._bodyDef.type = Box2DStuff.b2Body.b2_dynamicBody;        
+        this._fixtureDef = new Box2DStuff.b2FixtureDef();
+        this._fixtureDef.density = 1;
+        this._fixtureDef.friction = 0;
+        this._fixtureDef.restitution = 1;
+        this._fixtureDef.shape = new Box2DStuff.b2CircleShape(p_radius * Box2DStuff.scale);        
+        
         this._currentMovementAngleInDeg = movementangle;
         this._speed = speed;
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
-        this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed;
+        this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed;        
+        this._velocityVector = new Box2DStuff.b2Vec2(this._xUnits, this._yUnits);
         
         for(var i = 0; i < numLightningBolts; i++){
             xOnCircle = (Math.cos(currentAngle * (Math.PI / 180)) * this._radius) + (x + this._radius);
@@ -30,7 +42,7 @@ define(['LightningPiece.js'], function(LightningPiece){
     }
     
     Target.prototype.draw = function(context, interpolation){
-        this._lightning.draw(context, interpolation, this._xUnits, this._yUnits);
+        this._lightning.draw(context, interpolation, 0, 0);
         
         context.save();
         
@@ -39,29 +51,35 @@ define(['LightningPiece.js'], function(LightningPiece){
         context.shadowColor = "#004CFF";
         context.lineWidth = 3;
         context.beginPath();
-        context.arc((this._x + this._radius) + (this._xUnits * interpolation), (this._y + this._radius) + (this._yUnits * interpolation), this._radius, 0, 2 * Math.PI, false);
+        //context.arc((this._x + this._radius) + (this._xUnits * interpolation), (this._y + this._radius) + (this._yUnits * interpolation), this._radius, 0, 2 * Math.PI, false);
+        context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
         context.stroke(); 
         
         context.restore();
     }
     
     Target.prototype.update = function(){
-        this._x += this._xUnits;
-        this._y += this._yUnits;
+        this._x = (this._targetBody.GetPosition().x / Box2DStuff.scale) - this._radius;
+        this._y = (this._targetBody.GetPosition().y / Box2DStuff.scale) - this._radius;
         
         this._lightning.update();
         this._lightning.setX(this._x);
         this._lightning.setY(this._y);
+
     }
     
     Target.prototype.setX = function(newX){
-        this._x = newX;
+        this._x = newX * Box2DStuff.scale;
         this._lightning.setX(newX);
+        
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x, this._y));
     }
     
     Target.prototype.setY = function(newY){
-        this._y = newY;
+        this._y = newY * Box2DStuff.scale;
         this._lightning.setY(newY);
+        
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x, this._y));
     }
     
     Target.prototype.getX = function(){
@@ -76,6 +94,8 @@ define(['LightningPiece.js'], function(LightningPiece){
         this._currentMovementAngleInDeg = newAngle;
         this._xUnits = Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._yUnits = Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
+        this._velocityVector.Set(this._xUnits, this._yUnits);
+        this._targetBody.SetLinearVelocity(this._velocityVector);
     }
     
      Target.prototype.getMovementAngle = function(){
@@ -88,6 +108,17 @@ define(['LightningPiece.js'], function(LightningPiece){
     
     Target.prototype.getId = function(){
         return this._id;
+    }
+    
+    Target.prototype.addToPhysicsSimulation = function(){
+        this._targetBody = Box2DStuff.physicsWorld.CreateBody(this._bodyDef);
+        this._targetBody.CreateFixture(this._fixtureDef);
+        this._targetBody.SetUserData(this);
+        this._targetBody.SetLinearVelocity(this._velocityVector);
+    }
+    
+    Target.prototype.removeFromPhysicsSimulation = function(){
+        Box2DStuff.physicsWorld.DestroyBody(this._targetBody);
     }
     
     return Target;

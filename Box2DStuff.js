@@ -1,4 +1,4 @@
-define(['Third Party/Box2D'], function(Box2D){
+define(['Third Party/Box2d.min'], function(Box2D){
     
     var physicsWorld = new Box2D.Dynamics.b2World(new Box2D.Common.Math.b2Vec2(0, 0), true);
     
