@@ -74,9 +74,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     //BackgroundLines.initialize(canvasWidth, canvasHeight, 15, 100);
     
-    //var target2 = new Target(canvasWidth, canvasHeight, 40, 8, 100, 100);
-    var TESTX,TESTY;
-    
+    //var target2 = new Target(canvasWidth, canvasHeight, 40, 8, 100, 100);    
     
     
     var debugDraw = new Box2DStuff.b2DebugDraw();
@@ -90,11 +88,6 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     //var testtarget = new Target(50, canvasWidth, canvasHeight, 40, 6, 100, 100, 15, 12, 1);
     //var testtarget2 = new Target(50, canvasWidth, canvasHeight, 40, 6, 200, 200, 45, 3, 50);
-    
-    
-    
-    
-    
     
     
     function gameLoop(){
