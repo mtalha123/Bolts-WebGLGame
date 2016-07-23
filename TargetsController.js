@@ -29,7 +29,7 @@ define(['Target', 'Custom Utility/Timer', 'BorderLightning', 'Custom Utility/Ran
             spawnTimer.reset();
             spawnTimer.start();
         }
-        
+  
         for(var a = 0; a < targetsActivated.length; a++){
             targetsActivated[a].update();
         }

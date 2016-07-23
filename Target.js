@@ -9,8 +9,8 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         var lightningCoordinates = [];
         var xOnCircle;
         var yOnCircle;
-        this._x = x; 
-        this._y = y;
+        this._x = this._prevX = x; 
+        this._y = this._prevY = y;
         this._targetBody;
         
         this._bodyDef = new Box2DStuff.b2BodyDef();
@@ -42,6 +42,9 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     }
     
     Target.prototype.draw = function(context, interpolation){
+        this._lightning.setX(this._prevX + (interpolation * (this._x - this._prevX)));
+        this._lightning.setY(this._prevY + (interpolation * (this._y - this._prevY)));
+        
         this._lightning.draw(context, interpolation, 0, 0);
         
         context.save();
@@ -52,34 +55,43 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         context.lineWidth = 3;
         context.beginPath();
         //context.arc((this._x + this._radius) + (this._xUnits * interpolation), (this._y + this._radius) + (this._yUnits * interpolation), this._radius, 0, 2 * Math.PI, false);
-        context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
+        
+        //drawing with interpolation
+        context.arc((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius, (this._prevY + (interpolation * (this._y - this._prevY))) + this._radius, this._radius, 0, 2 * Math.PI, false);
+        
+        //uncomment the following line to draw without interpolation
+        //context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
         context.stroke(); 
         
         context.restore();
     }
     
     Target.prototype.update = function(){
+        this._prevX = this._x;
+        this._prevY = this._y;
         this._x = (this._targetBody.GetPosition().x / Box2DStuff.scale) - this._radius;
         this._y = (this._targetBody.GetPosition().y / Box2DStuff.scale) - this._radius;
         
         this._lightning.update();
-        this._lightning.setX(this._x);
-        this._lightning.setY(this._y);
+       // this._lightning.setX(this._x);
+        //this._lightning.setY(this._y);
 
     }
     
     Target.prototype.setX = function(newX){
-        this._x = newX * Box2DStuff.scale;
+        this._x = this._prevX = newX;
         this._lightning.setX(newX);
         
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x, this._y));
+        console.log("currentX: " + this._x + "     prevX: " + this._prevX);
+        
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x * Box2DStuff.scale, this._y * Box2DStuff.scale));
     }
     
     Target.prototype.setY = function(newY){
-        this._y = newY * Box2DStuff.scale;
+        this._y = this._prevY = newY;
         this._lightning.setY(newY);
-        
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x, this._y));
+         console.log("currentY: " + this._y + "     prevY: " + this._prevY);
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x * Box2DStuff.scale, this._y * Box2DStuff.scale));
     }
     
     Target.prototype.getX = function(){
