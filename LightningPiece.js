@@ -176,8 +176,8 @@ define(['DrawPathWithGlow', 'Custom Utility/Random', 'Third Party/Matrix', 'Cust
     //Arguments:
     //-The context is the context of the global canvas on which the whole game is being drawn
     //-The interpolation is needed to make the animation look smooth even though there are only 25 updates happening each second
-    //-the last two arguements are there so that if the lightning piece is made to move continiously by the client then inteporlation can be used between the current x and y coordinates and the next ones
-    LightningPiece.prototype.draw = function(context, interpolation, nextIncrementX, nextIncrementY){  
+    //-the last two arguements FILL IN LATER
+    LightningPiece.prototype.draw = function(context, interpolation, previousX, previousY){  
     
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //         THE FOLLOWING CODE CAN BE UNCOMMENTED IN ORDER TO MAKE THE ANIMATION HAPPEN AT THE FRAME RATE. HOWEVER, THIS SHOULD ONLY BE FOR TESTING PURPOSES
@@ -194,9 +194,9 @@ define(['DrawPathWithGlow', 'Custom Utility/Random', 'Third Party/Matrix', 'Cust
         
         if(Math.round(this._currentFrame + (2.4 * interpolation)) <= (this._numberOfFrames - 1)){
             //console.log(Math.round(this._currentFrame + (2.4 * interpolation)));
-            context.drawImage(this._lightningCanvasesArray[Math.round(this._currentFrame + (2.4 * interpolation))], this._x + (nextIncrementX * interpolation), this._y + (nextIncrementY * interpolation));
+            context.drawImage(this._lightningCanvasesArray[Math.round(this._currentFrame + (2.4 * interpolation))], this._x, this._y);
         }else{
-            context.drawImage(this._lightningCanvasesArray[this._numberOfFrames - 1], this._x + (nextIncrementX * interpolation), this._y + (nextIncrementY * interpolation));
+            context.drawImage(this._lightningCanvasesArray[this._numberOfFrames - 1], this._x, this._y);
         }
     }
     
