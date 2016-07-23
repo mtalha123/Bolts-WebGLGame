@@ -1,4 +1,4 @@
-define(['LightningPiece'], function(LightningPiece){
+define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     
     var canvasWidth, canvasHeight, borderLightningPiece;    
     var margin;    

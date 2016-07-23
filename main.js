@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random','Matrix', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Matrix, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'Box2DStuff'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, Box2DStuff){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
