@@ -69,10 +69,7 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         bodyDefs.position.Set(physicsBodyPositions[1][0], physicsBodyPositions[1][1]);
         rightSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
         rightSide.CreateFixture(fixtureDefs);
-        rightSide.SetUserData("right");    
-        
-        console.log(bottomSide.GetPosition().x);
-        
+        rightSide.SetUserData("right");            
     }
     
     function draw(context, interpolation){
