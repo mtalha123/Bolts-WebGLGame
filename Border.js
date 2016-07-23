@@ -17,7 +17,7 @@ define(['LightningPiece'], function(LightningPiece){
         heightOfBlueThing = 50;
         gapForScore = 0.10 * canvasWidth;
         scoreX = margin + (widthOfBlueThing/2);
-        scoreY = margin + 0.02 * canvasHeight;
+        scoreY = margin + 0.015 * canvasHeight;
         
 //        var borderPath = [ // X                      Y
 //                          [ margin,                margin, 
