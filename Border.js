@@ -5,6 +5,8 @@ define(['LightningPiece'], function(LightningPiece){
     var widthOfBlueThing;
     var heightOfBlueThing;
     var gapForScore;
+    var score = 1000;
+    var scoreX, scoreY;
     
     function initialize(p_canvasWidth, p_canvasHeight){
         canvasWidth = p_canvasWidth;
@@ -14,6 +16,8 @@ define(['LightningPiece'], function(LightningPiece){
         widthOfBlueThing = canvasWidth - (margin * 2);
         heightOfBlueThing = 50;
         gapForScore = 0.10 * canvasWidth;
+        scoreX = margin + (widthOfBlueThing/2);
+        scoreY = margin + 0.02 * canvasHeight;
         
 //        var borderPath = [ // X                      Y
 //                          [ margin,                margin, 
@@ -36,6 +40,18 @@ define(['LightningPiece'], function(LightningPiece){
     
     function draw(context, interpolation){
         borderLightningPiece.draw(context, interpolation, 0, 0);
+        
+        context.save();
+        
+        context.fillStyle = "yellow";
+        context.font = "50px Arial";
+        context.shadowBlur = 10;
+        context.shadowColor = "white";
+        for(var i = 0; i < 4; i ++){
+            context.fillText("" + score, scoreX - (context.measureText(score).width/2), scoreY);
+        }
+        
+        context.restore();
         
     }
     
