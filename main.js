@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'BorderLightning', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'Box2DStuff'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, BorderLightning, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, Box2DStuff){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random','Matrix', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Matrix, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -68,7 +68,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     image.src = "Assets/borderbluefield.png";
     
     //var BIG_TEST = new LightningPiece(canvasWidth, canvasHeight, [[300, 200, 80, 80], [300, 200, 250, 50],  [300, 200, 500, 100]], 10, 30, {lineWidth: 1});
-    BorderLightning.initialize(canvasWidth, canvasHeight);
+    Border.initialize(canvasWidth, canvasHeight);
     TargetsController.initialize(canvasWidth, canvasHeight);
    // CollisionSystem.initialize();
     
@@ -167,8 +167,9 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
 //
 //        context.stroke();
         
-
-        BorderLightning.draw(context, interpolation);
+        //BIG_TEST.draw(context, interpolation);
+        Border.draw(context, interpolation);
+        
         TargetsController.draw(context, interpolation);
         //BackgroundLines.draw(context, interpolation);
         Cursor.draw(context, interpolation, 0.01 * canvasWidth);
@@ -183,12 +184,13 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     function update(){
         //BIG_TEST.incrementAnimationFrame();
+
         //EventSystem.update();
         Box2DStuff.physicsWorld.Step(1 / 25, 10, 6);
         //Box2DStuff.physicsWorld.ClearForces();
-        BorderLightning.update();
         //testtarget.update();
         //testtarget2.update();
+        Border.update();
         TargetsController.update();
        // CollisionSystem.checkBorderCollision();
     }
