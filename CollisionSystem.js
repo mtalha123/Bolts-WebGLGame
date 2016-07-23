@@ -1,4 +1,4 @@
-define(['BorderLightning', 'EventSystem'], function(BorderLightning, EventSystem){
+define(['Border', 'EventSystem'], function(Border, EventSystem){
     
     var currentEntities = [];
     
