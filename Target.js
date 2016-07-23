@@ -15,7 +15,9 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         
         this._bodyDef = new Box2DStuff.b2BodyDef();
         this._bodyDef.position.Set((x * Box2DStuff.scale) + (p_radius * Box2DStuff.scale), (y * Box2DStuff.scale) + (p_radius * Box2DStuff.scale));
-        this._bodyDef.type = Box2DStuff.b2Body.b2_dynamicBody;        
+        this._bodyDef.type = Box2DStuff.b2Body.b2_dynamicBody;   
+        //Uncommenting the following line will set all the targets to be "bullet bodies", meaning they will not overlap (the collision will be more accurate). **REDUCES PERFORMANCE***
+       // this._bodyDef.bullet = true;        
         this._fixtureDef = new Box2DStuff.b2FixtureDef();
         this._fixtureDef.density = 1;
         this._fixtureDef.friction = 0;
