@@ -1,6 +1,7 @@
-define([''], function(){
+define(['Custom Utility/Timer'], function(Timer){
     
-    var x = 0, y = 0;
+    var x = 0, y = 0;    
+    var mouseHeldDown = false;    
     
     function draw(context, interpolation, radius){
         context.save();
@@ -12,16 +13,34 @@ define([''], function(){
         context.arc(x, y, radius, 0, 2 * Math.PI, false);
         context.fill();
         context.stroke();
+        
+        if(mouseHeldDown){
+            context.fillStyle = "rgba(255, 0, 0, 0.3)";
+            context.beginPath();
+            context.arc(x, y, radius, 0, 2 * Math.PI, false);
+            context.fill();
+        }
+        
         context.restore();
     }
     
-    function useCoordinates(p_x, p_y){
-        x = p_x;
-        y = p_y;
+    function mouseMove(event){
+        x = event.clientX;
+        y = event.clientY;
+    }
+    
+    function mouseDown(event){
+        mouseHeldDown = true;
+    }
+    
+    function mouseUp(event){
+        mouseHeldDown = false;
     }
     
     return {
         draw : draw,
-        useCoordinates: useCoordinates
+        mouseMove: mouseMove,
+        mouseDown: mouseDown,
+        mouseUp: mouseUp
     }
 });

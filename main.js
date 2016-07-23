@@ -203,9 +203,8 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         }
     }
     
-    canvas.addEventListener("mousemove", function(event){
-        Cursor.useCoordinates(event.clientX, event.clientY);
-    }, false);
-    
+    canvas.addEventListener("mousemove", Cursor.mouseMove, false);    
+    canvas.addEventListener("mousedown", Cursor.mouseDown, false);    
+    canvas.addEventListener("mouseup", Cursor.mouseUp, false);
     
 });
