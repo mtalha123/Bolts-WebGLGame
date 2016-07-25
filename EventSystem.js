@@ -1,16 +1,13 @@
 // EVENTS:  BorderCollisionEvent (Entity, coordinatesOfCollision), EntityCollisionEvent (entity1, entity2, coordinatesOfCollision), TargetClickedEvent(Target), TargetAchievedByUserEvent(Target), 
 //          TargetLostFocusEvent(Target), TargetDestroyedEvent(Target)
 
-define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/TargetDestroyedEvent'], function(BorderCollisionEvent, TargetSpawnedEvent, TargetDestroyedEvent){
+define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/TargetDestroyedEvent', 'Events/TargetInFocusEvent'], function(BorderCollisionEvent, TargetSpawnedEvent, TargetDestroyedEvent, TargetInFocusEvent){
     
     var allEvents = {
         bordercollision: function(){
             return new BorderCollisionEvent();
         },  
         entitycollision: function(){
-            //FILL IN LATER
-        },  
-        targetclicked: function(){
             //FILL IN LATER
         },  
         targetlostfocus: function(){
@@ -21,18 +18,21 @@ define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/Targ
         },
         targetspawned: function(){
             return new TargetSpawnedEvent();
+        },
+        targetinfocus: function(){
+            return new TargetInFocusEvent();
         }
     };
     
     var currentEventsQueue = [];
     
     var subscribers = {
-        E_bordercollision: [],  
-        E_entitycollision: [],  
-        E_targetclicked: [],  
-        E_targetlostfocus: [],  
-        E_targetdestroyed: [],
-        E_targetspawned: []
+        bordercollision: [],  
+        entitycollision: [],    
+        targetlostfocus: [],  
+        targetdestroyed: [],
+        targetspawned: [],
+        targetinfocus: []
     };
     
     
@@ -58,7 +58,7 @@ define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/Targ
     function update(){
         
         var eventBeingProcessed = currentEventsQueue.shift();
-    
+
         while(eventBeingProcessed){
             for(var i = 0; i < subscribers[eventBeingProcessed.getType()].length; i++){
                 subscribers[eventBeingProcessed.getType()][i].recieveEvent(eventBeingProcessed);
