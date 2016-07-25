@@ -84,15 +84,13 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         this._x = this._prevX = newX;
         this._lightning.setX(newX);
         
-        console.log("currentX: " + this._x + "     prevX: " + this._prevX);
-        
         this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x * Box2DStuff.scale, this._y * Box2DStuff.scale));
     }
     
     Target.prototype.setY = function(newY){
         this._y = this._prevY = newY;
         this._lightning.setY(newY);
-         console.log("currentY: " + this._y + "     prevY: " + this._prevY);
+        
         this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x * Box2DStuff.scale, this._y * Box2DStuff.scale));
     }
     

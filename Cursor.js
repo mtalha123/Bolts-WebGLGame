@@ -24,6 +24,18 @@ define(['Custom Utility/Timer'], function(Timer){
         context.restore();
     }
     
+    function isMouseButtonHeldDown(){
+        return mouseHeldDown;
+    }
+    
+    function getX(){
+        return x;
+    }
+    
+    function getY(){
+        return y;
+    }
+    
     function mouseMove(event){
         x = event.clientX;
         y = event.clientY;
@@ -39,6 +51,9 @@ define(['Custom Utility/Timer'], function(Timer){
     
     return {
         draw : draw,
+        getX: getX,
+        getY: getY,
+        isMouseButtonHeldDown: isMouseButtonHeldDown,
         mouseMove: mouseMove,
         mouseDown: mouseDown,
         mouseUp: mouseUp
