@@ -25,7 +25,7 @@ define([''], function(){
     }
     
     TargetDestroyedEvent.prototype.getType = function(){
-        return "E_targetdestroyed";
+        return "targetdestroyed";
     }
     
     return TargetDestroyedEvent;

@@ -31,7 +31,7 @@ define([''], function(){
     }
     
     BorderCollisionEvent.prototype.getType = function(){
-        return "E_bordercollision";
+        return "bordercollision";
     }
     
     return BorderCollisionEvent;

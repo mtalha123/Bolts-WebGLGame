@@ -25,7 +25,7 @@ define([''], function(){
     }
     
     TargetSpawnedEvent.prototype.getType = function(){
-        return "E_targetspawned";
+        return "targetspawned";
     }
     
     return TargetSpawnedEvent;
