@@ -8,7 +8,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         var targetIds = 1;
         
         for(var i = 0; i < numTargets; i++){
-            targetsPool[i] = new Target(targetIds, canvasWidth, canvasHeight, 60, 8, 0, 0, 0, 1);
+            targetsPool[i] = new Target(targetIds, canvasWidth, canvasHeight, 60, 8, 0, 0, 0, 5);
             targetIds++;
         }
         spawnTimer.start();
