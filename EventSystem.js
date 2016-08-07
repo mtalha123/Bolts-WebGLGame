@@ -3,27 +3,6 @@
 
 define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/TargetDestroyedEvent', 'Events/TargetInFocusEvent'], function(BorderCollisionEvent, TargetSpawnedEvent, TargetDestroyedEvent, TargetInFocusEvent){
     
-    var allEvents = {
-        bordercollision: function(){
-            return new BorderCollisionEvent();
-        },  
-        entitycollision: function(){
-            //FILL IN LATER
-        },  
-        targetlostfocus: function(){
-            //FILL IN LATER
-        },  
-        targetdestroyed: function(){
-            return new TargetDestroyedEvent();
-        },
-        targetspawned: function(){
-            return new TargetSpawnedEvent();
-        },
-        targetinfocus: function(){
-            return new TargetInFocusEvent();
-        }
-    };
-    
     var currentEventsQueue = [];
     
     var subscribers = {
@@ -48,11 +27,10 @@ define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/Targ
     }
     
     function publishEvent(eventObject){
-        currentEventsQueue.push(eventObject);
-    }
-    
-    function getEventObject(eventObjectType){
-        return allEvents[eventObjectType]();
+        var eventType = eventType;
+        var eventData = eventData;
+
+        currentEventsQueue.push({eventType: eventType, eventData: eventData});
     }
     
     function update(){
@@ -72,7 +50,6 @@ define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/Targ
         initialize: initialize,
         register: register,
         publishEvent: publishEvent,
-        getEventObject: getEventObject,
         update: update
     }
 });
