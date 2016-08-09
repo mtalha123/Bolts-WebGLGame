@@ -25,12 +25,12 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
     }
     
     function recieveEvent(eventInfo){
-        if(eventInfo.getType() === "targetspawned"){
-            currentEntities.push(eventInfo.Target);
-        }else if(eventInfo.getType() === "targetdestroyed"){
+        if(eventInfo.eventType === "targetspawned"){
+            currentEntities.push(eventInfo.eventData.Target);
+        }else if(eventInfo.eventType === "targetdestroyed"){
             
             for(var i = 0; i < currentEntities.length; i++){
-                if(currentEntities[i].getId() === eventInfo.Target.getId()){
+                if(currentEntities[i].getId() === eventInfo.eventData.getId()){
                     currentEntities[i].splice(i, 1);    
                 }
             }

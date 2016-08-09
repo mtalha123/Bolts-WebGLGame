@@ -26,7 +26,7 @@ define([], function(){
         }
     }
     
-    function publishEvent(eventObject){
+    function publishEvent(eventType, eventData){
         var eventType = eventType;
         var eventData = eventData;
 
@@ -38,8 +38,8 @@ define([], function(){
         var eventBeingProcessed = currentEventsQueue.shift();
 
         while(eventBeingProcessed){
-            for(var i = 0; i < subscribers[eventBeingProcessed.getType()].length; i++){
-                subscribers[eventBeingProcessed.getType()][i].recieveEvent(eventBeingProcessed);
+            for(var i = 0; i < subscribers[eventBeingProcessed.eventType].length; i++){
+                subscribers[eventBeingProcessed.eventType][i].recieveEvent(eventBeingProcessed);
             }
             
             eventBeingProcessed = currentEventsQueue.shift();
