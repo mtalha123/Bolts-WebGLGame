@@ -1,7 +1,7 @@
 // EVENTS:  BorderCollisionEvent (Entity, coordinatesOfCollision), EntityCollisionEvent (entity1, entity2, coordinatesOfCollision), TargetClickedEvent(Target), TargetAchievedByUserEvent(Target), 
 //          TargetLostFocusEvent(Target), TargetDestroyedEvent(Target)
 
-define(['Events/BorderCollisionEvent', 'Events/TargetSpawnedEvent', 'Events/TargetDestroyedEvent', 'Events/TargetInFocusEvent'], function(BorderCollisionEvent, TargetSpawnedEvent, TargetDestroyedEvent, TargetInFocusEvent){
+define([], function(){
     
     var currentEventsQueue = [];
     
