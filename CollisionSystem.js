@@ -12,9 +12,11 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
             if(Cursor.getX() >= currentEntities[i].getX() && (Cursor.getX() <= currentEntities[i].getX() + (currentEntities[i].getRadius()*2)) ){
                 if(Cursor.getY() >= currentEntities[i].getY() && (Cursor.getY() <= currentEntities[i].getY() + (currentEntities[i].getRadius()*2)) ){
                     if(Cursor.isMouseButtonHeldDown()){
-                        var eventObject = EventSystem.getEventObject("targetinfocus");
-                        eventObject.setProperties(currentEntities[i], Cursor.getX(), Cursor.getY());
-                        EventSystem.publishEvent(eventObject);
+                        EventSystem.publishEvent("targetinfocus", {
+                            Target: currentEntities[i],
+                            x: Cursor.getX(),
+                            y: Cursor.getY()
+                        });
                     }
                 }
             }             
@@ -24,11 +26,11 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
     
     function recieveEvent(eventInfo){
         if(eventInfo.getType() === "targetspawned"){
-            currentEntities.push(eventInfo.getTarget());
+            currentEntities.push(eventInfo.Target);
         }else if(eventInfo.getType() === "targetdestroyed"){
             
             for(var i = 0; i < currentEntities.length; i++){
-                if(currentEntities[i].getId() === eventInfo.getTarget().getId()){
+                if(currentEntities[i].getId() === eventInfo.Target.getId()){
                     currentEntities[i].splice(i, 1);    
                 }
             }

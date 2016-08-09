@@ -73,10 +73,12 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         newlyActivatedTarget.setY(spawnY);
         
         targetsActivated.push(newlyActivatedTarget);
-        
-        var eventObject = EventSystem.getEventObject("targetspawned");
-        eventObject.setProperties(newlyActivatedTarget, spawnX, spawnY);
-        EventSystem.publishEvent(eventObject);
+
+        EventSystem.publishEvent("targetspawned", {
+            Target: newlyActivatedTarget,
+            x: spawnX,
+            y: spawnY
+        });
     }
     
     function recieveEvent(eventInfo){
