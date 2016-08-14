@@ -6,6 +6,8 @@ define([], function(){
     var currentEventsQueue = [];
     
     var subscribers = {
+        initializefromserver: [],
+        gameupdatefromserver: [],
         bordercollision: [],  
         entitycollision: [],    
         targetlostfocus: [],  

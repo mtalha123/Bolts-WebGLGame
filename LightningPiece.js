@@ -192,9 +192,9 @@ define(['DrawPathWithGlow', 'Custom Utility/Random', 'Third Party/Matrix', 'Cust
         
         //context.drawImage(this._lightningCanvasesArray[0], this._x, this._y);
         
-        if(Math.round(this._currentFrame + (2.4 * interpolation)) <= (this._numberOfFrames - 1)){
+        if(Math.round(this._currentFrame + (3 * interpolation)) <= (this._numberOfFrames - 1)){
             //console.log(Math.round(this._currentFrame + (2.4 * interpolation)));
-            context.drawImage(this._lightningCanvasesArray[Math.round(this._currentFrame + (2.4 * interpolation))], this._x, this._y);
+            context.drawImage(this._lightningCanvasesArray[Math.round(this._currentFrame + (3 * interpolation))], this._x, this._y);
         }else{
             context.drawImage(this._lightningCanvasesArray[this._numberOfFrames - 1], this._x, this._y);
         }

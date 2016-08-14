@@ -1,18 +1,21 @@
-define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'EventSystem'], function(Target, Timer, Border, Random, EventSystem){
+define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Target, Timer, Border, Random, EventSystem, isObjectEmpty){
     var targetsPool = [];
     var targetsActivated = [];
     var spawnTimer = new Timer();
-    var numTargets = 10;
+    var numTargets = 2;
+    var authUpdateData = {};
     
-    function initialize(canvasWidth, canvasHeight){
-        var targetIds = 1;
-        
-        for(var i = 0; i < numTargets; i++){
-            targetsPool[i] = new Target(targetIds, canvasWidth, canvasHeight, 60, 8, 0, 0, 0, 5);
-            targetIds++;
+    function initialize(canvasWidth, canvasHeight, initializeData){
+        var i = 0;
+        for(var key in initializeData){
+            targetsPool[i] = new Target(key, canvasWidth, canvasHeight, 60, 8, initializeData[key].x, initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
+            i++;
         }
+        console.log(JSON.stringify(initializeData));
         spawnTimer.start();
         EventSystem.register(this, "targetinfocus");
+        EventSystem.register(this, "gameupdatefromserver");
+        EventSystem.register(this, "initializefromserver");
     }
     
     function draw(context, interpolation){
@@ -22,17 +25,74 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     }
     
     function update(){
-        if(spawnTimer.getTime() > 1000){
-            if(targetsPool.length > 0){
-                spawn();
+        if(isObjectEmpty(authUpdateData)){
+            if(spawnTimer.getTime() > 1000){
+                if(targetsPool.length > 0){
+                    spawn();
+                }
+                spawnTimer.reset();
+                spawnTimer.start();
             }
-            spawnTimer.reset();
-            spawnTimer.start();
+
+            for(var a = 0; a < targetsActivated.length; a++){
+                targetsActivated[a].update();
+                console.log("LOCAL: " + targetsActivated[a].getId() + "   X: " + targetsActivated[a].getX() + "   Y: " + targetsActivated[a].getY());
+                console.log("");
+            }
+        }else{
+            authoritativeUpdate(authUpdateData);
+            authUpdateData = {};
+            
+//            for(var a = 0; a < targetsActivated.length; a++){
+//                targetsActivated[a].update();
+//            }
         }
-  
-        for(var a = 0; a < targetsActivated.length; a++){
-            targetsActivated[a].update();
+    }
+    
+    function authoritativeUpdate(data){
+        for(var key in data){
+            if(data[key].type === "spawn"){
+                for(var i = 0; i < targetsActivated.length; i++){
+                    if(key === targetsActivated[i].getId()){
+                        targetsActivated[i].setMovementAngle(data[key].movementAngle);
+//                        targetsActivated[i].setX(data[key].x);
+//                        targetsActivated[i].setY(data[key].y);
+                        targetsActivated[i].mergeUpdate(data[key].x, data[key].y);
+                    }
+                }
+                    
+                for(var b = 0; b < targetsPool.length; b++){
+                    if(key === targetsPool[b].getId()){
+                        var newlyActivatedTarget = targetsPool.splice(b, 1)[0];
+                        newlyActivatedTarget.addToPhysicsSimulation();
+                        newlyActivatedTarget.setMovementAngle(data[key].movementAngle);
+//                        newlyActivatedTarget.setX(data[key].x);
+//                        newlyActivatedTarget.setY(data[key].y);
+                        newlyActivatedTarget.mergeUpdate(data[key].x, data[key].y);
+                        targetsActivated.push(newlyActivatedTarget);
+                        
+                        EventSystem.publishEvent("targetspawned", {
+                            Target: newlyActivatedTarget,
+                            x: data[key].x,
+                            y: data[key].y
+                        });
+                    }
+                }
+                
+            }else{
+                for(var i = 0; i < targetsActivated.length; i++){
+                    if(key === targetsActivated[i].getId()){
+//                        targetsActivated[i].setX(data[key].x);
+//                        targetsActivated[i].setY(data[key].y);
+                        targetsActivated[i].mergeUpdate(data[key].x, data[key].y);
+                    }
+                }
+            }
         }
+    }
+    
+    function setAuthoritativeUpdate(data){
+        authUpdateData = data;
     }
     
     function spawn(){
@@ -67,7 +127,10 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                 newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(180, 360));
                 break;
         }
-    
+        
+        spawnX = 400;
+        spawnY = 400;
+        newlyActivatedTarget.setMovementAngle(45);
         
         newlyActivatedTarget.setX(spawnX);
         newlyActivatedTarget.setY(spawnY);
@@ -82,13 +145,21 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     }
     
     function recieveEvent(eventInfo){
-        console.log("HAPPENED!");
+        if(eventInfo.eventType === "targetinfocus"){
+            console.log("HAPPENED!");
+        }else if(eventInfo.eventType === "initializefromserver"){
+           
+        }else if(eventInfo.eventType === "gameupdatefromserver"){
+          
+        }
     }
     
     return {
         initialize: initialize,
         draw: draw,
         update: update,
+        authoritativeUpdate: authoritativeUpdate,
+        setAuthoritativeUpdate: setAuthoritativeUpdate,
         recieveEvent: recieveEvent
     }
 });

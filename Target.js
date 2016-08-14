@@ -12,12 +12,13 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         this._targetBody;
+        this._isInSimulation = false;
         
         this._bodyDef = new Box2DStuff.b2BodyDef();
         this._bodyDef.position.Set((x * Box2DStuff.scale) + (p_radius * Box2DStuff.scale), (y * Box2DStuff.scale) + (p_radius * Box2DStuff.scale));
         this._bodyDef.type = Box2DStuff.b2Body.b2_dynamicBody;   
         //Uncommenting the following line will set all the targets to be "bullet bodies", meaning they will not overlap (the collision will be more accurate). **REDUCES PERFORMANCE***
-       // this._bodyDef.bullet = true;        
+        this._bodyDef.bullet = true;        
         this._fixtureDef = new Box2DStuff.b2FixtureDef();
         this._fixtureDef.density = 1;
         this._fixtureDef.friction = 0;
@@ -80,18 +81,48 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
 
     }
     
+    Target.prototype.mergeUpdate = function(newX, newY){
+//        if((newX <= this._x + 40) && (newX >= this._x - 40)){
+//            this._prevX = this._x;
+//        }else{
+//            this._prevX = newX;
+//        }
+//        
+//        if((newY <= this._y + 40) && (newY >= this._y - 40)){
+//            this._prevY = this._y;
+//        }else{
+//            this._prevY = newY;
+//        }
+        
+        this._prevX = this._x;
+        this._prevY = this._y;
+        this._x = newX;
+        this._y = newY;
+        
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
+        
+        this._lightning.update();
+    }
+    
     Target.prototype.setX = function(newX){
         this._x = this._prevX = newX;
         this._lightning.setX(newX);
         
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x * Box2DStuff.scale, this._y * Box2DStuff.scale));
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
+        
+//        this._x = newX;
+//        this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
     }
     
     Target.prototype.setY = function(newY){
         this._y = this._prevY = newY;
         this._lightning.setY(newY);
         
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2(this._x * Box2DStuff.scale, this._y * Box2DStuff.scale));
+        this._targetBody.SetPosition(new Box2DStuff.b2Vec2( (this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
+        
+//        this._y = newY;
+//        this._targetBody.SetPosition(new Box2DStuff.b2Vec2( (this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
+    
     }
     
     Target.prototype.getX = function(){
@@ -127,6 +158,7 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         this._targetBody.CreateFixture(this._fixtureDef);
         this._targetBody.SetUserData(this);
         this._targetBody.SetLinearVelocity(this._velocityVector);
+        this._isInSimulation = true;
     }
     
     Target.prototype.removeFromPhysicsSimulation = function(){

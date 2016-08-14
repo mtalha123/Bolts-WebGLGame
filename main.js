@@ -8,19 +8,25 @@
 
 requirejs.config({
     baseUrl : "./",
+    paths : {
+        socketio: 'http://192.168.0.19:4000/socket.io/socket.io.js'
+    },
     shim: {
         'Third Party/Matrix': {
             exports: 'Matrix' // what variable does the library export to the global scope?
         },
         'Third Party/Box2d.min': {
             exports: 'Box2D' // what variable does the library export to the global scope?
-        }        
+        },
+        'socketio': {
+            exports: "io"
+        }
     }
 });
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'Box2DStuff'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, Box2DStuff){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'Box2DStuff', 'NetworkManager'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, Box2DStuff, NetworkManager){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -52,7 +58,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     //set to 5 so that in the event the game can't catch up with the updates, there is still drawing happening at least once ever 5 updates
     var maxFrameSkip = 5;
     var nextTick = Date.now();
-    var TICKS_PER_SECOND = 25;
+    var TICKS_PER_SECOND = 20;
     var tickTimeMillis = 1000 / TICKS_PER_SECOND;
     
     //in case updates are behind, update loop keeps looping until the number of maxFrameSkip 
@@ -68,9 +74,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     image.src = "Assets/borderbluefield.png";
     
     //var BIG_TEST = new LightningPiece(canvasWidth, canvasHeight, [[300, 200, 80, 80], [300, 200, 250, 50],  [300, 200, 500, 100]], 10, 30, {lineWidth: 1});
-    Border.initialize(canvasWidth, canvasHeight);
-    TargetsController.initialize(canvasWidth, canvasHeight);
-    CollisionSystem.initialize();
+    NetworkManager.initialize(canvasWidth, canvasHeight, networkEventListener);
     
     //BackgroundLines.initialize(canvasWidth, canvasHeight, 15, 100);
     
@@ -91,49 +95,50 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     
     function gameLoop(){
-        
-        //set to 0 each time game loop runs so that it can be utilized for the next set of updates
-        loops = 0;
-       
-        tickTimer.start();
-        
-        //update loop
-        while(Date.now() > nextTick && loops < maxFrameSkip){
-            tickCounter+=1;
-            update();  
-            nextTick += tickTimeMillis;
-            loops++;
-        }
-        
-        interpolation = ( (Date.now() + tickTimeMillis) - nextTick ) / ( tickTimeMillis );
+        if(NetworkManager.connectedToServer()){
+            //set to 0 each time game loop runs so that it can be utilized for the next set of updates
+            loops = 0;
 
-        //the time in the previous second's calculation of the TPS that went over into this second is accounted for
-        //in the condition below
-        if(tickTimer.getTime() >= (1000 - offsetTime)){
-            testTicksPerSecond = tickCounter;
-            tickCounter = 0;
+            tickTimer.start();
 
-            if(offsetTime == 0){
-                offsetTime = tickTimer.getTime() - 1000;
+            //update loop
+            while(Date.now() > nextTick && loops < maxFrameSkip){
+                tickCounter+=1;
+                update();  
+                nextTick += tickTimeMillis;
+                loops++;
             }
 
-            tickTimer.reset();
-            tickTimer.start();
+            interpolation = ( (Date.now() + tickTimeMillis) - nextTick ) / ( tickTimeMillis );
+
+            //the time in the previous second's calculation of the TPS that went over into this second is accounted for
+            //in the condition below
+            if(tickTimer.getTime() >= (1000 - offsetTime)){
+                testTicksPerSecond = tickCounter;
+                tickCounter = 0;
+
+                if(offsetTime == 0){
+                    offsetTime = tickTimer.getTime() - 1000;
+                }
+
+                tickTimer.reset();
+                tickTimer.start();
+            }
+
+            fpsCounter.start();
+
+            draw(interpolation);
+
+            //----set text info then draw the FPS and TPS numbers-----
+            context.fillStyle = "blue";
+            context.font = "20px Arial";        
+            context.fillText("FPS: " + fpsCounter.getFPS(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.03);
+            context.fillText("TPS: " + testTicksPerSecond, canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.06);
+            context.fillText("ms: " + NetworkManager.getPing(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.09);
+            //-------------------------------------
+
+            fpsCounter.end();
         }
-        
-        fpsCounter.start();
-        
-        draw(interpolation);
-        
-        //----set text info then draw the FPS and TPS numbers-----
-        context.fillStyle = "blue";
-        context.font = "20px Arial";        
-        context.fillText("FPS: " + fpsCounter.getFPS(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.03);
-        context.fillText("TPS: " + testTicksPerSecond, canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.06);
-        //-------------------------------------
-        
-        fpsCounter.end();
-        
         
         window.requestAnimationFrame(gameLoop);
         
@@ -174,6 +179,8 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         //BackgroundLines.draw(context, interpolation);
         Cursor.draw(context, interpolation, 0.01 * canvasWidth);
         
+        context.fillStyle = "red";
+        
 //        Box2DStuff.physicsWorld.Step(1 / 25, 10, 6);
 //        //Box2DStuff.physicsWorld.DrawDebugData();
 //        Box2DStuff.physicsWorld.ClearForces();
@@ -183,13 +190,9 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function update(){
-        //BIG_TEST.incrementAnimationFrame();
-
-        Box2DStuff.physicsWorld.Step(1 / 25, 10, 6);
+        Box2DStuff.physicsWorld.Step(1 / 20, 10, 6);
         EventSystem.update();
-        //Box2DStuff.physicsWorld.ClearForces();
-        //testtarget.update();
-        //testtarget2.update();
+       // Box2DStuff.physicsWorld.ClearForces();
         Border.update();
         TargetsController.update();
         CollisionSystem.update();
@@ -200,6 +203,19 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
             return (percentage/100) * canvasWidth;
         }else if(widthOrHeight === "height"){
             return (percentage/100) * canvasHeight;
+        }
+    }
+    
+    function networkEventListener(eventType, eventData){
+        if(eventType === "initializefromserver"){
+            Border.initialize(canvasWidth, canvasHeight);
+            TargetsController.initialize(canvasWidth, canvasHeight, eventData.TargetsController);
+            CollisionSystem.initialize();
+        }else if(eventType === "gameupdatefromserver"){
+            console.log("FROMSERVER: " + JSON.stringify(eventData.TargetsController));
+            console.log("");
+            TargetsController.setAuthoritativeUpdate(eventData.TargetsController);
+           // TargetsController.authoritativeUpdate(eventData.TargetsController);
         }
     }
     
