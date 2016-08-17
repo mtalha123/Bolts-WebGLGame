@@ -12,8 +12,8 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
             console.log("Connected to server.");
             socket.emit("initialize", {canvasWidth: canvasWidth, canvasHeight: canvasHeight});
             
-           // socket.emit("ping");
-            //pingTimer.start();
+            socket.emit("latency");
+            pingTimer.start();
         });
 
         socket.on("initialize", function(data){
@@ -38,12 +38,12 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
         EventSystem.register(this, "mouseup");
         EventSystem.register(this, "mousedown");
         
-//        socket.on("ping", function(data){
-//            ping = pingTimer.getTime();
-//            socket.emit("ping");
-//            pingTimer.reset();
-//            pingTimer.start();
-//        });
+        socket.on("latency", function(data){
+            ping = pingTimer.getTime();
+            socket.emit("latency");
+            pingTimer.reset();
+            pingTimer.start();
+        });
     }
 
     function connectedToServer(){
