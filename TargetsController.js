@@ -14,8 +14,8 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         console.log(JSON.stringify(initializeData));
         spawnTimer.start();
         EventSystem.register(this, "targetinfocus");
-        EventSystem.register(this, "gameupdatefromserver");
-        EventSystem.register(this, "initializefromserver");
+        EventSystem.register(this, "S_gameupdate");
+        EventSystem.register(this, "S_initialize");
     }
     
     function draw(context, interpolation){
@@ -36,8 +36,8 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
 
             for(var a = 0; a < targetsActivated.length; a++){
                 targetsActivated[a].update();
-                console.log("LOCAL: " + targetsActivated[a].getId() + "   X: " + targetsActivated[a].getX() + "   Y: " + targetsActivated[a].getY());
-                console.log("");
+                //console.log("LOCAL: " + targetsActivated[a].getId() + "   X: " + targetsActivated[a].getX() + "   Y: " + targetsActivated[a].getY());
+               // console.log("");
             }
         }else{
             authoritativeUpdate(authUpdateData);
@@ -147,9 +147,9 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     function recieveEvent(eventInfo){
         if(eventInfo.eventType === "targetinfocus"){
             console.log("HAPPENED!");
-        }else if(eventInfo.eventType === "initializefromserver"){
+        }else if(eventInfo.eventType === "S_initialize"){
            
-        }else if(eventInfo.eventType === "gameupdatefromserver"){
+        }else if(eventInfo.eventType === "S_gameupdate"){
           
         }
     }

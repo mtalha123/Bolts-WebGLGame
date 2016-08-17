@@ -18,17 +18,25 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
 
         socket.on("initialize", function(data){
             isConnectedToServer = true;
-            listenerFunction("initializefromserver", data);
+            listenerFunction("S_initialize", data);
         });
 
         socket.on("gameupdate", function(data){
-            listenerFunction("gameupdatefromserver", data);
+            listenerFunction("S_gameupdate", data);
         });
+        
+//        socket.on("targetinfocus", function(data){
+//            listenerFunction("S_targetinfocus", data); 
+//        });
 
         socket.on("disconnect", function(){
             console.log("Disconnected from server."); 
             isConnectedToServer = false;
         });
+        
+        EventSystem.register(this, "mousemove");
+        EventSystem.register(this, "mouseup");
+        EventSystem.register(this, "mousedown");
         
 //        socket.on("ping", function(data){
 //            ping = pingTimer.getTime();
@@ -46,10 +54,21 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
         return ping;
     }
     
+    function recieveEvent(eventInfo){
+        if(eventInfo.eventType === "mousemove"){
+            socket.emit("mousemove", eventInfo.eventData)
+        }else if(eventInfo.eventType === "mousedown"){
+            socket.emit("mousedown", eventInfo.eventData)
+        }else if(eventInfo.eventType === "mouseup"){
+            socket.emit("mouseup", eventInfo.eventData)
+        }
+    }
+    
     return {
         initialize: initialize,
         connectedToServer: connectedToServer,
         getPing: getPing,
+        recieveEvent: recieveEvent
     }
     
 });

@@ -1,4 +1,4 @@
-define(['Custom Utility/Timer'], function(Timer){
+define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     
     var x = 0, y = 0;    
     var mouseHeldDown = false;    
@@ -39,14 +39,19 @@ define(['Custom Utility/Timer'], function(Timer){
     function mouseMove(event){
         x = event.clientX;
         y = event.clientY;
+        
+        EventSystem.publishEvent("mousemove", {x: x, y: y});
     }
     
     function mouseDown(event){
         mouseHeldDown = true;
+        
+        EventSystem.publishEvent("mousedown", {x: x, y: y});
     }
     
     function mouseUp(event){
         mouseHeldDown = false;
+        EventSystem.publishEvent("mouseup", {x: x, y: y});
     }
     
     return {

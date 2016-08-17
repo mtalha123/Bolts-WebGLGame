@@ -207,16 +207,28 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function networkEventListener(eventType, eventData){
-        if(eventType === "initializefromserver"){
+        if(eventType === "S_initialize"){
             Border.initialize(canvasWidth, canvasHeight);
             TargetsController.initialize(canvasWidth, canvasHeight, eventData.TargetsController);
             CollisionSystem.initialize();
-        }else if(eventType === "gameupdatefromserver"){
-            console.log("FROMSERVER: " + JSON.stringify(eventData.TargetsController));
-            console.log("");
-            TargetsController.setAuthoritativeUpdate(eventData.TargetsController);
+        }else if(eventType === "S_gameupdate"){
+           // console.log("FROMSERVER: " + JSON.stringify(eventData.TargetsController));
+           // console.log("");
+            for(var key in eventData){
+                switch(key){
+                    case "TargetsController":
+                        TargetsController.setAuthoritativeUpdate(eventData.TargetsController);
+                        break;
+                    
+                    case "CollisionSystem":
+                        CollisionSystem.recieveFromServer(eventData.CollisionSystem);
+                        break;
+                }
+            }
            // TargetsController.authoritativeUpdate(eventData.TargetsController);
-        }
+        }//else if(eventType === "S_targetinfocus"){
+           // EventSystem.publishEvent("S_targetinfocus", eventData);
+    //    }
     }
     
     canvas.addEventListener("mousemove", Cursor.mouseMove, false);    

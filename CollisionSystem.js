@@ -5,6 +5,7 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
     function initialize(){
         EventSystem.register(this, "targetspawned");  
         EventSystem.register(this, "targetdestroyed");
+        EventSystem.register(this, "S_targetinfocus");
     }
     
     function update(){
@@ -12,11 +13,11 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
             if(Cursor.getX() >= currentEntities[i].getX() && (Cursor.getX() <= currentEntities[i].getX() + (currentEntities[i].getRadius()*2)) ){
                 if(Cursor.getY() >= currentEntities[i].getY() && (Cursor.getY() <= currentEntities[i].getY() + (currentEntities[i].getRadius()*2)) ){
                     if(Cursor.isMouseButtonHeldDown()){
-                        EventSystem.publishEvent("targetinfocus", {
-                            Target: currentEntities[i],
-                            x: Cursor.getX(),
-                            y: Cursor.getY()
-                        });
+//                        EventSystem.publishEvent("targetinfocus", {
+//                            Target: currentEntities[i],
+//                            x: Cursor.getX(),
+//                            y: Cursor.getY()
+//                        });
                     }
                 }
             }             
@@ -25,7 +26,9 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
     }
     
     function recieveEvent(eventInfo){
-        if(eventInfo.eventType === "targetspawned"){
+        if(eventInfo.eventType === "S_targetinfocus"){
+            //console.log("TARGETINFOCUS");
+        }else if(eventInfo.eventType === "targetspawned"){
             currentEntities.push(eventInfo.eventData.Target);
         }else if(eventInfo.eventType === "targetdestroyed"){
             
@@ -37,10 +40,15 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
         }
     }
     
+    function recieveFromServer(data){
+        console.log("TARGETINFOCUS: " + data);
+    }
+    
     return {
         initialize: initialize,
         update: update,
-        recieveEvent: recieveEvent
+        recieveEvent: recieveEvent,
+        recieveFromServer: recieveFromServer
     };
     
     
