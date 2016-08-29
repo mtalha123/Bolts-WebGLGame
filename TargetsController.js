@@ -4,13 +4,18 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     var spawnTimer = new Timer();
     var numTargets = 2;
     var authUpdateData = {};
+    var canvasWidth, canvasHeight;
     
-    function initialize(canvasWidth, canvasHeight, initializeData){
+    function initialize(p_canvasWidth, p_canvasHeight, initializeData){
+        canvasWidth = p_canvasWidth;
+        canvasHeight = p_canvasHeight;
+        
         var i = 0;
         for(var key in initializeData){
-            targetsPool[i] = new Target(key, canvasWidth, canvasHeight, 60, 8, initializeData[key].x, initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
+            targetsPool[i] = new Target(key, canvasWidth, canvasHeight, canvasWidth * 0.03, 8, initializeData[key].x, initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
             i++;
         }
+    
         console.log(JSON.stringify(initializeData));
         spawnTimer.start();
         EventSystem.register(this, "targetinfocus");
@@ -57,7 +62,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                         targetsActivated[i].setMovementAngle(data[key].movementAngle);
 //                        targetsActivated[i].setX(data[key].x);
 //                        targetsActivated[i].setY(data[key].y);
-                        targetsActivated[i].mergeUpdate(data[key].x, data[key].y);
+                        targetsActivated[i].serverUpdate(data[key].x, data[key].y, data.TESTNUM);
                     }
                 }
                     
@@ -68,7 +73,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                         newlyActivatedTarget.setMovementAngle(data[key].movementAngle);
 //                        newlyActivatedTarget.setX(data[key].x);
 //                        newlyActivatedTarget.setY(data[key].y);
-                        newlyActivatedTarget.mergeUpdate(data[key].x, data[key].y);
+                        newlyActivatedTarget.serverUpdate(data[key].x, data[key].y, data.TESTNUM);
                         targetsActivated.push(newlyActivatedTarget);
                         
                         EventSystem.publishEvent("targetspawned", {
@@ -84,7 +89,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                     if(key === targetsActivated[i].getId()){
 //                        targetsActivated[i].setX(data[key].x);
 //                        targetsActivated[i].setY(data[key].y);
-                        targetsActivated[i].mergeUpdate(data[key].x, data[key].y);
+                        targetsActivated[i].serverUpdate(data[key].x, data[key].y, data.TESTNUM);
                     }
                 }
             }
@@ -128,8 +133,8 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                 break;
         }
         
-        spawnX = 400;
-        spawnY = 400;
+        spawnX = canvasWidth * 0.2;
+        spawnY = canvasHeight * 0.4;
         newlyActivatedTarget.setMovementAngle(45);
         
         newlyActivatedTarget.setX(spawnX);

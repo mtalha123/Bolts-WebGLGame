@@ -13,6 +13,9 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         this._y = this._prevY = y;
         this._targetBody;
         this._isInSimulation = false;
+        this._numPrevStates = 10;
+        
+        this._TESTNUM = 1;
         
         this._bodyDef = new Box2DStuff.b2BodyDef();
         this._bodyDef.position.Set((x * Box2DStuff.scale) + (p_radius * Box2DStuff.scale), (y * Box2DStuff.scale) + (p_radius * Box2DStuff.scale));
@@ -30,6 +33,8 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
         this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed;        
         this._velocityVector = new Box2DStuff.b2Vec2(this._xUnits, this._yUnits);
+        
+        this._previousStates = [];
         
         for(var i = 0; i < numLightningBolts; i++){
             xOnCircle = (Math.cos(currentAngle * (Math.PI / 180)) * this._radius) + (x + this._radius);
@@ -61,7 +66,7 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         
         //drawing with interpolation
         context.arc((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius, (this._prevY + (interpolation * (this._y - this._prevY))) + this._radius, this._radius, 0, 2 * Math.PI, false);
-        
+    
         //uncomment the following line to draw without interpolation
         //context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
         context.stroke(); 
@@ -70,38 +75,45 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     }
     
     Target.prototype.update = function(){
-        this._prevX = this._x;
-        this._prevY = this._y;
-        this._x = (this._targetBody.GetPosition().x / Box2DStuff.scale) - this._radius;
-        this._y = (this._targetBody.GetPosition().y / Box2DStuff.scale) - this._radius;
+//        console.log("LOCAL TESTNUM: " + this._TESTNUM + "    X: " + this._x + "     Y: " + this._y);
+//        console.log("");
+        this.saveCurrentState();
+        
+        this._setXWithInterpolation((this._targetBody.GetPosition().x / Box2DStuff.scale) - this._radius);
+        this._setYWithInterpolation((this._targetBody.GetPosition().y / Box2DStuff.scale) - this._radius);
         
         this._lightning.update();
        // this._lightning.setX(this._x);
         //this._lightning.setY(this._y);
-
+        
+        this._TESTNUM++;
     }
     
-    Target.prototype.mergeUpdate = function(newX, newY){
-//        if((newX <= this._x + 40) && (newX >= this._x - 40)){
-//            this._prevX = this._x;
-//        }else{
-//            this._prevX = newX;
-//        }
-//        
-//        if((newY <= this._y + 40) && (newY >= this._y - 40)){
-//            this._prevY = this._y;
-//        }else{
-//            this._prevY = newY;
-//        }
+    Target.prototype.serverUpdate = function(newX, newY, SERVERTESTNUM){
+        this._lightning.update();
+        this.update();
+        // console.log("LOCAL TESTNUM: " + this._TESTNUM + "    X: " + this._x + "     Y: " + this._y);
+       // console.log("");
+        //console.log("SERVERTESTNUM: " + SERVERTESTNUM + "     NEWX: " + newX + "      NEWY: " + newY);
+        //console.log("");
+        for(var i = 0; i < this._previousStates.length; i++){
+           // console.log("STATES              X: " + this._previousStates[i].x + "   Y: " + this._previousStates[i].y);
+            //console.log("");
+            if( (newX === this._previousStates[i].x && newY === this._previousStates[i].y) || (newX === this._x && newY === this._y) ){
+               // console.log("STATES              X: " + this._previousStates[i].x + "   Y: " + this._previousStates[i].y + "    for loop i: " + i);
+                console.log("SERVER COORDINATES IN THE PAST!");
+//                this.update();
+                this._previousStates.splice(0, i + 1);
+                return;
+            }
+        }
+        //console.log("SERVER COORDINATES IN THE FUTURE!");
+        this._previousStates = [];
         
-        this._prevX = this._x;
-        this._prevY = this._y;
-        this._x = newX;
-        this._y = newY;
+        this._setXWithInterpolation(newX);
+        this._setYWithInterpolation(newY);
         
         this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
-        
-        this._lightning.update();
     }
     
     Target.prototype.setX = function(newX){
@@ -123,6 +135,16 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
 //        this._y = newY;
 //        this._targetBody.SetPosition(new Box2DStuff.b2Vec2( (this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
     
+    }
+    
+    Target.prototype._setXWithInterpolation = function(newX){
+        this._prevX = this._x;
+        this._x = newX;
+    }
+    
+    Target.prototype._setYWithInterpolation = function(newY){
+        this._prevY = this._y;
+        this._y = newY;
     }
     
     Target.prototype.getX = function(){
@@ -163,6 +185,17 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     
     Target.prototype.removeFromPhysicsSimulation = function(){
         Box2DStuff.physicsWorld.DestroyBody(this._targetBody);
+    }
+    
+    Target.prototype.saveCurrentState = function(){
+        if(this._previousStates.length >= this._numPrevStates){
+            this._previousStates.splice(0, 1);
+        }
+        this._previousStates.push({x: this._x, y: this._y});
+    }
+    
+    Target.prototype.getPastState = function(index){
+        return this._previousStates[index - 1];
     }
     
     return Target;
