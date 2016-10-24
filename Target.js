@@ -155,7 +155,7 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
     }
     
     Target.prototype.removeFromPhysicsSimulation = function(){
-        Box2DStuff.physicsWorld.DestroyBody(this._targetBody);
+        //FILL IN LATER
     }
     
     Target.prototype.saveCurrentState = function(){
