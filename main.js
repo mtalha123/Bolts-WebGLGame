@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.18:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.20:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'Box2DStuff', 'NetworkManager'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, Box2DStuff, NetworkManager){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, PhysicsSystem, NetworkManager, isObjectEmpty){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -76,41 +76,93 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     //var BIG_TEST = new LightningPiece(canvasWidth, canvasHeight, [[300, 200, 80, 80], [300, 200, 250, 50],  [300, 200, 500, 100]], 10, 30, {lineWidth: 1});
     NetworkManager.initialize(canvasWidth, canvasHeight, networkEventListener);
     
-    //BackgroundLines.initialize(canvasWidth, canvasHeight, 15, 100);
+    var mostRecentServerUpdateInfo = {};
+    var mostRecentServerUpdateReceiptTime = 0;
     
-    //var target2 = new Target(canvasWidth, canvasHeight, 40, 8, 100, 100);    
+//    var debugDraw = new Box2DStuff.b2DebugDraw();
+//    debugDraw.SetSprite (context);
+//    debugDraw.SetDrawScale(100);
+//    debugDraw.SetFillAlpha(0.3);
+//    debugDraw.SetLineThickness(1.0);
+//    debugDraw.SetFlags(Box2DStuff.b2DebugDraw.e_shapeBit | Box2DStuff.b2DebugDraw.e_jointBit);
+//    Box2DStuff.physicsWorld.SetDebugDraw(debugDraw)    
     
+    var updateCounter = 0;
     
-    var debugDraw = new Box2DStuff.b2DebugDraw();
-    debugDraw.SetSprite (context);
-    debugDraw.SetDrawScale(100);
-    debugDraw.SetFillAlpha(0.3);
-    debugDraw.SetLineThickness(1.0);
-    debugDraw.SetFlags(Box2DStuff.b2DebugDraw.e_shapeBit | Box2DStuff.b2DebugDraw.e_jointBit);
-    Box2DStuff.physicsWorld.SetDebugDraw(debugDraw)
-    
-    
-    //var testtarget = new Target(50, canvasWidth, canvasHeight, 40, 6, 100, 100, 15, 12, 1);
-    //var testtarget2 = new Target(50, canvasWidth, canvasHeight, 40, 6, 200, 200, 45, 3, 50);
-    
+    //testing
+    var timeForUpdateToBeSlowedAt = Date.now() + 5000;
     
     function gameLoop(){
         if(NetworkManager.connectedToServer()){
             //set to 0 each time game loop runs so that it can be utilized for the next set of updates
             loops = 0;
-
+            
             tickTimer.start();
 
+            //variable to hold currentTime so references to it in multiple places gives same value as opposed to using Date.now()
+            var currentTime = Date.now();
+            
             //update loop
-            while(Date.now() > nextTick && loops < maxFrameSkip){
+            while(currentTime > nextTick && loops < maxFrameSkip){
+
+                   // console.log("currentTick: " + nextTick + "   Current Time: " + Date.now() + "  timeCurrUpdateLate: " + (Date.now() - nextTick) + "   nextTick: " + (nextTick + tickTimeMillis));
                 tickCounter+=1;
-                update();  
+                update();
+                var currentTickTime = nextTick;
                 nextTick += tickTimeMillis;
                 loops++;
+                updateCounter++;
+                
+                //console.log("Update Counter: " + updateCounter + " at time: " + (nextTick - tickTimeMillis));
+                
+                var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
+                
+              //  console.log("LATE BY: " + updatesLateBy);
+                
+                //log how much time current update is late by in ms
+                console.log("Update late by: " + (Date.now() - currentTickTime));
+                
+                if(loops > 1){
+                    console.log("MORE UPDATE ITERATIONS!");
+                }
+                
+                if(mostRecentServerUpdateInfo.currentTickTimestamp > currentTickTime){
+                    console.log("LOOP CONTINUED!");
+                                        
+                    continue; 
+                }
+
+                if(!isObjectEmpty(mostRecentServerUpdateInfo)){
+                    for(var key in mostRecentServerUpdateInfo){
+                        switch(key){
+                            case "TargetsController":
+                                TargetsController.serverUpdate(mostRecentServerUpdateInfo.TargetsController);
+                                break;
+
+                            case "CollisionSystem":
+                                CollisionSystem.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
+                                break;
+                        }
+                    }
+                    mostRecentServerUpdateInfo = {};
+                }
+                
+                //Use following if statement to slow down execution of an update so as to simulate a "late" update
+//                if(currentTime >= timeForUpdateToBeSlowedAt){
+//                    console.log("SLOWED!!!!!!!")
+//                    timeForUpdateToBeSlowedAt += 5000;
+//                    for(var a = 0; a < 5; a++){
+//                        DrawPathsWithGlow(context, [[0,10], [400,500], [1500,300], [10,10]]);
+//                    }
+//                }
             }
 
             interpolation = ( (Date.now() + tickTimeMillis) - nextTick ) / ( tickTimeMillis );
 
+            if(interpolation < 0){
+                interpolation = 0;
+            }
+        
             //the time in the previous second's calculation of the TPS that went over into this second is accounted for
             //in the condition below
             if(tickTimer.getTime() >= (1000 - offsetTime)){
@@ -154,48 +206,22 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         context.fillStyle = "#a6a6a6";
         context.fillRect(0, 0, canvasWidth, canvasHeight);
         //--------------
-        
-        //TESTING
-//        context.strokeStyle = "black";
-//        context.lineWidth = 6;
-//        context.beginPath();
-//
-//        context.moveTo(20, 30);
-//        context.lineTo(80, 80);
-//        context.lineTo(100, 140);
-//        
-//        context.moveTo(200, 130);
-//        context.lineTo(250, 50);
-//
-//        context.moveTo(400, 300);
-//        context.lineTo(600, 100);        
-//
-//        context.stroke();
-        
-        //BIG_TEST.draw(context, interpolation);
+
         Border.draw(context, interpolation);
         
         TargetsController.draw(context, interpolation);
-        //BackgroundLines.draw(context, interpolation);
         Cursor.draw(context, interpolation, 0.01 * canvasWidth);
+
         
-        context.fillStyle = "red";
-        
-//        Box2DStuff.physicsWorld.Step(1 / 25, 10, 6);
-//        //Box2DStuff.physicsWorld.DrawDebugData();
-//        Box2DStuff.physicsWorld.ClearForces();
-        //testtarget.draw(context, interpolation);
-        //testtarget2.draw(context, interpolation);
-                
+        //Box2DStuff.physicsWorld.DrawDebugData();                
     }
     
     function update(){
-        Box2DStuff.physicsWorld.Step(1 / 20, 10, 6);
-        EventSystem.update();
-       // Box2DStuff.physicsWorld.ClearForces();
+        PhysicsSystem.update(1 / 20, 10, 6);
         Border.update();
         TargetsController.update();
         CollisionSystem.update();
+        EventSystem.update();
     }
     
     function getPixelsFromPercent(widthOrHeight, percentage){
@@ -206,29 +232,39 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         }
     }
     
+    function doServerUpdateFrom(serverUpdateObject){
+        for(var key in serverUpdateObject){
+            switch(key){
+                case "TargetsController":
+                    TargetsController.serverUpdate(serverUpdateObject.TargetsController);
+                    break;
+
+                case "CollisionSystem":
+                    CollisionSystem.recieveFromServer(serverUpdateObject.CollisionSystem);
+                    break;
+            }
+        }
+    }
+    
     function networkEventListener(eventType, eventData){
         if(eventType === "S_initialize"){
             Border.initialize(canvasWidth, canvasHeight);
             TargetsController.initialize(canvasWidth, canvasHeight, eventData.TargetsController);
             CollisionSystem.initialize();
+            nextTick = eventData.nextTick;
         }else if(eventType === "S_gameupdate"){
-           // console.log("FROMSERVER: " + JSON.stringify(eventData.TargetsController));
-           // console.log("");
-            for(var key in eventData){
-                switch(key){
-                    case "TargetsController":
-                        TargetsController.setAuthoritativeUpdate(eventData.TargetsController);
-                        break;
-                    
-                    case "CollisionSystem":
-                        CollisionSystem.recieveFromServer(eventData.CollisionSystem);
-                        break;
+
+            //PURELY FOR TESTING (DELETE THIS AFTER BREAKS ENCAPSULATION)------
+            for(var test in mostRecentServerUpdateInfo.TargetsController){
+                if(mostRecentServerUpdateInfo.TargetsController[test].type === "spawn"){
+                    console.log("SPAWN SKIPPED!!!!!");
                 }
             }
-           // TargetsController.authoritativeUpdate(eventData.TargetsController);
-        }//else if(eventType === "S_targetinfocus"){
-           // EventSystem.publishEvent("S_targetinfocus", eventData);
-    //    }
+            //-----
+            
+            mostRecentServerUpdateInfo = eventData;
+            mostRecentServerUpdateReceiptTime = Date.now();
+        }
     }
     
     canvas.addEventListener("mousemove", Cursor.mouseMove, false);    

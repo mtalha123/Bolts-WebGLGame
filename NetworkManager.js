@@ -6,7 +6,7 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
     var socket;
     
     function initialize(canvasWidth, canvasHeight, listenerFunction){
-        socket = io.connect('192.168.0.18:4000');
+        socket = io.connect('192.168.0.20:4000');
  
         socket.on("connect", function(data){
             console.log("Connected to server.");
@@ -24,10 +24,6 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
         socket.on("gameupdate", function(data){
             listenerFunction("S_gameupdate", data);
         });
-        
-//        socket.on("targetinfocus", function(data){
-//            listenerFunction("S_targetinfocus", data); 
-//        });
 
         socket.on("disconnect", function(){
             console.log("Disconnected from server."); 

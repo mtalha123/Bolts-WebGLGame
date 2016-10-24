@@ -8,7 +8,7 @@ define(function(){
         this.timer = Timer;
     }
     StartedState.prototype = {
-        start : function(){
+        start : function(offset){
             // timer already started, don't do anything
         },
         getTime : function(){
@@ -24,7 +24,7 @@ define(function(){
         this.timer = Timer;
     }
     StoppedState.prototype = {
-        start : function(){
+        start : function(offset){
             this.timer.__pastTime = Date.now() - (this.timer._currentTime - this.timer._pastTime);
             this.timer._state = this.timer._startedState;
         },
@@ -40,8 +40,11 @@ define(function(){
         this.timer = Timer;
     }
     NotStartedState.prototype = {
-        start : function(){
-            this.timer._pastTime = Date.now();
+        start : function(offset){
+            if(offset === undefined){
+                offset = 0;
+            }
+            this.timer._pastTime = Date.now() + offset;
             this.timer._state = this.timer._startedState;
         },
         getTime : function(){
@@ -66,8 +69,8 @@ define(function(){
     }
     Timer.prototype = {
         //starts the timer
-        start: function(){
-            this._state.start();
+        start: function(offset){
+            this._state.start(offset);
         },
         //gets the time in MILLSECONDS
         getTime: function(){

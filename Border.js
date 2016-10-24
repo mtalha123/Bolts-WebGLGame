@@ -1,4 +1,4 @@
-define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
+define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSystem){
     
     var canvasWidth, canvasHeight, borderLightningPiece;    
     var margin;    
@@ -7,6 +7,11 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     var gapForScore;
     var score = 1000;
     var scoreX, scoreY;
+    
+    var leftPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
+    var topPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
+    var rightPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
+    var bottomPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
     
     function initialize(p_canvasWidth, p_canvasHeight){
         canvasWidth = p_canvasWidth;
@@ -19,13 +24,6 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         scoreX = margin + (widthOfBlueThing/2);
         scoreY = margin + 0.015 * canvasHeight;
         
-//        var borderPath = [ // X                      Y
-//                          [ margin,                margin, 
-//                            canvasWidth - margin,  margin, 
-//                            canvasWidth - margin,  canvasHeight - margin, 
-//                            margin,                canvasHeight - margin,      
-//                            margin,                margin ]       
-//        ];
         var borderPath = [ //               X                                                   Y
                           [ margin + (widthOfBlueThing/2) - (gapForScore/2),                 margin,
                             margin,                                                          margin, 
@@ -38,52 +36,38 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         borderLightningPiece = new LightningPiece(canvasWidth, canvasHeight, borderPath, 20, 20, {});   
         
         var physicsBodyPositions = [ 
-                                     [(margin + (widthOfBlueThing/2)) * Box2DStuff.scale, (margin + (heightOfBlueThing/2)) * Box2DStuff.scale], //top 
-                                     [(canvasWidth - margin - (heightOfBlueThing/2)) * Box2DStuff.scale, (margin + ((canvasHeight - margin)/2)) * Box2DStuff.scale], //right
-                                     [(margin + (widthOfBlueThing/2)) * Box2DStuff.scale, (canvasHeight - margin - (heightOfBlueThing/2)) * Box2DStuff.scale], //bottom
-                                     [(margin + (heightOfBlueThing/2)) * Box2DStuff.scale, (margin + ((canvasHeight - margin)/2)) * Box2DStuff.scale] //left                
+                                     [margin + (widthOfBlueThing/2), margin + (heightOfBlueThing/2)], //top 
+                                     [canvasWidth - margin - (heightOfBlueThing/2), (margin + (canvasHeight - margin) / 2)], //right
+                                     [margin + (widthOfBlueThing/2), canvasHeight - margin - (heightOfBlueThing/2)], //bottom
+                                     [margin + (heightOfBlueThing/2), (margin + (canvasHeight - margin) / 2)] //left                
                                    ];
         
         
-        var bodyDefs = new Box2DStuff.b2BodyDef();     
-        var fixtureDefs = new Box2DStuff.b2FixtureDef();
+        leftPhysicsBody.setX(physicsBodyPositions[3][0]);
+        leftPhysicsBody.setY(physicsBodyPositions[3][1]);
+        leftPhysicsBody.createRectangle(heightOfBlueThing, canvasHeight - (margin * 2), 10, 0, 1);
+        PhysicsSystem.addToSimulation(leftPhysicsBody);
         
-        //some of the following lines are settings that will apply to all the sides and the following lines also create the top side 
-        bodyDefs.type = Box2DStuff.b2Body.b2_staticBody;
-        bodyDefs.position.Set(physicsBodyPositions[0][0], physicsBodyPositions[0][1]);
-        fixtureDefs.density = 10;
-        fixtureDefs.friction = 0;
-        fixtureDefs.resitituation = 1;
-        fixtureDefs.shape = new Box2DStuff.b2PolygonShape();
-        fixtureDefs.shape.SetAsBox((widthOfBlueThing/2) * Box2DStuff.scale, (heightOfBlueThing/2) * Box2DStuff.scale);
-        topSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
-        topSide.CreateFixture(fixtureDefs);
-        topSide.SetUserData("top");
+        rightPhysicsBody.setX(physicsBodyPositions[1][0]);
+        rightPhysicsBody.setY(physicsBodyPositions[1][1]);
+        rightPhysicsBody.createRectangle(heightOfBlueThing, canvasHeight - (margin * 2), 10, 0, 1);
+        PhysicsSystem.addToSimulation(rightPhysicsBody);
         
-        //since the bottom side is the exact same as the top one except for the position, the bottom is set after the top instead of going clockwise (so instead of the right side in this case)
-        bodyDefs.position.Set(physicsBodyPositions[2][0], physicsBodyPositions[2][1]);
-        bottomSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
-        bottomSide.CreateFixture(fixtureDefs);
-        bottomSide.SetUserData("bottom");
+        topPhysicsBody.setX(physicsBodyPositions[0][0]);
+        topPhysicsBody.setY(physicsBodyPositions[0][1]);
+        topPhysicsBody.createRectangle(widthOfBlueThing, heightOfBlueThing, 10, 0, 1);
+        PhysicsSystem.addToSimulation(topPhysicsBody);
         
-        //left side
-        bodyDefs.position.Set(physicsBodyPositions[3][0], physicsBodyPositions[3][1]);
-        fixtureDefs.shape = new Box2DStuff.b2PolygonShape();
-        fixtureDefs.shape.SetAsBox((heightOfBlueThing/2) * Box2DStuff.scale, ((canvasHeight - (margin * 2))/2) * Box2DStuff.scale);
-        leftSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
-        leftSide.CreateFixture(fixtureDefs);
-        leftSide.SetUserData("left");
-        
-        
-        //just like the bottom side was set right after the top, the right side if set after the left because it hsa much of the same settings except for the positioning as well as the user data
-        bodyDefs.position.Set(physicsBodyPositions[1][0], physicsBodyPositions[1][1]);
-        rightSide = Box2DStuff.physicsWorld.CreateBody(bodyDefs);
-        rightSide.CreateFixture(fixtureDefs);
-        rightSide.SetUserData("right");         
+        bottomPhysicsBody.setX(physicsBodyPositions[2][0]);
+        bottomPhysicsBody.setY(physicsBodyPositions[2][1]);
+        bottomPhysicsBody.createRectangle(widthOfBlueThing, heightOfBlueThing, 10, 0, 1);
+        PhysicsSystem.addToSimulation(bottomPhysicsBody);
     }
     
     function draw(context, interpolation){
         borderLightningPiece.draw(context, interpolation, 0, 0);
+        
+        //drawBorderPlain(context);
         
         context.save();
         
@@ -101,7 +85,6 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     
     function update(){
         borderLightningPiece.update();
-       
     }
     
     
@@ -119,16 +102,29 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     }
     
     function getLeftSidePhysicsBody(){
-        return leftSide;
+        return leftPhysicsBody;
     }
     function getTopSidePhysicsBody(){
-        return topSide;
+        return topPhysicsBody;
     }
     function getRightSidePhysicsBody(){
-        return rightSide;
+        return rightPhysicsBody;
     }
     function getBottomSidePhysicsBody(){
-        return bottomSide;
+        return bottomPhysicsBody;
+    }
+    
+    //THIS IS ONLY FOR TESTING TO SEE WHERE THE BORDER IS
+    function drawBorderPlain(context){
+        context.save();
+        
+        context.fillStyle = "rgb(0, 0, 200)";
+        context.fillRect(getLeftX(), getTopY(), widthOfBlueThing, heightOfBlueThing);
+        context.fillRect(getRightX(), getTopY(), heightOfBlueThing, widthOfBlueThing);
+        context.fillRect(getLeftX(), getBottomY(), widthOfBlueThing, heightOfBlueThing);
+        context.fillRect(getLeftX(), getTopY(), heightOfBlueThing, widthOfBlueThing);
+        
+        context.restore();
     }
     
     return {

@@ -1,4 +1,4 @@
-define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
+define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSystem){
 
     function Target(id, canvasWidth, canvasHeight, p_radius, numbolts, x, y, movementangle, speed){
         this._id = id;
@@ -11,28 +11,17 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         var yOnCircle;
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
-        this._targetBody;
-        this._isInSimulation = false;
-        this._numPrevStates = 10;
+        this._numPrevStates = 20;
         
-        this._TESTNUM = 1;
+        this._serverTargetPositionX = 0, this._serverTargetPositionY = 0;
         
-        this._bodyDef = new Box2DStuff.b2BodyDef();
-        this._bodyDef.position.Set((x * Box2DStuff.scale) + (p_radius * Box2DStuff.scale), (y * Box2DStuff.scale) + (p_radius * Box2DStuff.scale));
-        this._bodyDef.type = Box2DStuff.b2Body.b2_dynamicBody;   
-        //Uncommenting the following line will set all the targets to be "bullet bodies", meaning they will not overlap (the collision will be more accurate). **REDUCES PERFORMANCE***
-        this._bodyDef.bullet = true;        
-        this._fixtureDef = new Box2DStuff.b2FixtureDef();
-        this._fixtureDef.density = 1;
-        this._fixtureDef.friction = 0;
-        this._fixtureDef.restitution = 1;
-        this._fixtureDef.shape = new Box2DStuff.b2CircleShape(p_radius * Box2DStuff.scale);        
+        this._physicsEntity = PhysicsSystem.requestPhysicsEntity("dynamic");
+        this._physicsEntity.createCircle(p_radius, 1, 0, 1);
         
         this._currentMovementAngleInDeg = movementangle;
         this._speed = speed;
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
         this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed;        
-        this._velocityVector = new Box2DStuff.b2Vec2(this._xUnits, this._yUnits);
         
         this._previousStates = [];
         
@@ -66,75 +55,62 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         
         //drawing with interpolation
         context.arc((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius, (this._prevY + (interpolation * (this._y - this._prevY))) + this._radius, this._radius, 0, 2 * Math.PI, false);
-    
+        
         //uncomment the following line to draw without interpolation
         //context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
-        context.stroke(); 
         
+        context.stroke();
+        
+        //this._drawTargetFromServerPosition(context);
+     
         context.restore();
     }
     
     Target.prototype.update = function(){
-//        console.log("LOCAL TESTNUM: " + this._TESTNUM + "    X: " + this._x + "     Y: " + this._y);
-//        console.log("");
         this.saveCurrentState();
         
-        this._setXWithInterpolation((this._targetBody.GetPosition().x / Box2DStuff.scale) - this._radius);
-        this._setYWithInterpolation((this._targetBody.GetPosition().y / Box2DStuff.scale) - this._radius);
+        this._setXWithInterpolation(this._physicsEntity.getX() - this._radius);
+        this._setYWithInterpolation(this._physicsEntity.getY() - this._radius);
+        
+        //use below line to display all physics information for this target (e.g. velocity, angular vel., etc.)
+       // this._displayPhysicsBodyInfo();
         
         this._lightning.update();
-       // this._lightning.setX(this._x);
-        //this._lightning.setY(this._y);
-        
-        this._TESTNUM++;
+
     }
     
-    Target.prototype.serverUpdate = function(newX, newY, SERVERTESTNUM){
-        this._lightning.update();
-        this.update();
-        // console.log("LOCAL TESTNUM: " + this._TESTNUM + "    X: " + this._x + "     Y: " + this._y);
-       // console.log("");
-        //console.log("SERVERTESTNUM: " + SERVERTESTNUM + "     NEWX: " + newX + "      NEWY: " + newY);
-        //console.log("");
-        for(var i = 0; i < this._previousStates.length; i++){
-           // console.log("STATES              X: " + this._previousStates[i].x + "   Y: " + this._previousStates[i].y);
-            //console.log("");
-            if( (newX === this._previousStates[i].x && newY === this._previousStates[i].y) || (newX === this._x && newY === this._y) ){
-               // console.log("STATES              X: " + this._previousStates[i].x + "   Y: " + this._previousStates[i].y + "    for loop i: " + i);
-                console.log("SERVER COORDINATES IN THE PAST!");
-//                this.update();
-                this._previousStates.splice(0, i + 1);
-                return;
-            }
+    Target.prototype.serverUpdate = function(newX, newY, linearVelocityX, linearVelocityY){
+        
+        this._serverTargetPositionX = newX;
+        this._serverTargetPositionY = newY;
+
+        if(!this._checkWithPastAndCurrentStatesAndDeleteAnyIrrelevant(newX, newY)){
+            //logs message in case newX and newY don't match with any previous states
+            console.log("SERVER COORDINATES IN THE FUTURE! AT: " + Date.now());
+
+            this._previousStates = [];
+
+            this._setXWithInterpolation(newX);
+            this._setYWithInterpolation(newY);
+
+            this._physicsEntity.setX(newX + this._radius);
+            this._physicsEntity.setY(newY + this._radius);
+            
         }
-        //console.log("SERVER COORDINATES IN THE FUTURE!");
-        this._previousStates = [];
-        
-        this._setXWithInterpolation(newX);
-        this._setYWithInterpolation(newY);
-        
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
     }
     
     Target.prototype.setX = function(newX){
         this._x = this._prevX = newX;
         this._lightning.setX(newX);
         
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
-        
-//        this._x = newX;
-//        this._targetBody.SetPosition(new Box2DStuff.b2Vec2((this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
+        this._physicsEntity.setX(this._x + this._radius);
     }
     
     Target.prototype.setY = function(newY){
         this._y = this._prevY = newY;
         this._lightning.setY(newY);
-        
-        this._targetBody.SetPosition(new Box2DStuff.b2Vec2( (this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
-        
-//        this._y = newY;
-//        this._targetBody.SetPosition(new Box2DStuff.b2Vec2( (this._x + this._radius) * Box2DStuff.scale, (this._y + this._radius) * Box2DStuff.scale));
-    
+
+        this._physicsEntity.setY(this._y + this._radius);    
     }
     
     Target.prototype._setXWithInterpolation = function(newX){
@@ -159,8 +135,7 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
         this._currentMovementAngleInDeg = newAngle;
         this._xUnits = Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._yUnits = Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
-        this._velocityVector.Set(this._xUnits, this._yUnits);
-        this._targetBody.SetLinearVelocity(this._velocityVector);
+        this._physicsEntity.setLinearVelocity(this._xUnits, this._yUnits);
     }
     
      Target.prototype.getMovementAngle = function(){
@@ -176,11 +151,7 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     }
     
     Target.prototype.addToPhysicsSimulation = function(){
-        this._targetBody = Box2DStuff.physicsWorld.CreateBody(this._bodyDef);
-        this._targetBody.CreateFixture(this._fixtureDef);
-        this._targetBody.SetUserData(this);
-        this._targetBody.SetLinearVelocity(this._velocityVector);
-        this._isInSimulation = true;
+        PhysicsSystem.addToSimulation(this._physicsEntity);
     }
     
     Target.prototype.removeFromPhysicsSimulation = function(){
@@ -196,6 +167,48 @@ define(['LightningPiece', 'Box2DStuff'], function(LightningPiece, Box2DStuff){
     
     Target.prototype.getPastState = function(index){
         return this._previousStates[index - 1];
+    }
+    
+    Target.prototype._checkWithPastAndCurrentStatesAndDeleteAnyIrrelevant = function(x, y){
+        //check if passed in arg. match with current state
+        if(x === this._x && y === this._y){
+            this._previousStates = [];
+            return true;
+        }
+        
+        //check if passed in arg. match with any past state
+        for(var i = 0; i < this._previousStates.length; i++){
+            if(x === this._previousStates[i].x && y === this._previousStates[i].y){
+                this._previousStates.splice(0, i + 1);
+                return true;
+            }    
+        }
+        
+        //there was no match so all past states considered to be irrelevant, therefore all past states deleted
+        this._previousStates = [];
+        
+        //no match for arg. passed in found with current or previous states, therefore return false
+        return false;
+    }
+    
+    //testing - display a lot of physics info in relation to this target
+    Target.prototype._displayPhysicsBodyInfo = function(){
+        console.log("Linear Damping: " + this._physicsEntity._body.GetLinearDamping());
+        console.log("Inertia: " + this._physicsEntity._body.GetInertia());
+        console.log("Angular Damping: " + this._physicsEntity._body.GetAngularDamping());
+        console.log("Angular Velocity: " + this._physicsEntity._body.GetAngularVelocity());
+        console.log("Mass: " + this._physicsEntity._body.GetMass());
+    }
+    
+    Target.prototype._drawTargetFromServerPosition = function(context){
+        context.save();
+        
+        context.strokeStyle = "red";
+        context.beginPath();
+        context.arc(this._serverTargetPositionX + this._radius, this._serverTargetPositionY + this._radius, this._radius, 0, 2 * Math.PI, false);
+        context.stroke();
+        
+        context.restore();
     }
     
     return Target;
