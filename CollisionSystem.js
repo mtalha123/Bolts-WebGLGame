@@ -3,9 +3,9 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
     var currentEntities = [];
     
     function initialize(){
-        EventSystem.register(this, "targetspawned");  
-        EventSystem.register(this, "targetdestroyed");
-        EventSystem.register(this, "S_targetinfocus");
+        EventSystem.register(recieveEvent, "targetspawned");  
+        EventSystem.register(recieveEvent, "targetdestroyed");
+        EventSystem.register(recieveEvent, "S_targetinfocus");
     }
     
     function update(){
@@ -47,7 +47,6 @@ define(['Border', 'EventSystem', 'Cursor'], function(Border, EventSystem, Cursor
     return {
         initialize: initialize,
         update: update,
-        recieveEvent: recieveEvent,
         recieveFromServer: recieveFromServer
     };
     

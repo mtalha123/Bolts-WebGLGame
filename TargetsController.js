@@ -21,9 +21,9 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         
         console.log("INITIALIZEDATA: " + JSON.stringify(initializeData));
 
-        EventSystem.register(this, "targetinfocus");
-        EventSystem.register(this, "S_gameupdate");
-        EventSystem.register(this, "S_initialize");
+        EventSystem.register(recieveEvent, "targetinfocus");
+        EventSystem.register(recieveEvent, "S_gameupdate");
+        EventSystem.register(recieveEvent, "S_initialize");
     }
     
     function draw(context, interpolation){
@@ -188,6 +188,5 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         draw: draw,
         update: update,
         serverUpdate: serverUpdate,
-        recieveEvent: recieveEvent
     }
 });

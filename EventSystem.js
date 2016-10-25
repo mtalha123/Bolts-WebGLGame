@@ -24,10 +24,13 @@ define([], function(){
     function initialize(){
     }
     
-    function register(object, eventType){
+    function register(callback, eventType, object ){
         for(var key in subscribers){
             if(eventType === key){
-                subscribers[key].push(object);
+                if(object != undefined){
+                    subscribers[key].push(object);
+                }
+                subscribers[key].push(callback);
             } 
         }
     }
@@ -45,7 +48,13 @@ define([], function(){
 
         while(eventBeingProcessed){
             for(var i = 0; i < subscribers[eventBeingProcessed.eventType].length; i++){
-                subscribers[eventBeingProcessed.eventType][i].recieveEvent(eventBeingProcessed);
+                if(typeof subscribers[eventBeingProcessed.eventType][i] === "function"){
+                    if(typeof subscribers[eventBeingProcessed.eventType][i-1] === "object"){
+                        subscribers[eventBeingProcessed.eventType][i].call(subscribers[eventBeingProcessed.eventType][i-1], eventBeingProcessed);
+                    }else{
+                        subscribers[eventBeingProcessed.eventType][i](eventBeingProcessed);
+                    }
+                }
             }
             
             eventBeingProcessed = currentEventsQueue.shift();

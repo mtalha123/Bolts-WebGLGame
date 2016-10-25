@@ -30,9 +30,9 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
             isConnectedToServer = false;
         });
         
-        EventSystem.register(this, "mousemove");
-        EventSystem.register(this, "mouseup");
-        EventSystem.register(this, "mousedown");
+        EventSystem.register(recieveEvent, "mousemove");
+        EventSystem.register(recieveEvent, "mouseup");
+        EventSystem.register(recieveEvent, "mousedown");
         
         socket.on("latency", function(data){
             ping = pingTimer.getTime();
