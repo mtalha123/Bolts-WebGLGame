@@ -6,7 +6,7 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
     var socket;
     
     function initialize(canvasWidth, canvasHeight, listenerFunction){
-        socket = io.connect('192.168.0.20:4000');
+        socket = io.connect('192.168.0.12:4000');
  
         socket.on("connect", function(data){
             console.log("Connected to server.");
@@ -30,10 +30,6 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
             isConnectedToServer = false;
         });
         
-        EventSystem.register(recieveEvent, "mousemove");
-        EventSystem.register(recieveEvent, "mouseup");
-        EventSystem.register(recieveEvent, "mousedown");
-        
         socket.on("latency", function(data){
             ping = pingTimer.getTime();
             socket.emit("latency");
@@ -50,21 +46,15 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
         return ping;
     }
     
-    function recieveEvent(eventInfo){
-        if(eventInfo.eventType === "mousemove"){
-            socket.emit("mousemove", eventInfo.eventData)
-        }else if(eventInfo.eventType === "mousedown"){
-            socket.emit("mousedown", eventInfo.eventData)
-        }else if(eventInfo.eventType === "mouseup"){
-            socket.emit("mouseup", eventInfo.eventData)
-        }
+    function sendToServer(name,info){
+        socket.emit(name, info);
     }
     
     return {
         initialize: initialize,
         connectedToServer: connectedToServer,
         getPing: getPing,
-        recieveEvent: recieveEvent
+        sendToServer: sendToServer
     }
     
 });

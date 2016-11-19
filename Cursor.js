@@ -1,7 +1,7 @@
 define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     
-    var x = 0, y = 0;    
-    var mouseHeldDown = false;    
+    var x = 0, y = 0; 
+    var mouseHeldDown = false;  
     
     function draw(context, interpolation, radius){
         context.save();
@@ -36,31 +36,26 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
         return y;
     }
     
-    function mouseMove(event){
-        x = event.clientX;
-        y = event.clientY;
-        
-        EventSystem.publishEvent("mousemove", {x: x, y: y});
+    function changePosition(p_x, p_y){
+        x = p_x;
+        y = p_y;
     }
     
-    function mouseDown(event){
+    function press(){
         mouseHeldDown = true;
-        
-        EventSystem.publishEvent("mousedown", {x: x, y: y});
     }
     
-    function mouseUp(event){
+    function release(){
         mouseHeldDown = false;
-        EventSystem.publishEvent("mouseup", {x: x, y: y});
     }
     
     return {
         draw : draw,
         getX: getX,
         getY: getY,
-        isMouseButtonHeldDown: isMouseButtonHeldDown,
-        mouseMove: mouseMove,
-        mouseDown: mouseDown,
-        mouseUp: mouseUp
+        changePosition: changePosition,
+        press: press,
+        release: release,
+        isMouseButtonHeldDown: isMouseButtonHeldDown
     }
 });

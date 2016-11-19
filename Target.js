@@ -61,7 +61,7 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
         
         context.stroke();
         
-        //this._drawTargetFromServerPosition(context);
+       // this._drawTargetFromServerPosition(context);
      
         context.restore();
     }
@@ -170,6 +170,10 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
     }
     
     Target.prototype._checkWithPastAndCurrentStatesAndDeleteAnyIrrelevant = function(x, y){
+        
+        //testing
+        return true;
+        
         //check if passed in arg. match with current state
         if(x === this._x && y === this._y){
             this._previousStates = [];

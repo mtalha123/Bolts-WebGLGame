@@ -70,8 +70,6 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                                 x: data[key].x,
                                 y: data[key].y
                             });
-                              spawnTimer.reset();
-                                spawnTimer.start(data.spawnTimer);
                         }
                     }
                 }                
@@ -101,6 +99,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     }
     
     function checkInPreviousStatesAndDeletePriorStatesIfSuccess(targetid, x, y){
+        return true;
         for(var a = 0; a < previousStates.length; a++){
             if(targetid === previousStates[a].targetId && x === previousStates[a].spawnX && y === previousStates[a].spawnY){
                 previousStates.splice(0, a + 1);
@@ -175,7 +174,14 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     
     function recieveEvent(eventInfo){
         if(eventInfo.eventType === "targetinfocus"){
-            console.log("HAPPENED!");
+           // console.log("TARGET IN FOCUS - TARGETS CONTROLLER");
+            for(var a = 0; a < targetsActivated.length; a++){
+                //console.log("INSIDE FOR LOOP - ID: " + targetsActivated[a]._id);
+                if(targetsActivated[a]._id === "100"){
+                    console.log("MOVEMENT ANGLE CHANGED - TARGETS CONTROLLER");
+                    targetsActivated[a].setMovementAngle(75);   
+                }
+            }
         }else if(eventInfo.eventType === "S_initialize"){
            
         }else if(eventInfo.eventType === "S_gameupdate"){

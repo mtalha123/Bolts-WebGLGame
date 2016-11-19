@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.20:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.12:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, PhysicsSystem, NetworkManager, isObjectEmpty){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -107,8 +107,8 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
 
                    // console.log("currentTick: " + nextTick + "   Current Time: " + Date.now() + "  timeCurrUpdateLate: " + (Date.now() - nextTick) + "   nextTick: " + (nextTick + tickTimeMillis));
                 tickCounter+=1;
-                update();
                 var currentTickTime = nextTick;
+                update(currentTickTime);
                 nextTick += tickTimeMillis;
                 loops++;
                 updateCounter++;
@@ -123,7 +123,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
                 console.log("Update late by: " + (Date.now() - currentTickTime));
                 
                 if(loops > 1){
-                    console.log("MORE UPDATE ITERATIONS!");
+                    console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
                 }
                 
                 if(mostRecentServerUpdateInfo.currentTickTimestamp > currentTickTime){
@@ -216,11 +216,21 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         //Box2DStuff.physicsWorld.DrawDebugData();                
     }
     
-    function update(){
+    function update(currentTick){        
+        var inputInfo = InputHandler.consumeCurrentState();
+        
+        if(inputInfo != undefined){
+            inputInfo.updateCounter = updateCounter;
+            NetworkManager.sendToServer("input", inputInfo);
+        }else{
+            NetworkManager.sendToServer("input", "none");
+        }
+    
+        CollisionSystem.update();
+        
         PhysicsSystem.update(1 / 20, 10, 6);
         Border.update();
         TargetsController.update();
-        CollisionSystem.update();
         EventSystem.update();
     }
     
@@ -247,11 +257,8 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function networkEventListener(eventType, eventData){
-        if(eventType === "S_initialize"){
-            Border.initialize(canvasWidth, canvasHeight);
-            TargetsController.initialize(canvasWidth, canvasHeight, eventData.TargetsController);
-            CollisionSystem.initialize();
-            nextTick = eventData.nextTick;
+        if(eventType === "S_initialize"){            
+            initialize(eventData.TargetsController, eventData.nextTick);
         }else if(eventType === "S_gameupdate"){
 
             //PURELY FOR TESTING (DELETE THIS AFTER BREAKS ENCAPSULATION)------
@@ -267,8 +274,22 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         }
     }
     
-    canvas.addEventListener("mousemove", Cursor.mouseMove, false);    
-    canvas.addEventListener("mousedown", Cursor.mouseDown, false);    
-    canvas.addEventListener("mouseup", Cursor.mouseUp, false);
+    function initialize(TargetsControllerInfo, nextServerTick){
+        Border.initialize(canvasWidth, canvasHeight);
+        TargetsController.initialize(canvasWidth, canvasHeight, TargetsControllerInfo);
+        CollisionSystem.initialize();      
+        
+        canvas.addEventListener("mousemove", function(event){
+            InputHandler.recieveEvent("mousemove", event);
+        }, false);    
+        canvas.addEventListener("mousedown", function(event){
+           InputHandler.recieveEvent("mousedown", event);
+        }, false);    
+        canvas.addEventListener("mouseup", function(event){
+           InputHandler.recieveEvent("mouseup", event);
+        }, false);
+        
+        nextTick = Date.now();
+    }
     
 });
