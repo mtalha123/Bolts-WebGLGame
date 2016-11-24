@@ -113,14 +113,14 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
                 loops++;
                 updateCounter++;
                 
-                //console.log("Update Counter: " + updateCounter + " at time: " + (nextTick - tickTimeMillis));
+                console.log("Update Counter: " + updateCounter + " at time: " + (nextTick - tickTimeMillis));
                 
                 var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
                 
               //  console.log("LATE BY: " + updatesLateBy);
                 
                 //log how much time current update is late by in ms
-                console.log("Update late by: " + (Date.now() - currentTickTime));
+                //console.log("Update late by: " + (Date.now() - currentTickTime));
                 
                 if(loops > 1){
                     console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
@@ -217,12 +217,13 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function update(currentTick){        
-        var inputInfo = InputHandler.consumeCurrentState();
+        var inputInfo = InputHandler.notifyOfCurrentStateAndConsume();
         
         if(inputInfo != undefined){
             inputInfo.updateCounter = updateCounter;
             NetworkManager.sendToServer("input", inputInfo);
         }else{
+            console.log("NONE SENT!");
             NetworkManager.sendToServer("input", "none");
         }
     

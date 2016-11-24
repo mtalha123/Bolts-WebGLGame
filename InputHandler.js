@@ -1,6 +1,6 @@
-define(['Cursor'], function(Cursor){
+define(['Cursor', 'EventSystem'], function(Cursor, EventSystem){
     
-    /*inputState obj organization:    
+    /*mostRecentInput obj organization:    
     { 
         mouseState: {
             xPos: the x position,
@@ -12,13 +12,15 @@ define(['Cursor'], function(Cursor){
         }
     }
        */
-    var inputState = {
+    
+    var mostRecentInput = {
         mouseState: {
-            clicked: false
+            type: undefined
         }
     };
     
     var stateChangedSinceLastConsume = false;
+    
     
     function recieveEvent(type, event){
         stateChangedSinceLastConsume = true;
@@ -26,31 +28,63 @@ define(['Cursor'], function(Cursor){
         switch(type){
             case "mousedown":
                 Cursor.press();
-                inputState.mouseState.clicked = true;
+                mostRecentInput.mouseState.type = "mousedown";
                 break;
             case "mouseup":
                 Cursor.release();
-                inputState.mouseState.clicked = false;
+                mostRecentInput.mouseState.type = "mouseup";
+                break;
+            case "mousemove":
+                if(mostRecentInput.mouseState.type === "mousedown" || mostRecentInput.mouseState.type === "mousehelddown"){
+                    mostRecentInput.mouseState.type = "mousehelddown"; 
+                }else{
+                    mostRecentInput.mouseState.type = "mousemove";
+                }
                 break;
         }
-        inputState.mouseState.xPos = event.clientX;
-        inputState.mouseState.yPos = event.clientY;
+        mostRecentInput.mouseState.xPos = event.clientX;
+        mostRecentInput.mouseState.yPos = event.clientY;
         
         Cursor.changePosition(event.clientX, event.clientY);
     }
     
-    function consumeCurrentState(){
+    function notifyOfCurrentStateAndConsume(){
         if(stateChangedSinceLastConsume){
             stateChangedSinceLastConsume = false;
-            return inputState;   
+            EventSystem.publishEventImmediately(mostRecentInput.mouseState.type, {x: mostRecentInput.mouseState.xPos, y: mostRecentInput.mouseState.yPos});
+            return mostRecentInput;   
         }
         
         return undefined;
     }
     
+    
     return {
         recieveEvent: recieveEvent,
-        consumeCurrentState: consumeCurrentState
+        notifyOfCurrentStateAndConsume: notifyOfCurrentStateAndConsume
     }
     
 });
+
+
+
+//
+//if(this._mostRecentState){
+//        var mostRecentMouseState = this._mostRecentState.mouseState;
+//        
+//        if(this._mouseClicked){
+//            if(mostRecentMouseState.clicked){
+//                this._EventSystem.publishEventImmediately("mousehelddown", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
+//            }else{
+//                this._EventSystem.publishEventImmediately("mouseup", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
+//                this._mouseClicked = false;
+//            }
+//        }else{
+//            if(mostRecentMouseState.clicked){
+//                this._EventSystem.publishEventImmediately("mousedown", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
+//                this._mouseClicked = true;
+//            }else{
+//                this._EventSystem.publishEventImmediately("mousemove", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
+//            }
+//        }
+//    }
