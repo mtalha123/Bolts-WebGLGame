@@ -25,7 +25,18 @@ define(['Box2DStuff'], function(Box2DStuff){
         Box2DStuff.physicsWorld.Step(timestep, velocityIterations, positionIterations);
         
         for(var i = 0; i < allEntities.length; i++){
-                allEntities[i]._update();
+            if(allEntities[i]._isInSimulation){
+                allEntities[i]._update();   
+            }
+        }
+    }
+    
+    function removeEntityFromSimulation(entity){
+        for(var i = 0; i < allEntities.length; i++){
+            if(allEntities[i]._id === entity._id){
+                allEntities[i]._isInSimulation = false;
+                Box2DStuff.physicsWorld.DestroyBody(allEntities[i]._body);
+            }
         }
     }
     
@@ -107,10 +118,8 @@ define(['Box2DStuff'], function(Box2DStuff){
     }
     
     PhysicsEntity.prototype._update = function(){
-        if(this._isInSimulation){
-            this._x = ((this._body.GetPosition().x / Box2DStuff.scale));
-            this._y = ((this._body.GetPosition().y / Box2DStuff.scale));
-        }
+        this._x = ((this._body.GetPosition().x / Box2DStuff.scale));
+        this._y = ((this._body.GetPosition().y / Box2DStuff.scale));
     }
     
     PhysicsEntity.prototype._createFixtureDef = function(density, friction, restitution){
@@ -125,7 +134,8 @@ define(['Box2DStuff'], function(Box2DStuff){
     return {
         requestPhysicsEntity: requestPhysicsEntity,
         addToSimulation: addToSimulation,
-        update: update
+        update: update,
+        removeEntityFromSimulation: removeEntityFromSimulation
     };
     
     

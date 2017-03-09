@@ -7,7 +7,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     var previousStates = [];
 
     //counts the number of updates until the next spawn
-    var spawnCountDown = 40;
+    var spawnCountDown = 20;
     
     function initialize(p_canvasWidth, p_canvasHeight, initializeData){
         canvasWidth = p_canvasWidth;
@@ -21,8 +21,8 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         
         console.log("INITIALIZEDATA: " + JSON.stringify(initializeData));
 
-        EventSystem.register(recieveEvent, "targetinfocus");
-        EventSystem.register(recieveEvent, "S_gameupdate");
+        EventSystem.register(recieveEvent, "target_destroyed");
+        EventSystem.register(recieveEvent, "S_game_update");
         EventSystem.register(recieveEvent, "S_initialize");
     }
     
@@ -33,15 +33,22 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     }
     
     function update(){
-        spawnCountDown--;
-        
-        if(spawnCountDown <= 0){
-            if(targetsPool.length > 0){
-                console.log("SPAWNED: " + Date.now());
-                spawn();
+        if(targetsPool.length > 0){
+            spawnCountDown--;
+            
+            if(spawnCountDown <= 0){
+                spawn();                
+                spawnCountDown = 20;
             }
-            spawnCountDown = 40;
         }
+        
+//        if(spawnCountDown <= 0){
+//            if(targetsPool.length > 0){
+//                console.log("SPAWNED: " + Date.now());
+//                spawn();
+//            }
+//            spawnCountDown = 40;
+//        }
 
         for(var a = 0; a < targetsActivated.length; a++){
             targetsActivated[a].update();
@@ -65,7 +72,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                             
                             saveCurrentState(newlyActivatedTarget.getId(), data[key].x, data[key].y);
                             
-                            EventSystem.publishEvent("targetspawned", {
+                            EventSystem.publishEvent("target_spawned", {
                                 Target: newlyActivatedTarget,
                                 x: data[key].x,
                                 y: data[key].y
@@ -114,7 +121,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         
-        var newlyActivatedTarget = targetsPool.shift();        
+        var newlyActivatedTarget = targetsPool.shift();   
         newlyActivatedTarget.addToPhysicsSimulation();
         
         switch(random){
@@ -146,7 +153,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         spawnX = canvasWidth * 0.2;
         spawnY = canvasHeight * 0.4;
         newlyActivatedTarget.setMovementAngle(45);
-        console.log("ID: " + newlyActivatedTarget.getId() + "      SPAWNX: " + spawnX + "     SPAWNY: " + spawnY);
+       // console.log("ID: " + newlyActivatedTarget.getId() + "      SPAWNX: " + spawnX + "     SPAWNY: " + spawnY);
         newlyActivatedTarget.setX(spawnX);
         newlyActivatedTarget.setY(spawnY);
         
@@ -154,7 +161,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         
         saveCurrentState(newlyActivatedTarget.getId(), spawnX, spawnY);
         
-        EventSystem.publishEvent("targetspawned", {
+        EventSystem.publishEvent("target_spawned", {
             Target: newlyActivatedTarget,
             x: spawnX,
             y: spawnY
@@ -173,20 +180,23 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     }
     
     function recieveEvent(eventInfo){
-        if(eventInfo.eventType === "targetinfocus"){
-           // console.log("TARGET IN FOCUS - TARGETS CONTROLLER");
+        if(eventInfo.eventType === "target_destroyed"){
             for(var a = 0; a < targetsActivated.length; a++){
-                //console.log("INSIDE FOR LOOP - ID: " + targetsActivated[a]._id);
-                if(targetsActivated[a]._id === "100"){
-                    console.log("MOVEMENT ANGLE CHANGED - TARGETS CONTROLLER");
-                    targetsActivated[a].setMovementAngle(75);   
+                if(targetsActivated[a]._id === eventInfo.eventData.target._id){
+//                    console.log("MOVEMENT ANGLE CHANGED - TARGETS CONTROLLER");
+                    targetsActivated[a].removeFromPhysicsSimulation();
+                    targetsPool.push(targetsActivated.splice(a, 1)[0]);  
                 }
             }
         }else if(eventInfo.eventType === "S_initialize"){
            
-        }else if(eventInfo.eventType === "S_gameupdate"){
+        }else if(eventInfo.eventType === "S_game_update"){
           
         }
+    }
+    
+    function getRadiusOfTarget(){
+        return 60;
     }
     
     return {
@@ -194,5 +204,6 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         draw: draw,
         update: update,
         serverUpdate: serverUpdate,
+        getRadiusOfTarget: getRadiusOfTarget
     }
 });

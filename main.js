@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'CollisionSystem', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, CollisionSystem, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'InputProcessor', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler', 'SynchronizedTimers', 'ComboSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, InputProcessor, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler, SynchronizedTimers, ComboSystem){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -113,7 +113,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
                 loops++;
                 updateCounter++;
                 
-                console.log("Update Counter: " + updateCounter + " at time: " + (nextTick - tickTimeMillis));
+                //console.log("Update Counter: " + updateCounter + " at time: " + (nextTick - tickTimeMillis));
                 
                 var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
                 
@@ -140,7 +140,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
                                 break;
 
                             case "CollisionSystem":
-                                CollisionSystem.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
+                                InputProcessor.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
                                 break;
                         }
                     }
@@ -210,24 +210,25 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         Border.draw(context, interpolation);
         
         TargetsController.draw(context, interpolation);
-        Cursor.draw(context, interpolation, 0.01 * canvasWidth);
+        Cursor.draw(context, interpolation);
 
-        
+        ComboSystem.draw(context);
         //Box2DStuff.physicsWorld.DrawDebugData();                
     }
     
     function update(currentTick){        
+        SynchronizedTimers.updateAllTimers();
+        
         var inputInfo = InputHandler.notifyOfCurrentStateAndConsume();
         
         if(inputInfo != undefined){
             inputInfo.updateCounter = updateCounter;
             NetworkManager.sendToServer("input", inputInfo);
         }else{
-            console.log("NONE SENT!");
             NetworkManager.sendToServer("input", "none");
         }
     
-        CollisionSystem.update();
+        InputProcessor.update();
         
         PhysicsSystem.update(1 / 20, 10, 6);
         Border.update();
@@ -276,19 +277,11 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function initialize(TargetsControllerInfo, nextServerTick){
+        SynchronizedTimers.initialize(tickTimeMillis);
         Border.initialize(canvasWidth, canvasHeight);
         TargetsController.initialize(canvasWidth, canvasHeight, TargetsControllerInfo);
-        CollisionSystem.initialize();      
-        
-        canvas.addEventListener("mousemove", function(event){
-            InputHandler.recieveEvent("mousemove", event);
-        }, false);    
-        canvas.addEventListener("mousedown", function(event){
-           InputHandler.recieveEvent("mousedown", event);
-        }, false);    
-        canvas.addEventListener("mouseup", function(event){
-           InputHandler.recieveEvent("mouseup", event);
-        }, false);
+        InputProcessor.initialize();      
+        InputHandler.initialize(canvas);
         
         nextTick = Date.now();
     }

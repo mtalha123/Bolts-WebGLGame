@@ -1,11 +1,11 @@
-define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSystem){
+define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPiece, PhysicsSystem, EventSystem){
     
     var canvasWidth, canvasHeight, borderLightningPiece;    
     var margin;    
     var widthOfBlueThing;
     var heightOfBlueThing;
     var gapForScore;
-    var score = 1000;
+    var score = 0;
     var scoreX, scoreY;
     
     var leftPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
@@ -62,6 +62,8 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
         bottomPhysicsBody.setY(physicsBodyPositions[2][1]);
         bottomPhysicsBody.createRectangle(widthOfBlueThing, heightOfBlueThing, 10, 0, 1);
         PhysicsSystem.addToSimulation(bottomPhysicsBody);
+        
+        EventSystem.register(recieveEvent, "score_achieved");
     }
     
     function draw(context, interpolation){
@@ -125,6 +127,10 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
         context.fillRect(getLeftX(), getTopY(), heightOfBlueThing, widthOfBlueThing);
         
         context.restore();
+    }
+    
+    function recieveEvent(eventInfo){
+        score += eventInfo.eventData;
     }
     
     return {

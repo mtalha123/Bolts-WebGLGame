@@ -1,4 +1,4 @@
-define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSystem, Timer){
+define(['socketio', 'Custom Utility/Timer'], function(io, Timer){
     
     var isConnectedToServer = false;
     var pingTimer = new Timer();
@@ -6,7 +6,7 @@ define(['socketio', 'EventSystem', 'Custom Utility/Timer'], function(io, EventSy
     var socket;
     
     function initialize(canvasWidth, canvasHeight, listenerFunction){
-        socket = io.connect('192.168.0.12:4000');
+        socket = io.connect('http://192.168.0.12:4000');
  
         socket.on("connect", function(data){
             console.log("Connected to server.");

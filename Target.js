@@ -54,14 +54,14 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
         //context.arc((this._x + this._radius) + (this._xUnits * interpolation), (this._y + this._radius) + (this._yUnits * interpolation), this._radius, 0, 2 * Math.PI, false);
         
         //drawing with interpolation
-        context.arc((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius, (this._prevY + (interpolation * (this._y - this._prevY))) + this._radius, this._radius, 0, 2 * Math.PI, false);
+        //context.arc((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius, (this._prevY + (interpolation * (this._y - this._prevY))) + this._radius, this._radius, 0, 2 * Math.PI, false);
         
         //uncomment the following line to draw without interpolation
-        //context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
+        context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
         
         context.stroke();
         
-       // this._drawTargetFromServerPosition(context);
+        //this._drawTargetFromServerPosition(context);
      
         context.restore();
     }
@@ -155,7 +155,7 @@ define(['LightningPiece', 'PhysicsSystem'], function(LightningPiece, PhysicsSyst
     }
     
     Target.prototype.removeFromPhysicsSimulation = function(){
-        //FILL IN LATER
+        PhysicsSystem.removeEntityFromSimulation(this._physicsEntity);
     }
     
     Target.prototype.saveCurrentState = function(){
