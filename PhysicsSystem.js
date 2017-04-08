@@ -2,6 +2,12 @@ define(['Box2DStuff'], function(Box2DStuff){
     
     var allEntities = [];
     var id = 1000;
+    var canvasWidth, canvasHeight;
+    
+    function initialize(p_canvasWidth, p_canvasHeight){
+        canvasWidth = p_canvasWidth;
+        canvasHeight = p_canvasHeight;
+    }
     
     function addToSimulation(physicsEntity){
         for(var i = 0; i < allEntities.length; i++){
@@ -119,7 +125,7 @@ define(['Box2DStuff'], function(Box2DStuff){
     
     PhysicsEntity.prototype._update = function(){
         this._x = ((this._body.GetPosition().x / Box2DStuff.scale));
-        this._y = ((this._body.GetPosition().y / Box2DStuff.scale));
+        this._y = canvasHeight - ((this._body.GetPosition().y / Box2DStuff.scale));
     }
     
     PhysicsEntity.prototype._createFixtureDef = function(density, friction, restitution){
@@ -132,6 +138,7 @@ define(['Box2DStuff'], function(Box2DStuff){
     
     
     return {
+        initialize: initialize,
         requestPhysicsEntity: requestPhysicsEntity,
         addToSimulation: addToSimulation,
         update: update,

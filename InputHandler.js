@@ -27,7 +27,9 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
     
     var mostRecentKeyPressed;
     
-    function initialize(canvas){
+    var canvasWidth, canvasHeight;
+    
+    function initialize(canvas, p_canvasWidth, p_canvasHeight){
         canvas.addEventListener("mousemove", function(event){
             handleMouseEvent("mousemove", event);
         }, false);    
@@ -43,6 +45,9 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
         document.addEventListener("keyup", function(event){
             handleKeyboardEvent("keyup", event);
         });
+        
+        canvasWidth = p_canvasWidth;
+        canvasHeight = p_canvasHeight;
     }
     
 //    function recieveEvent(type, event){
@@ -122,9 +127,9 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
                 break;
         }
         mostRecentInput.mouseState.xPos = eventData.clientX;
-        mostRecentInput.mouseState.yPos = eventData.clientY;
+        mostRecentInput.mouseState.yPos = canvasHeight - eventData.clientY;
         
-        Cursor.changePosition(eventData.clientX, eventData.clientY);
+        Cursor.changePosition(eventData.clientX, canvasHeight - eventData.clientY);
     }
     
     function handleKeyboardEvent(eventType, eventData){

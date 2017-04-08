@@ -1,34 +1,51 @@
-define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
+define(['Custom Utility/Timer', 'EventSystem', 'ShaderLibrary', 'ShaderProcessor'], function(Timer, EventSystem, ShaderLibrary, ShaderProcessor){
     
     var x = 0, y = 0; 
     var mouseHeldDown = false;  
     var radius = 20;
     EventSystem.register(recieveEvent, "combo_level_changed");
+    var handler = null;
+    var canvasWidth, canvasHeight;
     
-    function draw(context, interpolation){
-        context.save();
-        
-        context.fillStyle = "rgba(50, 50, 50, 0.5)";
-        context.strokeStyle = "black";
-        context.lineWidth = .5;
-        context.beginPath();
-        context.arc(x, y, radius, 0, 2 * Math.PI, false);
-        context.fill();
-        context.stroke();
-        
-        context.fillStyle = "yellow";
-        context.beginPath();
-        context.arc(x, y, 2, 0, 2 * Math.PI, false);
-        context.fill();
+    function initialize(p_canvasWidth, p_canvasHeight){
+        handler = ShaderProcessor.requestEffect(ShaderLibrary.CURSOR);
+        handler.canvasWidth = canvasWidth = p_canvasWidth;
+        handler.canvasHeight = canvasHeight = p_canvasHeight;
+        handler.shouldDraw(true);
+    }
+    
+    function draw(interpolation){
+//        context.save();
+//        
+//        context.fillStyle = "rgba(50, 50, 50, 0.5)";
+//        context.strokeStyle = "black";
+//        context.lineWidth = .5;
+//        context.beginPath();
+//        context.arc(x, y, radius, 0, 2 * Math.PI, false);
+//        context.fill();
+//        context.stroke();
+//        
+//        context.fillStyle = "yellow";
+//        context.beginPath();
+//        context.arc(x, y, 2, 0, 2 * Math.PI, false);
+//        context.fill();
+//        
+//        if(mouseHeldDown){
+//            context.fillStyle = "rgba(255, 0, 0, 0.3)";
+//            context.beginPath();
+//            context.arc(x, y, radius, 0, 2 * Math.PI, false);
+//            context.fill();
+//        }
+//        
+//        context.restore();
         
         if(mouseHeldDown){
-            context.fillStyle = "rgba(255, 0, 0, 0.3)";
-            context.beginPath();
-            context.arc(x, y, radius, 0, 2 * Math.PI, false);
-            context.fill();
-        }
-        
-        context.restore();
+            handler.setClicked(true);
+        }else{
+            handler.setClicked(false);
+        } 
+        handler.setX(x);
+        handler.setY(y);
     }
     
     function isMouseButtonHeldDown(){
@@ -90,6 +107,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     }
     
     return {
+        initialize: initialize,
         draw : draw,
         getX: getX,
         getY: getY,

@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.12:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.17:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'InputProcessor', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler', 'SynchronizedTimers', 'ComboSystem'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, InputProcessor, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler, SynchronizedTimers, ComboSystem){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'InputProcessor', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary' ,'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/map'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, InputProcessor, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, genCoords, map){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -42,8 +42,11 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     var canvasHeight = canvas.height = window.innerHeight;
     
     //get context of main canvas and store in variable "context"
-    var context = canvas.getContext("2d");
-    
+    //var context = canvas.getContext("2d");
+    var gl = canvas.getContext("webgl");
+    if(!gl){
+        alert("No WebGL enabled.");
+    }
 //-------------------------------------------------------------------------------------
     
     var fpsCounter = Object.create(FPSCounter);
@@ -69,10 +72,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     //in case of when an update happens in the next second but the # of updates hasn't been processed for the
     //first second yet, the difference between the time (which would now be over 1000 ms) and 1000 is the offsetTime
     var offsetTime = 0;
-    
-    var image = new Image();
-    image.src = "Assets/borderbluefield.png";
-    
+        
     //var BIG_TEST = new LightningPiece(canvasWidth, canvasHeight, [[300, 200, 80, 80], [300, 200, 250, 50],  [300, 200, 500, 100]], 10, 30, {lineWidth: 1});
     NetworkManager.initialize(canvasWidth, canvasHeight, networkEventListener);
     
@@ -89,8 +89,18 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     var updateCounter = 0;
     
+    var fpsHandler = null;
+    fontImage = new Image();
+    fontImage.src = "arial.png";
+    
     //testing
     var timeForUpdateToBeSlowedAt = Date.now() + 5000;
+    
+    //testing shaderprocessor module
+    var handler = null;
+    var time = 1;
+    
+    var testNum = 2;
     
     function gameLoop(){
         if(NetworkManager.connectedToServer()){
@@ -182,12 +192,24 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
             draw(interpolation);
 
             //----set text info then draw the FPS and TPS numbers-----
-            context.fillStyle = "blue";
-            context.font = "20px Arial";        
-            context.fillText("FPS: " + fpsCounter.getFPS(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.03);
-            context.fillText("TPS: " + testTicksPerSecond, canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.06);
-            context.fillText("ms: " + NetworkManager.getPing(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.09);
+//            context.fillStyle = "blue";
+//            context.font = "20px Arial";        
+//            context.fillText("FPS: " + fpsCounter.getFPS(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.03);
+//            context.fillText("TPS: " + testTicksPerSecond, canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.06);
+//            context.fillText("ms: " + NetworkManager.getPing(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.09);
             //-------------------------------------
+            //console.log("FPS: " + fpsCounter.getFPS());
+            
+            if(!fpsHandler){
+                fpsHandler = ShaderProcessor.requestEffect(ShaderLibrary.SCORE_TEXT);
+                fpsHandler.setText(fpsCounter.getFPS().toString());
+                fpsHandler.setX(canvasWidth * 0.9);
+                fpsHandler.setY(canvasHeight * 0.88);
+                fpsHandler.setFontTexture(fontImage, gl, 512, 512);
+                fpsHandler.setTextColor(0, 0, 1);
+                fpsHandler.shouldDraw(true);
+            }
+            fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
 
             fpsCounter.end();
         }
@@ -202,18 +224,35 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
 
     function draw(interpolation){
         //---clear screen---
-        context.clearRect(0, 0, canvasWidth, canvasHeight);       
-        context.fillStyle = "#a6a6a6";
-        context.fillRect(0, 0, canvasWidth, canvasHeight);
-        //--------------
-
-        Border.draw(context, interpolation);
+//        context.clearRect(0, 0, canvasWidth, canvasHeight);       
+//        context.fillStyle = "#a6a6a6";
+//        context.fillRect(0, 0, canvasWidth, canvasHeight);
+//        //--------------
+//
+        Border.draw(interpolation);
+//        
+        TargetsController.draw(interpolation);
+        Cursor.draw(interpolation);
+//
+//        ComboSystem.draw(context);
+        //Box2DStuff.physicsWorld.DrawDebugData();  
         
-        TargetsController.draw(context, interpolation);
-        Cursor.draw(context, interpolation);
-
-        ComboSystem.draw(context);
-        //Box2DStuff.physicsWorld.DrawDebugData();                
+        
+        gl.viewport(0, 0, canvasWidth, canvasHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearColor(0.65, 0.65, 0.65, 1.0);
+        gl.enable(gl.BLEND);
+        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+       // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
+        var handlers = ShaderProcessor.getHandlers();
+        var numVerticesDone = 0;
+        for(var i = 0; i < handlers.length; i++){
+            gl.useProgram(handlers[i]._shaderProgram);
+            ShaderProcessor.setUpAttributesAndUniforms(gl, handlers[i]);
+            gl.drawArrays(gl.TRIANGLES, 0, handlers[i].getNumVertices());
+            numVerticesDone += handlers[i].getNumVertices();
+        }       
     }
     
     function update(currentTick){        
@@ -234,6 +273,12 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         Border.update();
         TargetsController.update();
         EventSystem.update();
+        
+        
+        
+        //TESTING SHADERPROCESSOR MODULE
+        if(!handler){
+        }
     }
     
     function getPixelsFromPercent(widthOrHeight, percentage){
@@ -278,10 +323,13 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     function initialize(TargetsControllerInfo, nextServerTick){
         SynchronizedTimers.initialize(tickTimeMillis);
-        Border.initialize(canvasWidth, canvasHeight);
+        ShaderLibrary.initialize(gl);
+        Border.initialize(gl, canvasWidth, canvasHeight);
         TargetsController.initialize(canvasWidth, canvasHeight, TargetsControllerInfo);
         InputProcessor.initialize();      
-        InputHandler.initialize(canvas);
+        InputHandler.initialize(canvas, canvasWidth, canvasHeight);
+        PhysicsSystem.initialize(canvasWidth, canvasHeight);
+        Cursor.initialize(canvasWidth, canvasHeight);
         
         nextTick = Date.now();
     }

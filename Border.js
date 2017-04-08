@@ -1,4 +1,4 @@
-define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPiece, PhysicsSystem, EventSystem){
+define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/coordsToRGB', 'ShaderLibrary', 'Custom Utility/getNoiseTexture', 'Custom Utility/convertToShaderCoordinates.js'], function(LightningPiece, PhysicsSystem, EventSystem, ShaderProcessor, generateLightningCoordinates, coordsToRGB, ShaderLibrary, getNoiseTexture, convertToShaderCoordinates){
     
     var canvasWidth, canvasHeight, borderLightningPiece;    
     var margin;    
@@ -13,7 +13,14 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPie
     var rightPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
     var bottomPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
     
-    function initialize(p_canvasWidth, p_canvasHeight){
+    var borderPath;
+    var handler;
+    var fontImage, scoreHandler;
+    
+    fontImage = new Image();
+    fontImage.src = "arial.png";
+    
+    function initialize(gl, p_canvasWidth, p_canvasHeight){
         canvasWidth = p_canvasWidth;
         canvasHeight = p_canvasHeight;
         
@@ -22,18 +29,28 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPie
         heightOfBlueThing = 50;
         gapForScore = 0.10 * canvasWidth;
         scoreX = margin + (widthOfBlueThing/2);
-        scoreY = margin + 0.015 * canvasHeight;
+        scoreY = margin + 0.08 * canvasHeight;
         
-        var borderPath = [ //               X                                                   Y
-                          [ margin + (widthOfBlueThing/2) - (gapForScore/2),                 margin,
+        borderPath = [ //               X                                                   Y
+                            margin + (widthOfBlueThing/2) - (gapForScore/2),                 margin,
                             margin,                                                          margin, 
                             margin,                                                          canvasHeight - margin,       
                             canvasWidth - margin,                                            canvasHeight - margin, 
                             canvasWidth - margin,                                            margin,
-                            (canvasWidth - margin - (widthOfBlueThing/2)) + (gapForScore/2), margin      ]       
+                            (canvasWidth - margin - (widthOfBlueThing/2)) + (gapForScore/2), margin           
         ];
         
-        borderLightningPiece = new LightningPiece(canvasWidth, canvasHeight, borderPath, 20, 20, {});   
+        convertToShaderCoordinates(borderPath, canvasHeight);
+        
+        var borderCoords = coordsToRGB(borderPath, canvasWidth, canvasHeight);        
+        
+        handler = ShaderProcessor.requestEffect(ShaderLibrary.LIGHTNING);
+        handler.setResolution(canvasWidth, canvasHeight);
+        handler.setToBorderPath(canvasWidth, canvasHeight);
+        var noiseTexture = getNoiseTexture(1024, 1024);
+        handler.setNoiseTexture(noiseTexture, gl, 1024, 1024);
+        handler.setLightningCoords(borderCoords, gl, 8);
+        handler.shouldDraw(true);
         
         var physicsBodyPositions = [ 
                                      [margin + (widthOfBlueThing/2), margin + (heightOfBlueThing/2)], //top 
@@ -64,29 +81,48 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPie
         PhysicsSystem.addToSimulation(bottomPhysicsBody);
         
         EventSystem.register(recieveEvent, "score_achieved");
+        
+        scoreHandler = ShaderProcessor.requestEffect(ShaderLibrary.SCORE_TEXT);
+        scoreHandler.canvasWidth = canvasWidth;
+        scoreHandler.canvasHeight = canvasHeight;
+        scoreHandler.setText("0", canvasWidth, canvasHeight);
+        scoreHandler.setFontTexture(fontImage, gl, 512, 512);
+        scoreHandler.shouldDraw(true);
     }
     
-    function draw(context, interpolation){
-        borderLightningPiece.draw(context, interpolation, 0, 0);
+    function draw(interpolation){
+//        borderLightningPiece.draw(context, interpolation, 0, 0);
+//        
+//        //drawBorderPlain(context);
+//        
+//        context.save();
+//        
+//        context.fillStyle = "yellow";
+//        context.font = "50px Arial";
+//        context.shadowBlur = 10;
+//        context.shadowColor = "white";
+//        for(var i = 0; i < 4; i ++){
+//            context.fillText("" + score, scoreX - (context.measureText(score).width/2), scoreY);
+//        }
+//        
+//        context.restore();
         
-        //drawBorderPlain(context);
-        
-        context.save();
-        
-        context.fillStyle = "yellow";
-        context.font = "50px Arial";
-        context.shadowBlur = 10;
-        context.shadowColor = "white";
-        for(var i = 0; i < 4; i ++){
-            context.fillText("" + score, scoreX - (context.measureText(score).width/2), scoreY);
-        }
-        
-        context.restore();
+        scoreHandler.setText(score.toString(), canvasWidth, canvasHeight);
+        //FIX: SHOULD BE "scoreHandler.width / 2"
+        scoreHandler.setX(scoreX - (scoreHandler.width / 3.5));
+        scoreHandler.setY(canvasHeight - scoreY);
         
     }
     
     function update(){
-        borderLightningPiece.update();
+        //borderLightningPiece.update();
+        
+        var value = handler._uniforms.iGlobalTime.value[0];
+        value++;
+        if(value > 1023){
+            value = 0;
+        }
+        handler._uniforms.iGlobalTime.value = [value];
     }
     
     
@@ -133,6 +169,11 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPie
         score += eventInfo.eventData;
     }
     
+    //TESTING
+    function getBorderPath(){
+        return borderPath;
+    }
+    
     return {
         initialize: initialize,
         draw: draw,
@@ -145,5 +186,6 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem'], function(LightningPie
         getTopSidePhysicsBody: getTopSidePhysicsBody,
         getRightSidePhysicsBody: getRightSidePhysicsBody,
         getBottomSidePhysicsBody: getBottomSidePhysicsBody,
+        getBorderPath: getBorderPath
     }
 });

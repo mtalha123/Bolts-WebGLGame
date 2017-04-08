@@ -15,7 +15,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         
         var i = 0;
         for(var key in initializeData){
-            targetsPool[i] = new Target(key, canvasWidth, canvasHeight, 60, 8, initializeData[key].x, initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
+            targetsPool[i] = new Target(key, canvasWidth, canvasHeight, 60, 8, initializeData[key].x, canvasHeight - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
             i++;
         }
         
@@ -26,9 +26,9 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         EventSystem.register(recieveEvent, "S_initialize");
     }
     
-    function draw(context, interpolation){
+    function draw(interpolation){
         for(var a = 0; a < targetsActivated.length; a++){
-            targetsActivated[a].draw(context, interpolation);
+            targetsActivated[a].draw(interpolation);
         }
     }
     
