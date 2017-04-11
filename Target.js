@@ -1,4 +1,4 @@
-define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor', 'ShaderLibrary'], function(LightningPiece, PhysicsSystem, ShaderProcessor, ShaderLibrary){
+define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(LightningPiece, PhysicsSystem, ShaderProcessor){
 
     function Target(id, canvasWidth, canvasHeight, p_radius, numbolts, x, y, movementangle, speed){
         this._id = id;

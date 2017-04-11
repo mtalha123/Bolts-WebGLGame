@@ -1,4 +1,4 @@
-define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/coordsToRGB', 'ShaderLibrary', 'Custom Utility/getNoiseTexture', 'Custom Utility/convertToShaderCoordinates.js'], function(LightningPiece, PhysicsSystem, EventSystem, ShaderProcessor, generateLightningCoordinates, coordsToRGB, ShaderLibrary, getNoiseTexture, convertToShaderCoordinates){
+define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/coordsToRGB', 'Custom Utility/getNoiseTexture', 'Custom Utility/convertToShaderCoordinates.js'], function(LightningPiece, PhysicsSystem, EventSystem, ShaderProcessor, generateLightningCoordinates, coordsToRGB, getNoiseTexture, convertToShaderCoordinates){
     
     var canvasWidth, canvasHeight, borderLightningPiece;    
     var margin;    
