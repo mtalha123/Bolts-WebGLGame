@@ -18,7 +18,7 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'ge
     var fontImage, scoreHandler;
     
     fontImage = new Image();
-    fontImage.src = "arial.png";
+    fontImage.src = "Assets/arial.png";
     
     function initialize(gl, p_canvasWidth, p_canvasHeight){
         canvasWidth = p_canvasWidth;
@@ -44,7 +44,7 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'ge
         
         var borderCoords = coordsToRGB(borderPath, canvasWidth, canvasHeight);        
         
-        handler = ShaderProcessor.requestEffect(ShaderLibrary.LIGHTNING);
+        handler = ShaderProcessor.requestLightningEffect();
         handler.setResolution(canvasWidth, canvasHeight);
         handler.setToBorderPath(canvasWidth, canvasHeight);
         var noiseTexture = getNoiseTexture(1024, 1024);
@@ -82,7 +82,7 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'ge
         
         EventSystem.register(recieveEvent, "score_achieved");
         
-        scoreHandler = ShaderProcessor.requestEffect(ShaderLibrary.SCORE_TEXT);
+        scoreHandler = ShaderProcessor.requestTextEffect();
         scoreHandler.canvasWidth = canvasWidth;
         scoreHandler.canvasHeight = canvasHeight;
         scoreHandler.setText("0", canvasWidth, canvasHeight);

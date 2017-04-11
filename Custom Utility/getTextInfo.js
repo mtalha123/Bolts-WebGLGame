@@ -2,7 +2,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getVertices'], functio
     var fontInformation = {};
     var ASCIICodes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
     
-    getTextResource("http://192.168.0.17:4000/arial.fnt", fontInfoLoaded);
+    getTextResource("http://192.168.0.17:4000/Assets/arial.fnt", fontInfoLoaded);
     
     function fontInfoLoaded(error, text){
         for(var i = 0; i < ASCIICodes.length; i++){

@@ -25,7 +25,7 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor', 'ShaderLibrary'], 
         var xOnCircle;
         var yOnCircle; 
         
-        this.targetHandler = ShaderProcessor.requestEffect(ShaderLibrary.TARGET);
+        this.targetHandler = ShaderProcessor.requestTargetEffect();
         this.targetHandler.setResolution(canvasWidth, canvasHeight);
         this.targetHandler.setRadius(this._radius);
         this.targetHandler.setX(x);

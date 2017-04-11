@@ -91,7 +91,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
     var fpsHandler = null;
     fontImage = new Image();
-    fontImage.src = "arial.png";
+    fontImage.src = "Assets/arial.png";
     
     //testing
     var timeForUpdateToBeSlowedAt = Date.now() + 5000;
@@ -201,7 +201,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
             //console.log("FPS: " + fpsCounter.getFPS());
             
             if(!fpsHandler){
-                fpsHandler = ShaderProcessor.requestEffect(ShaderLibrary.SCORE_TEXT);
+                fpsHandler = ShaderProcessor.requestTextEffect();
                 fpsHandler.setText(fpsCounter.getFPS().toString());
                 fpsHandler.setX(canvasWidth * 0.9);
                 fpsHandler.setY(canvasHeight * 0.88);
