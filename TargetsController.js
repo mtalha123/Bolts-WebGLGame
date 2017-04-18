@@ -126,33 +126,33 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         
         switch(random){
             case 1:
-                spawnX = Border.getLeftX();
-                spawnY = Random.getRandomInt(Border.getTopY(), Border.getBottomY());
+                spawnX = Border.getLeftX() + newlyActivatedTarget.getRadius();
+                spawnY = Random.getRandomInt(Border.getBottomY() + newlyActivatedTarget.getRadius(), Border.getTopY() - newlyActivatedTarget.getRadius());
                 newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(-90, 90));
                 break;
 
             case 2:
-                spawnX = Random.getRandomInt(Border.getLeftX(), Border.getRightX());
-                spawnY = Border.getTopY();
-                newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(0, 180));
+                spawnX = Random.getRandomInt(Border.getLeftX() + newlyActivatedTarget.getRadius(), Border.getRightX() - newlyActivatedTarget.getRadius());
+                spawnY = Border.getTopY() - newlyActivatedTarget.getRadius();
+                newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(-180, 0));
                 break;
 
             case 3:
-                spawnX = Border.getRightX() - (newlyActivatedTarget.getRadius() * 2);
-                spawnY = Random.getRandomInt(Border.getTopY(), Border.getBottomY());
+                spawnX = Border.getRightX() - newlyActivatedTarget.getRadius();
+                spawnY = Random.getRandomInt(Border.getBottomY() + newlyActivatedTarget.getRadius(), Border.getTopY() - newlyActivatedTarget.getRadius());;
                 newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(90, 270));
                 break;
 
             case 4:
-                spawnX = Random.getRandomInt(Border.getLeftX(), Border.getRightX());
-                spawnY = Border.getBottomY() - (newlyActivatedTarget.getRadius() * 2);
-                newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(180, 360));
+                spawnX = Random.getRandomInt(Border.getLeftX() + newlyActivatedTarget.getRadius(), Border.getRightX() - newlyActivatedTarget.getRadius());
+                spawnY = Border.getBottomY() + newlyActivatedTarget.getRadius();
+                newlyActivatedTarget.setMovementAngle(Random.getRandomIntInclusive(0, 180));
                 break;
         }
         
-        spawnX = canvasWidth * 0.2;
-        spawnY = canvasHeight * 0.4;
-        newlyActivatedTarget.setMovementAngle(45);
+        //spawnX = canvasWidth * 0.4;
+       // spawnY = canvasHeight * 0.5;
+       // newlyActivatedTarget.setMovementAngle(-45);
        // console.log("ID: " + newlyActivatedTarget.getId() + "      SPAWNX: " + spawnX + "     SPAWNY: " + spawnY);
         newlyActivatedTarget.setX(spawnX);
         newlyActivatedTarget.setY(spawnY);

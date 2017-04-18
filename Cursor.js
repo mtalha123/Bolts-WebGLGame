@@ -1,4 +1,4 @@
-define(['Custom Utility/Timer', 'EventSystem', 'ShaderLibrary', 'ShaderProcessor'], function(Timer, EventSystem, ShaderLibrary, ShaderProcessor){
+define(['Custom Utility/Timer', 'EventSystem', 'ShaderProcessor'], function(Timer, EventSystem, ShaderProcessor){
     
     var x = 0, y = 0; 
     var mouseHeldDown = false;  
@@ -8,9 +8,7 @@ define(['Custom Utility/Timer', 'EventSystem', 'ShaderLibrary', 'ShaderProcessor
     var canvasWidth, canvasHeight;
     
     function initialize(p_canvasWidth, p_canvasHeight){
-        handler = ShaderProcessor.requestEffect(ShaderLibrary.CURSOR);
-        handler.canvasWidth = canvasWidth = p_canvasWidth;
-        handler.canvasHeight = canvasHeight = p_canvasHeight;
+        handler = ShaderProcessor.requestCursorEffect();
         handler.shouldDraw(true);
     }
     

@@ -47,7 +47,7 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
         
     }
     
-    Target.prototype.draw = function(context, interpolation){
+    Target.prototype.draw = function(interpolation){
 //        this._lightning.setX(this._prevX + (interpolation * (this._x - this._prevX)));
 //        this._lightning.setY(this._prevY + (interpolation * (this._y - this._prevY)));
 //        
@@ -74,8 +74,8 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
 //     
 //        context.restore();
 
-        this.targetHandler.setX(this._x + this._radius);
-        this.targetHandler.setY(this._y + this._radius);
+        this.targetHandler.setX((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius);
+        this.targetHandler.setY((this._prevY + (interpolation * (this._y - this._prevY))) + this._radius);
         this.TESTTIME++;
         this.targetHandler.setTime(this.TESTTIME);
     }

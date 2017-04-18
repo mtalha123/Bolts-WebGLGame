@@ -45,8 +45,7 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'ge
         var borderCoords = coordsToRGB(borderPath, canvasWidth, canvasHeight);        
         
         handler = ShaderProcessor.requestLightningEffect();
-        handler.setResolution(canvasWidth, canvasHeight);
-        handler.setToBorderPath(canvasWidth, canvasHeight);
+        handler.setToBorderPath();
         var noiseTexture = getNoiseTexture(1024, 1024);
         handler.setNoiseTexture(noiseTexture, gl, 1024, 1024);
         handler.setLightningCoords(borderCoords, gl, 8);
@@ -130,13 +129,14 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'ge
         return (margin + heightOfBlueThing);
     }
     function getTopY(){
-        return (margin + heightOfBlueThing);
+        return canvasHeight - (margin + heightOfBlueThing);
+       // return 700;
     }
     function getRightX(){
         return (canvasWidth - margin - heightOfBlueThing);
     }
     function getBottomY(){
-        return (canvasHeight - margin - heightOfBlueThing);
+        return canvasHeight - (canvasHeight - margin - heightOfBlueThing);
     }
     
     function getLeftSidePhysicsBody(){

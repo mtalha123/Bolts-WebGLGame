@@ -4,16 +4,18 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
     var TARGET = 2;
     var SCORE_TEXT = 3; 
     var CURSOR = 4;
+    var COMBO = 5;
     
     var vertexShaderSources = [], fragmentShadersInfo = [];
     var allPrograms = [];
         
-    getTextResource("http://192.168.0.17:4000/Shaders/vertexShader.glsl", vertexShaderLoaded, 0);
-    getTextResource("http://192.168.0.17:4000/Shaders/textVertexShader.glsl", vertexShaderLoaded, 1);
-    getTextResource("http://192.168.0.17:4000/Shaders/lightningFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: LIGHTNING});
-    getTextResource("http://192.168.0.17:4000/Shaders/targetFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: TARGET});
-    getTextResource("http://192.168.0.17:4000/Shaders/textFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 1, effect: SCORE_TEXT});
-    getTextResource("http://192.168.0.17:4000/Shaders/cursorFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: CURSOR});
+    getTextResource("http://192.168.0.13:4000/Shaders/vertexShader.glsl", vertexShaderLoaded, 0);
+    getTextResource("http://192.168.0.13:4000/Shaders/textVertexShader.glsl", vertexShaderLoaded, 1);
+    getTextResource("http://192.168.0.13:4000/Shaders/lightningFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: LIGHTNING});
+    getTextResource("http://192.168.0.13:4000/Shaders/targetFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: TARGET});
+    getTextResource("http://192.168.0.13:4000/Shaders/textFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 1, effect: SCORE_TEXT});
+    getTextResource("http://192.168.0.13:4000/Shaders/cursorFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: CURSOR});
+    getTextResource("http://192.168.0.13:4000/Shaders/comboFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: COMBO});
     
     
     function vertexShaderLoaded(error, text, index){
@@ -82,6 +84,8 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
                 return allPrograms[SCORE_TEXT];
             case CURSOR:
                 return allPrograms[CURSOR];
+            case COMBO:
+                return allPrograms[COMBO];
         }
     }
     
@@ -92,6 +96,7 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
         BACKGROUND_FIELD: BACKGROUND_FIELD,
         TARGET: TARGET,
         SCORE_TEXT: SCORE_TEXT,
-        CURSOR: CURSOR
+        CURSOR: CURSOR,
+        COMBO: COMBO
     };
 });

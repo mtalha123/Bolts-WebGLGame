@@ -101,53 +101,31 @@ void main(){
         b+=1.0;
     }
     
-    float invertedDistance = clamp(1.0 / distanceToPoint, 1.0, 300.0);
-    float multiplier = invertedDistance * (glowFactor / iResolution.x);
+    float invertedDistance = smoothstep(0.0, 220.0, 1.0 / distanceToPoint);//clamp(1.0 / distanceToPoint, 1.0, 300.0);
+    float multiplier = invertedDistance;// * (glowFactor / iResolution.x);
+    
+    float alpha = 1.0;
     
     if( (currentUV_t.y >= (yNoiseVal - lineWidthUV)) && (currentUV_t.y <= (yNoiseVal + lineWidthUV)) ){
-        finalColor = multiplier * glowColor;
-        
-        //finalColor = clamp(finalColor, 0.1, 1.0);
-        //float rr = map(0.1, 1.0, 0.65, 1.0, finalColor.r);
-        //float gg = map(0.1, 1.0, 0.65, 1.0, finalColor.g);
-        //float bb = map(0.1, 1.0, 0.65, 1.0, finalColor.b);
-        //finalColor = vec3(rr,gg, bb);
+        finalColor = vec3(1.0, 1.0, 0.7);//multiplier * glowColor;
+        alpha *= multiplier;
+
         if( (currentUV_t.x >= 0.0) && (currentUV_t.x <= lengthOfLightning) ){
         	finalColor = boltColor;
+            alpha = 1.0;
         }//else if(distance(currentUV, lightningEndUV) <= lineWidthUV){
         //	finalColor = boltColor;
        // }
     }else{
-        finalColor = multiplier * glowColor;
-      //  finalColor = clamp(finalColor, 0.1, 1.0);
-
-      //  float rr = map(0.1, 1.0, 0.65, 1.0, finalColor.r);
-      //  float gg = map(0.1, 1.0, 0.65, 1.0, finalColor.g);
-      //  float bb = map(0.1, 1.0, 0.65, 1.0, finalColor.b);
-       // finalColor = vec3(rr,gg, bb);
+        finalColor = vec3(1.0, 1.0, 0.7);//multiplier * glowColor;
+        alpha *= multiplier;
     }  
     
-    
-	//STILL TESTINGGGGGG----------
-    float gFactor = 0.1;
-    
-    if(finalColor.r < gFactor){
-    	//finalColor.r = gFactor;
-    }
-    
-    if(finalColor.g < gFactor){
-    	//finalColor.g = gFactor;
-    }
-    
-    if(finalColor.b < gFactor){
-    	//finalColor.b = gFactor;
-    }
-    
-    //-------------------------------
-   float alpha = 1.0 - smoothstep(0.001, 0.02, distanceToPoint);
-   finalColor = vec3(1.0, 1.0, 0.0);
-   if(alpha < 1.0){
-        finalColor = vec3(1.0, 1.0, 0.9);
-   }
+   //alpha = 1.0 - smoothstep(0.001, 0.02, distanceToPoint);
+//   finalColor = vec3(1.0, 1.0, 0.0);
+//   if(alpha < 1.0){
+//        finalColor = vec3(1.0, 1.0, 0.9);
+//   }
+
 	gl_FragColor = vec4(finalColor, alpha);//0.5 * multiplier);
 }

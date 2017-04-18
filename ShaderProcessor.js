@@ -1,17 +1,19 @@
-define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextInfo', 'Custom Utility/map', 'Custom Utility/convertToGLCoordinate'], function(ShaderLibrary, getVertices, getTextInfo, map, convertToGLCoordinate){
+define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextInfo', 'Custom Utility/map', 'Custom Utility/convertToGLCoordinate', 'globalInfo'], function(ShaderLibrary, getVertices, getTextInfo, map, convertToGLCoordinate, globalInfo){
     var allHandlers = [];
     
+    var fontImage = new Image();
+    var test = 4;
+    fontImage.src = "Assets/arial.png";
+    
     function requestLightningEffect(){
-        var handler;
-        
-        handler = {
+        var handler = {
             _shaderProgram: ShaderLibrary.requestProgram(ShaderLibrary.LIGHTNING),
-            _radius: 50,
+            _padding: 50,
             _shouldDraw: false,
             _uniforms: {
                 iResolution: {
                     type: "vec2",
-                    value: [1920, 800]
+                    value: [globalInfo.getCanvasWidth(), globalInfo.getCanvasHeight()]
                 },
                 iGlobalTime: {
                     type: "float",
@@ -57,10 +59,10 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
             },
             //path can only contain two points (x1, y1, x2, y2)
             _addToPath: function(path){
-                var x = path[0] - this._radius;
-                var y = path[1] - this._radius;
-                var width = (path[2] + this._radius) - x;
-                var height = (path[3] + this._radius) - y;
+                var x = path[0] - this._padding;
+                var y = path[1] - this._padding;
+                var width = (path[2] + this._padding) - x;
+                var height = (path[3] + this._padding) - y;
 
                 x /= this._uniforms.iResolution.value[0];
                 y /= this._uniforms.iResolution.value[1];
@@ -75,20 +77,15 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                     this._attributes.vertexPosition[a+1] = (this._attributes.vertexPosition[a+1] * 2) - 1;
                 }
             },
-            setToBorderPath: function(width, height){
+            setToBorderPath: function(){
                 this._attributes.vertexPosition = [];
-                //this._uniforms.coords.value = [];
+                var width = globalInfo.getCanvasWidth(), height = globalInfo.getCanvasHeight();
 
-                this._addToPath( [this._radius, this._radius, width - this._radius, this._radius] );
-                this._addToPath( [width - this._radius, this._radius * 3, width - this._radius, height - this._radius] );
-                this._addToPath( [this._radius, height - this._radius, width - (this._radius * 3), height - this._radius] );
-                this._addToPath( [this._radius, this._radius * 3, this._radius, height - (this._radius * 3)] );
+                this._addToPath( [this._padding, this._padding, width - this._padding, this._padding] );
+                this._addToPath( [width - this._padding, this._padding * 3, width - this._padding, height - this._padding] );
+                this._addToPath( [this._padding, height - this._padding, width - (this._padding * 3), height - this._padding] );
+                this._addToPath( [this._padding, this._padding * 3, this._padding, height - (this._padding * 3)] );
 
-//                        this._uniforms.coords.value = [this._radius, this._radius, width - this._radius, this._radius,
-//                                                       width - this._radius, height - this._radius,
-//                                                       this._radius, height - this._radius,
-//                                                       this._radius, this._radius                                                     
-//                                                      ]
             },
             setFluctuation: function(newFluctuation){
                 this._uniforms.fluctuation.value = [newFluctuation];
@@ -148,15 +145,13 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
     }
     
     function requestTargetEffect(){
-        var handler;
-        
-        handler = {
+        var handler = {
             _shaderProgram: ShaderLibrary.requestProgram(ShaderLibrary.TARGET),
             _shouldDraw: false,
             _uniforms: {
                 iResolution: {
                     type: "vec2",
-                    value: [1920, 950]
+                    value: [globalInfo.getCanvasWidth(), globalInfo.getCanvasHeight()]
                 },
                 iGlobalTime: {
                     type: "float",
@@ -292,15 +287,11 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
     }
     
     function requestTextEffect(){
-        var handler;
-        
-        handler = {
+        var handler = {
             _shaderProgram: ShaderLibrary.requestProgram(ShaderLibrary.SCORE_TEXT),
             _x: 100,
             _y: 100,
             width: null,
-            canvasWidth: null,
-            canvasHeight: null,
             _shouldDraw: false,
             _uniforms: {
                 fontTexture: {
@@ -329,14 +320,14 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
                 gl.bindTexture(gl.TEXTURE_2D, null);
             },
-            setText: function(string, canvasWidth, canvasHeight){
+            setText: function(string){
                 this._attributes.vertexPosition = [];
                 var textObject = getTextInfo(string);
                 this._attributes.texCoord = [];
                 this.width = 0;
 
-                var textCursorX = convertToGLCoordinate(this._x / canvasWidth);
-                var textCursorY = convertToGLCoordinate(this._y / canvasHeight);
+                var textCursorX = convertToGLCoordinate(this._x / globalInfo.getCanvasWidth());
+                var textCursorY = convertToGLCoordinate(this._y / globalInfo.getCanvasHeight());
 
                 for(var i = 0; i < string.length; i++){                            
                     var x = textObject[string[i]].x;
@@ -344,9 +335,9 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                     var width = textObject[string[i]].width;
                     var height = textObject[string[i]].height;
 
-                    var xOffset = textObject[string[i]].xoffset / canvasWidth;
-                    var yOffset = textObject[string[i]].yoffset / canvasHeight;
-                    var xAdvance = textObject[string[i]].xadvance / canvasWidth;
+                    var xOffset = textObject[string[i]].xoffset / globalInfo.getCanvasWidth();
+                    var yOffset = textObject[string[i]].yoffset / globalInfo.getCanvasHeight();
+                    var xAdvance = textObject[string[i]].xadvance / globalInfo.getCanvasWidth();
 
                     y -= height;
 
@@ -376,15 +367,15 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                     this._attributes.texCoord.push(y);
 
                     textCursorX += xAdvance;
-                    this.width += (xAdvance * canvasWidth);
+                    this.width += (xAdvance * globalInfo.getCanvasWidth());
                 }
             },
             getNumVertices: function(){
                 return this._attributes.vertexPosition.length / 2;
             },
             setX: function(newX){
-                var prevX_t = convertToGLCoordinate(this._x / this.canvasWidth);
-                var newX_t = convertToGLCoordinate(newX / this.canvasWidth);
+                var prevX_t = convertToGLCoordinate(this._x / globalInfo.getCanvasWidth());
+                var newX_t = convertToGLCoordinate(newX / globalInfo.getCanvasWidth());
 
                 var moveX = 0;
 
@@ -401,8 +392,8 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                 this._x = newX;
             },
             setY: function(newY){
-                var prevY_t = convertToGLCoordinate(this._y / this.canvasHeight);
-                var newY_t = convertToGLCoordinate(newY / this.canvasHeight);
+                var prevY_t = convertToGLCoordinate(this._y / globalInfo.getCanvasHeight());
+                var newY_t = convertToGLCoordinate(newY / globalInfo.getCanvasHeight());
 
                 var moveY = 0;
 
@@ -431,17 +422,15 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
     }
     
     function requestCursorEffect(){
-        handler = {
+        var handler = {
             _shaderProgram: ShaderLibrary.requestProgram(ShaderLibrary.CURSOR),
             _x: 0,
             _y: 0,
-            canvasWidth: null,
-            canvasHeight: null,
             _shouldDraw: false,
             _uniforms: {
                 iResolution: {
                     type: "vec2",
-                    value: [1920, 950]
+                    value: [globalInfo.getCanvasWidth(), globalInfo.getCanvasHeight()]
                 },
                 mouseCoords: {
                     type: "vec2",
@@ -461,8 +450,8 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
             setX: function(newX){
                 this._uniforms.mouseCoords.value[0] = newX;
 
-                var x_t = convertToGLCoordinate(newX / this.canvasWidth);
-                var y_t = convertToGLCoordinate(this._y / this.canvasHeight);
+                var x_t = convertToGLCoordinate(newX / globalInfo.getCanvasWidth());
+                var y_t = convertToGLCoordinate(this._y / globalInfo.getCanvasHeight());
                 this._attributes.vertexPosition = getVertices(x_t - 0.1, y_t - 0.1, 0.2, 0.2);
 
                 this._x = newX;
@@ -470,8 +459,8 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
             setY: function(newY){
                 this._uniforms.mouseCoords.value[1] = newY;
 
-                var x_t = convertToGLCoordinate(this._x / this.canvasWidth);
-                var y_t = convertToGLCoordinate(newY / this.canvasHeight);
+                var x_t = convertToGLCoordinate(this._x / globalInfo.getCanvasWidth());
+                var y_t = convertToGLCoordinate(newY / globalInfo.getCanvasHeight());
                 this._attributes.vertexPosition = getVertices(x_t - 0.1, y_t - 0.1, 0.2, 0.2);
 
                 this._y = newY;
@@ -487,6 +476,103 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                 this._shouldDraw = shoulddraw;
             }
         };
+        
+        allHandlers.push(handler);
+        return handler;
+    }
+    
+    function requestComboEffect(gl, x, y, radius, completion, lineWidth, comboText){
+        var radiusUV = radius / globalInfo.getCanvasHeight(), xUV = x / globalInfo.getCanvasWidth(), yUV = y / globalInfo.getCanvasHeight(), lineWidthUV = lineWidth / globalInfo.getCanvasHeight();
+        
+//        var vertices = getVertices(xUV - radiusUV - 0.05, yUV - radiusUV - 0.05, radiusUV * 2 + 0.05, radiusUV * 2 + 0.05);
+//        for(var i = 0; i < vertices.length; i++){
+//            vertices[i] = convertToGLCoordinate(vertices[i]);
+//        }
+        
+        var vertices = getVertices(x - radius - lineWidth, y - radius - lineWidth, radius * 2 + (lineWidth * 2), radius * 2 + (lineWidth * 2));
+        for(var i = 0; i < vertices.length-1; i+=2){
+            vertices[i] /= globalInfo.getCanvasWidth(); 
+            vertices[i+1] /= globalInfo.getCanvasHeight(); 
+            
+            vertices[i] = convertToGLCoordinate(vertices[i]);
+            vertices[i+1] = convertToGLCoordinate(vertices[i+1]);
+        }
+        
+        var comboTextInfo = getTextInfo(comboText);
+        
+        var handler = {
+            _shaderProgram: ShaderLibrary.requestProgram(ShaderLibrary.COMBO),
+            _shouldDraw: false,
+            _uniforms: {
+                iResolution: {
+                    type: "vec2",
+                    value: [globalInfo.getCanvasWidth(), globalInfo.getCanvasHeight()]
+                },
+                completion: {
+                    type: "float",
+                    value: [completion]
+                },
+                uniformCenter: {
+                    type: "vec2",
+                    value: [xUV, yUV]
+                },
+                radius: {
+                    type: "float",
+                    value: [radiusUV]
+                },
+                lineWidth: {
+                    type: "float",
+                    value: [lineWidthUV]
+                },
+                fontTexture: {
+                    type: "sampler2D",
+                    value: 3,
+                    texture: null
+                },
+                firstTextCoords: {
+                    type: "vec4",
+                    value: [comboTextInfo[comboText[0]].x / 512, (512 - comboTextInfo[comboText[0]].y - comboTextInfo[comboText[0]].height) / 512, (comboTextInfo[comboText[0]].x + comboTextInfo[comboText[0]].width) / 512, ( 512 - comboTextInfo[comboText[0]].y) / 512]
+                },
+                secondTextCoords: {
+                    type: "vec4",
+                    value: [comboTextInfo[comboText[1]].x / 512, (512 - comboTextInfo[comboText[1]].y - comboTextInfo[comboText[1]].height) / 512, (comboTextInfo[comboText[1]].x + comboTextInfo[comboText[1]].width) / 512, ( 512 - comboTextInfo[comboText[1]].y) / 512]
+                },
+                gap: {
+                    type: "float",
+                    value: [comboTextInfo[comboText[0]].xadvance / globalInfo.getCanvasHeight()]
+                },
+            },
+            _attributes: {
+                vertexPosition: vertices
+            },
+            getNumVertices: function(){
+                return this._attributes.vertexPosition.length / 2;
+            },
+            setComboText: function(comboText){
+                var comboTextInfo = getTextInfo(comboText);
+                
+                this._uniforms.firstTextCoords.value = [comboTextInfo[comboText[0]].x / 512, (512 - comboTextInfo[comboText[0]].y - comboTextInfo[comboText[0]].height) / 512, (comboTextInfo[comboText[0]].x + comboTextInfo[comboText[0]].width) / 512, ( 512 - comboTextInfo[comboText[0]].y) / 512];
+                
+                this._uniforms.secondTextCoords.value = [comboTextInfo[comboText[1]].x / 512, (512 - comboTextInfo[comboText[1]].y - comboTextInfo[comboText[1]].height) / 512, (comboTextInfo[comboText[1]].x + comboTextInfo[comboText[1]].width) / 512, ( 512 - comboTextInfo[comboText[1]].y) / 512];
+            },
+            shouldDraw: function(val){
+                this._shouldDraw = val;
+            },
+            setCompletion: function(completionVal){
+                this._uniforms.completion.value = [completionVal];
+            }
+        };
+        
+        handler._uniforms.fontTexture.texture = gl.createTexture();
+
+        gl.bindTexture(gl.TEXTURE_2D, handler._uniforms.fontTexture.texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, fontImage);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+        gl.bindTexture(gl.TEXTURE_2D, null);
         
         allHandlers.push(handler);
         return handler;
@@ -535,6 +621,10 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
                         gl.activeTexture(gl.TEXTURE2);
                         gl.bindTexture(gl.TEXTURE_2D, handler._uniforms.fontTexture.texture);
                         gl.uniform1i(uniformLocation, 2);
+                    }else if(handler._uniforms[uniformVar].value === 3){
+                        gl.activeTexture(gl.TEXTURE3);
+                        gl.bindTexture(gl.TEXTURE_2D, handler._uniforms.fontTexture.texture);
+                        gl.uniform1i(uniformLocation, 3);
                     }
                     break;
             }
@@ -558,13 +648,13 @@ define(['ShaderLibrary', 'Custom Utility/getVertices', 'Custom Utility/getTextIn
     }
     
     return {
-        requestEffect: requestEffect,
         getHandlers: getHandlers,
         setUpAttributesAndUniforms: setUpAttributesAndUniforms,
         requestLightningEffect: requestLightningEffect,
         requestTargetEffect: requestTargetEffect,
         requestTextEffect: requestTextEffect,
-        requestCursorEffect: requestCursorEffect
+        requestCursorEffect: requestCursorEffect,
+        requestComboEffect: requestComboEffect
     };
     
 });

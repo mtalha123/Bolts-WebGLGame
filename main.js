@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.17:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.13:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'InputProcessor', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary' ,'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/map'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, InputProcessor, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, genCoords, map){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'InputProcessor', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary' ,'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/map', 'globalInfo'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, InputProcessor, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, genCoords, map, globalInfo){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -234,7 +234,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         TargetsController.draw(interpolation);
         Cursor.draw(interpolation);
 //
-//        ComboSystem.draw(context);
+        ComboSystem.draw();
         //Box2DStuff.physicsWorld.DrawDebugData();  
         
         
@@ -278,6 +278,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
         
         //TESTING SHADERPROCESSOR MODULE
         if(!handler){
+            //handler = ShaderProcessor.requestComboEffect(gl, 300, 700, 80, 0.1, 3, "2x");
         }
     }
     
@@ -322,8 +323,10 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function initialize(TargetsControllerInfo, nextServerTick){
+        globalInfo.initialize(canvasWidth, canvasHeight);
         SynchronizedTimers.initialize(tickTimeMillis);
         ShaderLibrary.initialize(gl);
+        ComboSystem.initialize(gl);
         Border.initialize(gl, canvasWidth, canvasHeight);
         TargetsController.initialize(canvasWidth, canvasHeight, TargetsControllerInfo);
         InputProcessor.initialize();      

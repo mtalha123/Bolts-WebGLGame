@@ -1,4 +1,4 @@
-define(['EventSystem', 'TargetsController', 'SynchronizedTimers'], function(EventSystem, TargetsController, SynchronizedTimers){
+define(['EventSystem', 'TargetsController', 'SynchronizedTimers', 'ShaderProcessor'], function(EventSystem, TargetsController, SynchronizedTimers, ShaderProcessor){
     var totalStoredCharge = 0;
     var baseTargetCharge = 10;
     var chargeMultiplier = 1;
@@ -12,6 +12,12 @@ define(['EventSystem', 'TargetsController', 'SynchronizedTimers'], function(Even
     var maxComboLevel = 8;
     var targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;
     var areaToAchieveReductionAmount = 0.04 * targetAreaToAchieve;
+    
+    var comboHandler;
+    
+    function initialize(gl){
+        comboHandler = ShaderProcessor.requestComboEffect(gl, 300, 700, 80, 0.0, 3, "1x");
+    }
     
     function update(){
         if(untilDisintegrationTimer.getTime() >= timeUntilDisintegration){
@@ -45,6 +51,8 @@ define(['EventSystem', 'TargetsController', 'SynchronizedTimers'], function(Even
             EventSystem.publishEventImmediately("combo_level_changed", {comboLevel: currentComboLevel, timeUntilDisintegration: timeUntilDisintegration, timeAllDisintegrates: timeAllDisintegrates});
         }
         
+        comboHandler.shouldDraw(true);
+        
         untilDisintegrationTimer.reset();
         untilDisintegrationTimer.start();
         allDisintegratesTimer.reset();
@@ -60,6 +68,8 @@ define(['EventSystem', 'TargetsController', 'SynchronizedTimers'], function(Even
         targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;
         areaToAchieveReductionAmount = 0.04 * targetAreaToAchieve;
         numTargetsNeededHigherCombo = 1;
+        
+        comboHandler.shouldDraw(false);
         
         console.log("COMBO RESET!!!");
         EventSystem.publishEventImmediately("combo_level_changed", {comboLevel: currentComboLevel, timeUntilDisintegration: timeUntilDisintegration, timeAllDisintegrates: timeAllDisintegrates});
@@ -115,17 +125,23 @@ define(['EventSystem', 'TargetsController', 'SynchronizedTimers'], function(Even
         return totalStoredCharge;
     }
     
-    function draw(context){
-        context.save();
+    function draw(){
+//        context.save();
+//        
+//        context.fillStyle = "black";
+//        context.font = "20px Arial";
+//        context.fillText("x" + chargeMultiplier, 100, 100);
+//        context.fillText("timeUntilDisintegration: " + untilDisintegrationTimer.getTime(), 100, 150);
+//        context.fillText("timeAllDisintegrates: " + allDisintegratesTimer.getTime(), 100, 200);
+//        context.fillText("Area needed to achieve: " + targetAreaToAchieve, 100, 250);
+//        
+//        context.restore();
         
-        context.fillStyle = "black";
-        context.font = "20px Arial";
-        context.fillText("x" + chargeMultiplier, 100, 100);
-        context.fillText("timeUntilDisintegration: " + untilDisintegrationTimer.getTime(), 100, 150);
-        context.fillText("timeAllDisintegrates: " + allDisintegratesTimer.getTime(), 100, 200);
-        context.fillText("Area needed to achieve: " + targetAreaToAchieve, 100, 250);
+        var comboTxt = currentComboLevel.toString();
+        comboTxt = comboTxt.concat("x");
+        comboHandler.setComboText(comboTxt);
+        comboHandler.setCompletion(allDisintegratesTimer.getTime() / 2000);
         
-        context.restore();
     }
     
     function getTargetAreaToAchieve(){
@@ -149,5 +165,6 @@ define(['EventSystem', 'TargetsController', 'SynchronizedTimers'], function(Even
         draw: draw,
         increaseTotalStoredCharge: increaseTotalStoredCharge,
         getNumTargetsNeededHigherCombo: getNumTargetsNeededHigherCombo,
+        initialize: initialize
     };
 });

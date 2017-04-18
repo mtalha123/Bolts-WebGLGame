@@ -125,7 +125,7 @@ define(['Box2DStuff'], function(Box2DStuff){
     
     PhysicsEntity.prototype._update = function(){
         this._x = ((this._body.GetPosition().x / Box2DStuff.scale));
-        this._y = canvasHeight - ((this._body.GetPosition().y / Box2DStuff.scale));
+        this._y = ((this._body.GetPosition().y / Box2DStuff.scale));
     }
     
     PhysicsEntity.prototype._createFixtureDef = function(density, friction, restitution){
