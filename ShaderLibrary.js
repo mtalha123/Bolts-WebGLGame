@@ -1,26 +1,16 @@
-define(['Custom Utility/getTextResource'], function(getTextResource){
-    var LIGHTNING = 0;
-    var BACKGROUND_FIELD = 1;
-    var TARGET = 2;
-    var SCORE_TEXT = 3; 
-    var CURSOR = 4;
-    var COMBO = 5;
+define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResource, AssetManager){
+    var LIGHTNING = "LIGHTNING";
+    var BACKGROUND_FIELD = "BACKGROUND_FIELD";
+    var TARGET = "TARGET";
+    var TEXT = "TEXT"; 
+    var CURSOR = "CURSOR";
+    var COMBO = "COMBO";
     
     var vertexShaderSources = [], fragmentShadersInfo = [];
-    var allPrograms = [];
-        
-    getTextResource("http://192.168.0.13:4000/Shaders/vertexShader.glsl", vertexShaderLoaded, 0);
-    getTextResource("http://192.168.0.13:4000/Shaders/textVertexShader.glsl", vertexShaderLoaded, 1);
-    getTextResource("http://192.168.0.13:4000/Shaders/lightningFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: LIGHTNING});
-    getTextResource("http://192.168.0.13:4000/Shaders/targetFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: TARGET});
-    getTextResource("http://192.168.0.13:4000/Shaders/textFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 1, effect: SCORE_TEXT});
-    getTextResource("http://192.168.0.13:4000/Shaders/cursorFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: CURSOR});
-    getTextResource("http://192.168.0.13:4000/Shaders/comboFragmentShader.glsl", fragmentShaderLoaded, {vertexShaderId: 0, effect: COMBO});
-    
+    var allPrograms = {};    
     
     function vertexShaderLoaded(error, text, index){
         vertexShaderSources[index] = text;
-        //console.log("VERTEX SHADER SOURCE: " + vertexShaderSource);
     }
     
     function fragmentShaderLoaded(error, text, info){
@@ -30,17 +20,21 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
             text: text
         };
         fragmentShadersInfo.push(obj);
-        //console.log("FRAGMENT SHADER SOURCE: " + fragmentShaderSource);
     }
     
     function initialize(gl){
-        for(var i = 0; i < fragmentShadersInfo.length; i++){
+        var allShaderSources = AssetManager.getShaderAsset(null, true);
+        
+        for(var shaderSource in allShaderSources){
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
             var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
             
-            var vertexShaderSource = vertexShaderSources[fragmentShadersInfo[i].vertexShaderId];
-            var fragmentShaderSource = fragmentShadersInfo[i].text;
-
+            var currShaderSource = allShaderSources[shaderSource];
+            var indexBeginFragShader = currShaderSource.indexOf("precision mediump float;");
+            
+            var vertexShaderSource = currShaderSource.substring(0, indexBeginFragShader);
+            var fragmentShaderSource = currShaderSource.substring(indexBeginFragShader);
+ 
             gl.shaderSource(vertexShader, vertexShaderSource);
             gl.shaderSource(fragmentShader, fragmentShaderSource);
 
@@ -65,28 +59,12 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
                 alert("Could not link shaders: " + gl.getProgramInfoLog(shaderProgram));
             }
 
-            allPrograms[fragmentShadersInfo[i].effect] = shaderProgram;
+            allPrograms[shaderSource.toUpperCase()] = shaderProgram;
         }
     }
     
     function requestProgram(request){
-        switch(request){
-            case LIGHTNING:
-                return allPrograms[LIGHTNING];
-                break;
-            case BACKGROUND_FIELD:
-                return allPrograms[BACKGROUND_FIELD];
-                break;
-            case TARGET:
-                return allPrograms[TARGET];
-                break;
-            case SCORE_TEXT:
-                return allPrograms[SCORE_TEXT];
-            case CURSOR:
-                return allPrograms[CURSOR];
-            case COMBO:
-                return allPrograms[COMBO];
-        }
+        return allPrograms[request];
     }
     
     return {
@@ -95,7 +73,7 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
         LIGHTNING: LIGHTNING,
         BACKGROUND_FIELD: BACKGROUND_FIELD,
         TARGET: TARGET,
-        SCORE_TEXT: SCORE_TEXT,
+        TEXT: TEXT,
         CURSOR: CURSOR,
         COMBO: COMBO
     };

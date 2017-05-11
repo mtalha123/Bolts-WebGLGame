@@ -1,4 +1,4 @@
-define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'], function(Border, EventSystem, Cursor, SynchronizedTimers, ComboSystem){
+define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers'], function(Border, EventSystem, Cursor, SynchronizedTimers){
     
     var currentEntities = [];
     var currentTargetInFocus = undefined;
@@ -9,9 +9,9 @@ define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'],
     
     var startXInTarget, startYInTarget, targetDistCovered = 0;
     
-    var numTargetsAchievedSinceLastCombo = 0;
+    var ComboSystem;
     
-    function initialize(){
+    function initialize(p_ComboSystem){
         EventSystem.register(recieveEvent, "target_spawned"); 
         
         EventSystem.register(recieveEvent, "mouse_move");
@@ -19,11 +19,11 @@ define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'],
         EventSystem.register(recieveEvent, "mouse_up");
         EventSystem.register(recieveEvent, "mouse_held_down");
         EventSystem.register(recieveEvent, "key_press");
+        
+        ComboSystem = p_ComboSystem;
     }
     
     function update(){
-        ComboSystem.update();       
-        
         if(inputToBeProcessed.mouseState){
             var mouseState = inputToBeProcessed.mouseState;
 
@@ -31,40 +31,15 @@ define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'],
                 case "mouse_held_down":
                     var entityPossiblyFocused = isInsideAnyEntityBoundary(mouseState.x, mouseState.y);
                     if(entityPossiblyFocused){
-                        if(entityPossiblyFocused === currentTargetInFocus){
-                            if(startXInTarget && startYInTarget){
-                                var mouseXRelativeToTarget = mouseState.x - currentTargetInFocus.getX();
-                                var mouseYRelativeToTarget = mouseState.y - currentTargetInFocus.getY();
-
-                                targetDistCovered += distanceBetween(startXInTarget, startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
-
-                                startXInTarget = mouseXRelativeToTarget;
-                                startYInTarget = mouseYRelativeToTarget;
-                                
-                                if(targetDistCovered >= ComboSystem.getTargetAreaToAchieve()){
-                                    numTargetsAchievedSinceLastCombo++;
-                                    console.log("TARGET ACHIEVED@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2");
-                                    EventSystem.publishEventImmediately("target_destroyed", {target: currentTargetInFocus});
-                                    
-                                    console.log("NUM TARGETS NEEDED FOR HIGHER COMBO: " + ComboSystem.getNumTargetsNeededHigherCombo());
-                                    if(numTargetsAchievedSinceLastCombo >= ComboSystem.getNumTargetsNeededHigherCombo()){
-                                        ComboSystem.increaseTotalStoredCharge();
-                                        ComboSystem.increaseComboLevel();
-                                        numTargetsAchievedSinceLastCombo = 0;
-                                    }
-                                    
-                                    targetDistCovered = 0;                                    
-                                    currentTargetInFocus = undefined;
-                                }
-                            }
-
+                        if(entityPossiblyFocused === currentTargetInFocus){      
+                            handleMouseCoordsInsideCurrFocusedTarget(mouseState.x, mouseState.y);                            
                         }else{
-                            targetBecomeUnfocused(currentTargetInFocus);
-                            targetBecameFocused(entityPossiblyFocused, mouseState.x, mouseState.y);
+                            unfocusTarget(currentTargetInFocus);
+                            focusTarget(entityPossiblyFocused, mouseState.x, mouseState.y);
                         }
                     }else{
                         if(currentTargetInFocus){
-                            targetBecomeUnfocused();
+                            unfocusTarget();
                         }
                     }
 
@@ -73,24 +48,15 @@ define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'],
                     var entityPossiblyFocused = isInsideAnyEntityBoundary(mouseState.x, mouseState.y);
 
                     if(entityPossiblyFocused){
-                        targetBecameFocused(entityPossiblyFocused, mouseState.x, mouseState.y);
+                        focusTarget(entityPossiblyFocused, mouseState.x, mouseState.y);
                     }            
-                    break;
-                case "mouse_move":
-                    if(currentTargetInFocus){
-                        ///DOO THE RADIUS CHECK THING
-                    }
                     break;
                 case "mouse_up":
                     if(currentTargetInFocus){
-                        targetBecomeUnfocused();
+                        unfocusTarget();
                     }
                     break;
             }
-        }
-            
-        if(inputToBeProcessed.keyboardState){
-            releaseScoreAndResetComboStuff();
         }
 
         inputToBeProcessed = {
@@ -118,7 +84,7 @@ define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'],
     function isInsideAnyEntityBoundary(checkX, checkY){
         for(var i = 0; i < currentEntities.length; i++){
             var isInsideLeftAndRightBoundary = (checkX >= currentEntities[i].getX()) && (checkX <= (currentEntities[i].getX() + (currentEntities[i].getRadius()*2)) );
-            var isInsideTopAndBottomBoundary = (checkY >= currentEntities[i].getY()) && (checkY <= (currentEntities[i].getY() + (currentEntities[i].getRadius()*2)) );
+            var isInsideTopAndBottomBoundary = (checkY <= currentEntities[i].getY()) && (checkY >= (currentEntities[i].getY() - (currentEntities[i].getRadius()*2)) );
              
             if(isInsideLeftAndRightBoundary && isInsideTopAndBottomBoundary){
                 return currentEntities[i];
@@ -139,27 +105,38 @@ define(['Border', 'EventSystem', 'Cursor', 'SynchronizedTimers', 'ComboSystem'],
         return Math.sqrt( Math.pow((endX - startX), 2) + Math.pow((endY - startY), 2) );
     }
 
-    function targetBecameFocused(targetfocused, whereX, whereY){
+    function focusTarget(targetfocused, whereX, whereY){
         currentTargetInFocus = targetfocused;
         startXInTarget = whereX - currentTargetInFocus.getX();
         startYInTarget = whereY - currentTargetInFocus.getY();
         EventSystem.publishEvent("target_in_focus", { target: currentTargetInFocus });
     }
 
-    function targetBecomeUnfocused(){
+    function unfocusTarget(){
         EventSystem.publishEvent("target_out_of_focus", { target: currentTargetInFocus });
         currentTargetInFocus = undefined;   
         targetDistCovered = 0;
         startXInTarget = undefined, startYInTarget = undefined;
     }
     
-    function handleTargetAchieved(){
+    function handleMouseCoordsInsideCurrFocusedTarget(mouseX, mouseY){
+        var mouseXRelativeToTarget = mouseX - currentTargetInFocus.getX();
+        var mouseYRelativeToTarget = mouseY - currentTargetInFocus.getY();
+        targetDistCovered += distanceBetween(startXInTarget, startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
+        
+        startXInTarget = mouseXRelativeToTarget;
+        startYInTarget = mouseYRelativeToTarget;
+
+        if(targetDistCovered >= ComboSystem.getTargetAreaToAchieve()){
+            achieveTarget();
+        }
     }
     
-    function releaseScoreAndResetComboStuff(){
-        EventSystem.publishEventImmediately("score_achieved", ComboSystem.getTotalStoredCharge());        
-        ComboSystem.resetCombo();
-    } 
+    function achieveTarget(){
+        EventSystem.publishEventImmediately("target_destroyed", {target: currentTargetInFocus});
+        targetDistCovered = 0;                                    
+        currentTargetInFocus = undefined;
+    }
     
     return {
         initialize: initialize,

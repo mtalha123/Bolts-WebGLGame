@@ -1,5 +1,5 @@
-define([], function(){
-    function getVertices(x, y, width, height){
+define([''], function(){
+    function getVerticesUnNormalized(x, y, width, height){
         var vertices = [
             x + width, y,
             x, y,
@@ -12,5 +12,5 @@ define([], function(){
         return vertices;
     }
     
-    return getVertices;
+    return getVerticesUnNormalized;
 });

@@ -27,9 +27,9 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
     
     var mostRecentKeyPressed;
     
-    var canvasWidth, canvasHeight;
+    var appMetaData;
     
-    function initialize(canvas, p_canvasWidth, p_canvasHeight){
+    function initialize(canvas, p_appMetaData){
         canvas.addEventListener("mousemove", function(event){
             handleMouseEvent("mousemove", event);
         }, false);    
@@ -46,43 +46,8 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
             handleKeyboardEvent("keyup", event);
         });
         
-        canvasWidth = p_canvasWidth;
-        canvasHeight = p_canvasHeight;
+        appMetaData = p_appMetaData;
     }
-    
-//    function recieveEvent(type, event){
-//        stateChangedSinceLastConsume = true;
-//        
-//        switch(type){
-//            case "mousedown":
-//                Cursor.press();
-//                mostRecentInput.mouseState.type = "mousedown";
-//                break;
-//            case "mouseup":
-//                Cursor.release();
-//                mostRecentInput.mouseState.type = "mouseup";
-//                break;
-//            case "mousemove":
-//                if(mostRecentInput.mouseState.type === "mousedown" || mostRecentInput.mouseState.type === "mousehelddown"){
-//                    mostRecentInput.mouseState.type = "mousehelddown"; 
-//                }else{
-//                    mostRecentInput.mouseState.type = "mousemove";
-//                }
-//                break;
-//            case "keydown":
-//                if(!mostRecentInput.keyboardState.spacebarPressed){
-//                    mostRecentInput.keyboardState.spacebarPressed = true;
-//                }
-//                break;
-//            case "keyup":
-//                
-//                break;
-//        }
-//        mostRecentInput.mouseState.xPos = event.clientX;
-//        mostRecentInput.mouseState.yPos = event.clientY;
-//        
-//        Cursor.changePosition(event.clientX, event.clientY);
-//    }
     
     function notifyOfCurrentStateAndConsume(){
         var returnObject = {};
@@ -127,9 +92,9 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
                 break;
         }
         mostRecentInput.mouseState.xPos = eventData.clientX;
-        mostRecentInput.mouseState.yPos = canvasHeight - eventData.clientY;
+        mostRecentInput.mouseState.yPos = appMetaData.getCanvasHeight() - eventData.clientY;
         
-        Cursor.changePosition(eventData.clientX, canvasHeight - eventData.clientY);
+        Cursor.changePosition(eventData.clientX, appMetaData.getCanvasHeight() - eventData.clientY);
     }
     
     function handleKeyboardEvent(eventType, eventData){
@@ -159,26 +124,3 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
     }
     
 });
-
-
-
-//
-//if(this._mostRecentState){
-//        var mostRecentMouseState = this._mostRecentState.mouseState;
-//        
-//        if(this._mouseClicked){
-//            if(mostRecentMouseState.clicked){
-//                this._EventSystem.publishEventImmediately("mousehelddown", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
-//            }else{
-//                this._EventSystem.publishEventImmediately("mouseup", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
-//                this._mouseClicked = false;
-//            }
-//        }else{
-//            if(mostRecentMouseState.clicked){
-//                this._EventSystem.publishEventImmediately("mousedown", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
-//                this._mouseClicked = true;
-//            }else{
-//                this._EventSystem.publishEventImmediately("mousemove", {x: mostRecentMouseState.xPos, y: mostRecentMouseState.yPos});
-//            }
-//        }
-//    }

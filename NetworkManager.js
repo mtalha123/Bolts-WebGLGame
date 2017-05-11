@@ -5,8 +5,8 @@ define(['socketio', 'Custom Utility/Timer'], function(io, Timer){
     var ping = 0;
     var socket;
     
-    function initialize(canvasWidth, canvasHeight, listenerFunction){
-        socket = io.connect('http://192.168.0.13:4000');
+    function initializeAndConnect(canvasWidth, canvasHeight, listenerFunction){
+        socket = io.connect('http://192.168.0.15:4000');
  
         socket.on("connect", function(data){
             console.log("Connected to server.");
@@ -51,7 +51,7 @@ define(['socketio', 'Custom Utility/Timer'], function(io, Timer){
     }
     
     return {
-        initialize: initialize,
+        initializeAndConnect: initializeAndConnect,
         connectedToServer: connectedToServer,
         getPing: getPing,
         sendToServer: sendToServer

@@ -1,177 +1,95 @@
-define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/coordsToRGB', 'Custom Utility/getNoiseTexture', 'Custom Utility/convertToShaderCoordinates.js'], function(LightningPiece, PhysicsSystem, EventSystem, ShaderProcessor, generateLightningCoordinates, coordsToRGB, getNoiseTexture, convertToShaderCoordinates){
+define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/getNoiseTexture', 'RectangleEntity'], function(PhysicsSystem, EventSystem, coordsToRGB, getNoiseTexture, RectangleEntity){
     
-    var canvasWidth, canvasHeight, borderLightningPiece;    
     var margin;    
-    var widthOfBlueThing;
-    var heightOfBlueThing;
+    var borderLength;
+    var borderWidth;
     var gapForScore;
     var score = 0;
     var scoreX, scoreY;
     
-    var leftPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
-    var topPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
-    var rightPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
-    var bottomPhysicsBody = PhysicsSystem.requestPhysicsEntity("static");
+    var leftPhysicsBody;  
+    var topPhysicsBody;  
+    var rightPhysicsBody;  
+    var bottomPhysicsBody;  
     
     var borderPath;
     var handler;
-    var fontImage, scoreHandler;
+    var animationTime = 0;
+    var scoreHandler;
+    var appMetaData;
     
-    fontImage = new Image();
-    fontImage.src = "Assets/arial.png";
+    EventSystem.register(recieveEvent, "initialize");
     
-    function initialize(gl, p_canvasWidth, p_canvasHeight){
-        canvasWidth = p_canvasWidth;
-        canvasHeight = p_canvasHeight;
+    function initialize(gl, p_appMetaData, AssetManager, ShaderProcessor){     
+        appMetaData = p_appMetaData;
         
-        margin = 0.025 * canvasWidth;
-        widthOfBlueThing = canvasWidth - (margin * 2);
-        heightOfBlueThing = 50;
-        gapForScore = 0.10 * canvasWidth;
-        scoreX = margin + (widthOfBlueThing/2);
-        scoreY = margin + 0.08 * canvasHeight;
+        margin = 0.05 * appMetaData.getCanvasHeight();
+        borderLength = appMetaData.getCanvasWidth() - (margin * 2);
+        borderWidth = 0.05 * appMetaData.getCanvasHeight();
+        gapForScore = 0.10 * appMetaData.getCanvasWidth();
+        scoreX = margin + (borderLength/2);
+        scoreY = margin + 0.08 * appMetaData.getCanvasHeight();
         
-        borderPath = [ //               X                                                   Y
-                            margin + (widthOfBlueThing/2) - (gapForScore/2),                 margin,
-                            margin,                                                          margin, 
-                            margin,                                                          canvasHeight - margin,       
-                            canvasWidth - margin,                                            canvasHeight - margin, 
-                            canvasWidth - margin,                                            margin,
-                            (canvasWidth - margin - (widthOfBlueThing/2)) + (gapForScore/2), margin           
+        borderPath = [ //               X                                                                           Y
+                            margin + (borderLength/2) - (gapForScore/2),                                  appMetaData.getCanvasHeight() - margin,
+                            margin,                                                                       appMetaData.getCanvasHeight() - margin, 
+                            margin,                                                                       margin,       
+                            appMetaData.getCanvasWidth() - margin,                                        margin, 
+                            appMetaData.getCanvasWidth() - margin,                                        appMetaData.getCanvasHeight() - margin,
+                            (appMetaData.getCanvasWidth() - margin - (borderLength/2)) + (gapForScore/2), appMetaData.getCanvasHeight() - margin           
         ];
         
-        convertToShaderCoordinates(borderPath, canvasHeight);
+        handler = ShaderProcessor.requestLightningEffect(true, gl, {}, borderPath);
         
-        var borderCoords = coordsToRGB(borderPath, canvasWidth, canvasHeight);        
+        leftPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, margin, borderWidth, borderLength, 10, 0, 1);
+        leftPhysicsBody.addToSimulation();
         
-        handler = ShaderProcessor.requestLightningEffect();
-        handler.setToBorderPath();
-        var noiseTexture = getNoiseTexture(1024, 1024);
-        handler.setNoiseTexture(noiseTexture, gl, 1024, 1024);
-        handler.setLightningCoords(borderCoords, gl, 8);
-        handler.shouldDraw(true);
+        rightPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), appMetaData.getCanvasWidth() - (margin + borderWidth), margin, borderWidth, borderLength, 10, 0, 1);
+        rightPhysicsBody.addToSimulation();
         
-        var physicsBodyPositions = [ 
-                                     [margin + (widthOfBlueThing/2), margin + (heightOfBlueThing/2)], //top 
-                                     [canvasWidth - margin - (heightOfBlueThing/2), (margin + (canvasHeight - margin) / 2)], //right
-                                     [margin + (widthOfBlueThing/2), canvasHeight - margin - (heightOfBlueThing/2)], //bottom
-                                     [margin + (heightOfBlueThing/2), (margin + (canvasHeight - margin) / 2)] //left                
-                                   ];
+        topPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, appMetaData.getCanvasHeight() - (margin + borderWidth), borderLength, borderWidth, 10, 0, 1);
+        topPhysicsBody.addToSimulation();
         
-        
-        leftPhysicsBody.setX(physicsBodyPositions[3][0]);
-        leftPhysicsBody.setY(physicsBodyPositions[3][1]);
-        leftPhysicsBody.createRectangle(heightOfBlueThing, canvasHeight - (margin * 2), 10, 0, 1);
-        PhysicsSystem.addToSimulation(leftPhysicsBody);
-        
-        rightPhysicsBody.setX(physicsBodyPositions[1][0]);
-        rightPhysicsBody.setY(physicsBodyPositions[1][1]);
-        rightPhysicsBody.createRectangle(heightOfBlueThing, canvasHeight - (margin * 2), 10, 0, 1);
-        PhysicsSystem.addToSimulation(rightPhysicsBody);
-        
-        topPhysicsBody.setX(physicsBodyPositions[0][0]);
-        topPhysicsBody.setY(physicsBodyPositions[0][1]);
-        topPhysicsBody.createRectangle(widthOfBlueThing, heightOfBlueThing, 10, 0, 1);
-        PhysicsSystem.addToSimulation(topPhysicsBody);
-        
-        bottomPhysicsBody.setX(physicsBodyPositions[2][0]);
-        bottomPhysicsBody.setY(physicsBodyPositions[2][1]);
-        bottomPhysicsBody.createRectangle(widthOfBlueThing, heightOfBlueThing, 10, 0, 1);
-        PhysicsSystem.addToSimulation(bottomPhysicsBody);
+        bottomPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, margin, borderLength, borderWidth, 10, 0, 1);
+        bottomPhysicsBody.addToSimulation();
         
         EventSystem.register(recieveEvent, "score_achieved");
         
-        scoreHandler = ShaderProcessor.requestTextEffect();
-        scoreHandler.canvasWidth = canvasWidth;
-        scoreHandler.canvasHeight = canvasHeight;
-        scoreHandler.setText("0", canvasWidth, canvasHeight);
-        scoreHandler.setFontTexture(fontImage, gl, 512, 512);
-        scoreHandler.shouldDraw(true);
+        scoreHandler = ShaderProcessor.requestTextEffect(true, gl, {}, 100, 100, "0");
     }
     
-    function draw(interpolation){
-//        borderLightningPiece.draw(context, interpolation, 0, 0);
-//        
-//        //drawBorderPlain(context);
-//        
-//        context.save();
-//        
-//        context.fillStyle = "yellow";
-//        context.font = "50px Arial";
-//        context.shadowBlur = 10;
-//        context.shadowColor = "white";
-//        for(var i = 0; i < 4; i ++){
-//            context.fillText("" + score, scoreX - (context.measureText(score).width/2), scoreY);
-//        }
-//        
-//        context.restore();
-        
-        scoreHandler.setText(score.toString(), canvasWidth, canvasHeight);
+    function draw(interpolation){        
+        scoreHandler.setText(score.toString());
         //FIX: SHOULD BE "scoreHandler.width / 2"
-        scoreHandler.setX(scoreX - (scoreHandler.width / 3.5));
-        scoreHandler.setY(canvasHeight - scoreY);
+        scoreHandler.setPosition(scoreX - (scoreHandler.getWidth() / 3.5), appMetaData.getCanvasHeight() - scoreY);
         
     }
     
-    function update(){
-        //borderLightningPiece.update();
-        
-        var value = handler._uniforms.iGlobalTime.value[0];
-        value++;
-        if(value > 1023){
-            value = 0;
+    function update(){        
+        animationTime++;
+        //make sure the number doesn't get too big
+        if(animationTime > 1000){
+            animationTime = 0;
         }
-        handler._uniforms.iGlobalTime.value = [value];
+        handler.setTime(animationTime);
     }
     
     
     function getLeftX(){
-        return (margin + heightOfBlueThing);
+        return (margin + borderWidth);
     }
     function getTopY(){
-        return canvasHeight - (margin + heightOfBlueThing);
-       // return 700;
+        return appMetaData.getCanvasHeight() - (margin + borderWidth);
     }
     function getRightX(){
-        return (canvasWidth - margin - heightOfBlueThing);
+        return (appMetaData.getCanvasWidth() - margin - borderWidth);
     }
     function getBottomY(){
-        return canvasHeight - (canvasHeight - margin - heightOfBlueThing);
-    }
-    
-    function getLeftSidePhysicsBody(){
-        return leftPhysicsBody;
-    }
-    function getTopSidePhysicsBody(){
-        return topPhysicsBody;
-    }
-    function getRightSidePhysicsBody(){
-        return rightPhysicsBody;
-    }
-    function getBottomSidePhysicsBody(){
-        return bottomPhysicsBody;
-    }
-    
-    //THIS IS ONLY FOR TESTING TO SEE WHERE THE BORDER IS
-    function drawBorderPlain(context){
-        context.save();
-        
-        context.fillStyle = "rgb(0, 0, 200)";
-        context.fillRect(getLeftX(), getTopY(), widthOfBlueThing, heightOfBlueThing);
-        context.fillRect(getRightX(), getTopY(), heightOfBlueThing, widthOfBlueThing);
-        context.fillRect(getLeftX(), getBottomY(), widthOfBlueThing, heightOfBlueThing);
-        context.fillRect(getLeftX(), getTopY(), heightOfBlueThing, widthOfBlueThing);
-        
-        context.restore();
+        return margin + borderWidth;
     }
     
     function recieveEvent(eventInfo){
         score += eventInfo.eventData;
-    }
-    
-    //TESTING
-    function getBorderPath(){
-        return borderPath;
     }
     
     return {
@@ -182,10 +100,5 @@ define(['LightningPiece', 'PhysicsSystem', 'EventSystem', 'ShaderProcessor', 'ge
         getTopY: getTopY,
         getRightX: getRightX,
         getBottomY: getBottomY,
-        getLeftSidePhysicsBody: getLeftSidePhysicsBody,
-        getTopSidePhysicsBody: getTopSidePhysicsBody,
-        getRightSidePhysicsBody: getRightSidePhysicsBody,
-        getBottomSidePhysicsBody: getBottomSidePhysicsBody,
-        getBorderPath: getBorderPath
     }
 });

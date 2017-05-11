@@ -1,21 +1,19 @@
-define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'EventSystem'], function(Target, Timer, Border, Random, EventSystem){
+define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'], function(Target, SynchronizedTimers, Border, Random, EventSystem){
     var targetsPool = [];
     var targetsActivated = [];
     var numTargets = 2;
     var authUpdateData = {};
-    var canvasWidth, canvasHeight;
     var previousStates = [];
+    var targetRadius;
 
-    //counts the number of updates until the next spawn
-    var spawnCountDown = 20;
+    var spawnDelay = 500;
+    var spawnTimer = SynchronizedTimers.getTimer();
     
-    function initialize(p_canvasWidth, p_canvasHeight, initializeData){
-        canvasWidth = p_canvasWidth;
-        canvasHeight = p_canvasHeight;
-        
+    function initialize(gl, appMetaData, initializeData){
         var i = 0;
+        targetRadius = appMetaData.getCanvasHeight() * 0.06;
         for(var key in initializeData){
-            targetsPool[i] = new Target(key, canvasWidth, canvasHeight, 60, 8, initializeData[key].x, canvasHeight - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
+            targetsPool[i] = new Target(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed);
             i++;
         }
         
@@ -24,6 +22,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         EventSystem.register(recieveEvent, "target_destroyed");
         EventSystem.register(recieveEvent, "S_game_update");
         EventSystem.register(recieveEvent, "S_initialize");
+        spawnTimer.start();
     }
     
     function draw(interpolation){
@@ -34,21 +33,12 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     
     function update(){
         if(targetsPool.length > 0){
-            spawnCountDown--;
-            
-            if(spawnCountDown <= 0){
-                spawn();                
-                spawnCountDown = 20;
+            if(spawnTimer.getTime() >= spawnDelay){
+                spawn();
+                spawnTimer.reset();
             }
+            spawnTimer.start();
         }
-        
-//        if(spawnCountDown <= 0){
-//            if(targetsPool.length > 0){
-//                console.log("SPAWNED: " + Date.now());
-//                spawn();
-//            }
-//            spawnCountDown = 40;
-//        }
 
         for(var a = 0; a < targetsActivated.length; a++){
             targetsActivated[a].update();
@@ -150,12 +140,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
                 break;
         }
         
-        //spawnX = canvasWidth * 0.4;
-       // spawnY = canvasHeight * 0.5;
-       // newlyActivatedTarget.setMovementAngle(-45);
-       // console.log("ID: " + newlyActivatedTarget.getId() + "      SPAWNX: " + spawnX + "     SPAWNY: " + spawnY);
-        newlyActivatedTarget.setX(spawnX);
-        newlyActivatedTarget.setY(spawnY);
+        newlyActivatedTarget.setPosition(spawnX, spawnY);
         
         targetsActivated.push(newlyActivatedTarget);
         
@@ -183,7 +168,6 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
         if(eventInfo.eventType === "target_destroyed"){
             for(var a = 0; a < targetsActivated.length; a++){
                 if(targetsActivated[a]._id === eventInfo.eventData.target._id){
-//                    console.log("MOVEMENT ANGLE CHANGED - TARGETS CONTROLLER");
                     targetsActivated[a].removeFromPhysicsSimulation();
                     targetsPool.push(targetsActivated.splice(a, 1)[0]);  
                 }
@@ -196,7 +180,7 @@ define(['Target', 'Custom Utility/Timer', 'Border', 'Custom Utility/Random', 'Ev
     }
     
     function getRadiusOfTarget(){
-        return 60;
+        return targetRadius;
     }
     
     return {

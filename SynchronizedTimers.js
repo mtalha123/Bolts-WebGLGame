@@ -1,11 +1,6 @@
 define([''], function(){
     
     var allTimers = [];
-    var timeUncertainty = undefined;
-    
-    function initialize(timeuncertainty){
-        timeUncertainty = timeuncertainty;
-    }
     
     function getTimer(){
         var syncTimer = new SynchronizedTimer();
@@ -13,10 +8,10 @@ define([''], function(){
         return syncTimer;
     }
     
-    function updateAllTimers(){
+    function updateAllTimers(timeMillis){
         for(var i = 0; i < allTimers.length; i++){
             if(allTimers[i].isStarted() === true){
-                allTimers[i].setTime(allTimers[i].getTime() + timeUncertainty);   
+                allTimers[i].setTime(allTimers[i].getTime() + timeMillis);   
             }
         }
     }
@@ -52,7 +47,6 @@ define([''], function(){
     }
     
     return {
-        initialize: initialize,
         getTimer: getTimer,
         updateAllTimers: updateAllTimers
     };

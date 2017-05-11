@@ -1,6 +1,6 @@
-define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(LightningPiece, PhysicsSystem, ShaderProcessor){
+define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSystem, ShaderProcessor, CircleEntity){
 
-    function Target(id, canvasWidth, canvasHeight, p_radius, numbolts, x, y, movementangle, speed){
+    function Target(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed){
         this._id = id;
         this._radius = p_radius;        
         this._previousStates = [];
@@ -10,91 +10,33 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
         
         this._serverTargetPositionX = 0, this._serverTargetPositionY = 0;
         
-        this._physicsEntity = PhysicsSystem.requestPhysicsEntity("dynamic");
-        this._physicsEntity.createCircle(p_radius + 10, 1, 0, 1);
+        this._physicsEntity = new CircleEntity("dynamic", x, y, canvasHeight, p_radius + 10, 1, 0, 1);
         
         this._currentMovementAngleInDeg = movementangle;
         this._speed = speed;
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
         this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed; 
         
-        var numLightningBolts = numbolts;
-        var currentAngle = 0;
-        var angleIncrement = 360 / numLightningBolts;
-        var lightningCoordinates = [];
-        var xOnCircle;
-        var yOnCircle; 
+        this.targetHandler = ShaderProcessor.requestTargetEffect(false, gl, {x: [x], y: [y], radius: [p_radius], fluctuation: [20]});
         
-        this.targetHandler = ShaderProcessor.requestTargetEffect();
-        this.targetHandler.setResolution(canvasWidth, canvasHeight);
-        this.targetHandler.setRadius(this._radius);
-        this.targetHandler.setX(x);
-        this.targetHandler.setY(y);
-        this.targetHandler.setFluctuation(20);
-        
-        this.TESTTIME = 0;
-        
-//        for(var i = 0; i < numLightningBolts; i++){
-//            xOnCircle = (Math.cos(currentAngle * (Math.PI / 180)) * this._radius) + (x + this._radius);
-//            yOnCircle = (Math.sin(currentAngle * (Math.PI / 180)) * this._radius) + (y + this._radius);
-//                        
-//            lightningCoordinates.push([x + this._radius, y + this._radius, xOnCircle, yOnCircle]);
-//            currentAngle += angleIncrement;
-//            
-//        }       
-//                
-//        this._lightning = new LightningPiece(canvasWidth, canvasHeight, lightningCoordinates, 8, 5, {lineWidth: 1});
-        
+        this._animationTime = 0;        
     }
     
-    Target.prototype.draw = function(interpolation){
-//        this._lightning.setX(this._prevX + (interpolation * (this._x - this._prevX)));
-//        this._lightning.setY(this._prevY + (interpolation * (this._y - this._prevY)));
-//        
-//        this._lightning.draw(context, interpolation, 0, 0);
-//        
-//        context.save();
-//        
-//        context.strokeStyle = "blue";
-//        context.shadowBlur = 20;
-//        context.shadowColor = "#004CFF";
-//        context.lineWidth = 3;
-//        context.beginPath();
-//        //context.arc((this._x + this._radius) + (this._xUnits * interpolation), (this._y + this._radius) + (this._yUnits * interpolation), this._radius, 0, 2 * Math.PI, false);
-//        
-//        //drawing with interpolation
-//        //context.arc((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius, (this._prevY + (interpolation * (this._y - this._prevY))) + this._radius, this._radius, 0, 2 * Math.PI, false);
-//        
-//        //uncomment the following line to draw without interpolation
-//        context.arc(this._x + this._radius, this._y + this._radius, this._radius, 0, 2 * Math.PI, false);
-//        
-//        context.stroke();
-//        
-//        //this._drawTargetFromServerPosition(context);
-//     
-//        context.restore();
-
-        this.targetHandler.setX((this._prevX + (interpolation * (this._x - this._prevX))) + this._radius);
-        this.targetHandler.setY((this._prevY + (interpolation * (this._y - this._prevY))) + this._radius);
-        this.TESTTIME++;
-        this.targetHandler.setTime(this.TESTTIME);
+    Target.prototype.draw = function(interpolation){       
+        this.targetHandler.setPosition( this._prevX + (interpolation * (this._x - this._prevX)), this._prevY + (interpolation * (this._y - this._prevY)) );
+        this._animationTime++;
+        this.targetHandler.setTime(this._animationTime);
     }
     
     Target.prototype.update = function(){
         this.saveCurrentState();
         
-        this._setXWithInterpolation(this._physicsEntity.getX() - this._radius);
-        this._setYWithInterpolation(this._physicsEntity.getY() - this._radius);
-        
-        //use below line to display all physics information for this target (e.g. velocity, angular vel., etc.)
-       // this._displayPhysicsBodyInfo();
-        
-       // this._lightning.update();
-
+        this._physicsEntity.update();        
+        this._setXWithInterpolation(this._physicsEntity.getX());
+        this._setYWithInterpolation(this._physicsEntity.getY());
     }
     
     Target.prototype.serverUpdate = function(newX, newY, linearVelocityX, linearVelocityY){
-        
         this._serverTargetPositionX = newX;
         this._serverTargetPositionY = newY;
 
@@ -109,22 +51,13 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
 
             this._physicsEntity.setX(newX + this._radius);
             this._physicsEntity.setY(newY + this._radius);
-            
         }
     }
     
-    Target.prototype.setX = function(newX){
-        this._x = this._prevX = newX;
-       // this._lightning.setX(newX);
-        
-        this._physicsEntity.setX(this._x + this._radius);
-    }
-    
-    Target.prototype.setY = function(newY){
+    Target.prototype.setPosition = function(newX, newY){
+        this._x = this._prevX = newX;  
         this._y = this._prevY = newY;
-        //this._lightning.setY(newY);
-
-        this._physicsEntity.setY(this._y + this._radius);    
+        this._physicsEntity.setPosition(newX, newY);
     }
     
     Target.prototype._setXWithInterpolation = function(newX){
@@ -165,12 +98,13 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
     }
     
     Target.prototype.addToPhysicsSimulation = function(){
-        PhysicsSystem.addToSimulation(this._physicsEntity);
+        this._physicsEntity.addToSimulation();
         this.targetHandler.shouldDraw(true);
     }
     
     Target.prototype.removeFromPhysicsSimulation = function(){
-        PhysicsSystem.removeEntityFromSimulation(this._physicsEntity);
+        this._physicsEntity.removeFromSimulation();
+        console.log("REMOVED FROM SIM");
         this.targetHandler.shouldDraw(false);
     }
     
@@ -186,7 +120,6 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
     }
     
     Target.prototype._checkWithPastAndCurrentStatesAndDeleteAnyIrrelevant = function(x, y){
-        
         //testing
         return true;
         
@@ -221,14 +154,6 @@ define(['LightningPiece', 'PhysicsSystem', 'ShaderProcessor'], function(Lightnin
     }
     
     Target.prototype._drawTargetFromServerPosition = function(context){
-        context.save();
-        
-        context.strokeStyle = "red";
-        context.beginPath();
-        context.arc(this._serverTargetPositionX + this._radius, this._serverTargetPositionY + this._radius, this._radius, 0, 2 * Math.PI, false);
-        context.stroke();
-        
-        context.restore();
     }
     
     return Target;

@@ -1,49 +1,25 @@
-define(['Custom Utility/Timer', 'EventSystem', 'ShaderProcessor'], function(Timer, EventSystem, ShaderProcessor){
+define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     
     var x = 0, y = 0; 
     var mouseHeldDown = false;  
     var radius = 20;
     EventSystem.register(recieveEvent, "combo_level_changed");
     var handler = null;
-    var canvasWidth, canvasHeight;
+    var appMetaData;
     
-    function initialize(p_canvasWidth, p_canvasHeight){
-        handler = ShaderProcessor.requestCursorEffect();
+    function initialize(gl, p_appMetaData, ShaderProcessor){
+        appMetaData = p_appMetaData;
+        handler = ShaderProcessor.requestCursorEffect(true, {}, gl, 100, 100);
         handler.shouldDraw(true);
     }
     
     function draw(interpolation){
-//        context.save();
-//        
-//        context.fillStyle = "rgba(50, 50, 50, 0.5)";
-//        context.strokeStyle = "black";
-//        context.lineWidth = .5;
-//        context.beginPath();
-//        context.arc(x, y, radius, 0, 2 * Math.PI, false);
-//        context.fill();
-//        context.stroke();
-//        
-//        context.fillStyle = "yellow";
-//        context.beginPath();
-//        context.arc(x, y, 2, 0, 2 * Math.PI, false);
-//        context.fill();
-//        
-//        if(mouseHeldDown){
-//            context.fillStyle = "rgba(255, 0, 0, 0.3)";
-//            context.beginPath();
-//            context.arc(x, y, radius, 0, 2 * Math.PI, false);
-//            context.fill();
-//        }
-//        
-//        context.restore();
-        
         if(mouseHeldDown){
             handler.setClicked(true);
         }else{
             handler.setClicked(false);
         } 
-        handler.setX(x);
-        handler.setY(y);
+        handler.setPosition(x, y);
     }
     
     function isMouseButtonHeldDown(){

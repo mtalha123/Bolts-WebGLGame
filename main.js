@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.13:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.15:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow', 'LightningPiece', 'Custom Utility/Random', 'Border', 'BackgroundLines', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'InputProcessor', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputHandler', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary' ,'ShaderProcessor', 'generateLightningCoordinates', 'Custom Utility/map', 'globalInfo'], function(Timer, FPSCounter, DrawPathsWithGlow, LightningPiece, Random, Border, BackgroundLines, Target, Cursor, TargetsController, EventSystem, InputProcessor, PhysicsSystem, NetworkManager, isObjectEmpty, InputHandler, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, genCoords, map, globalInfo){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Random', 'Border', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'TargetAchiever', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'ShaderProcessor', 'appMetaData', 'AssetManager'], function(Timer, FPSCounter, Random, Border, Target, Cursor, TargetsController, EventSystem, TargetAchiever, PhysicsSystem, NetworkManager, isObjectEmpty, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, appMetaData, AssetManager){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -73,8 +73,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     //first second yet, the difference between the time (which would now be over 1000 ms) and 1000 is the offsetTime
     var offsetTime = 0;
         
-    //var BIG_TEST = new LightningPiece(canvasWidth, canvasHeight, [[300, 200, 80, 80], [300, 200, 250, 50],  [300, 200, 500, 100]], 10, 30, {lineWidth: 1});
-    NetworkManager.initialize(canvasWidth, canvasHeight, networkEventListener);
+    NetworkManager.initializeAndConnect(canvasWidth, canvasHeight, networkEventListener);
     
     var mostRecentServerUpdateInfo = {};
     var mostRecentServerUpdateReceiptTime = 0;
@@ -90,20 +89,17 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     var updateCounter = 0;
     
     var fpsHandler = null;
-    fontImage = new Image();
-    fontImage.src = "Assets/arial.png";
+    
+    var initializationDone = false;
     
     //testing
     var timeForUpdateToBeSlowedAt = Date.now() + 5000;
     
     //testing shaderprocessor module
     var handler = null;
-    var time = 1;
-    
-    var testNum = 2;
     
     function gameLoop(){
-        if(NetworkManager.connectedToServer()){
+        if(NetworkManager.connectedToServer() && initializationDone){
             //set to 0 each time game loop runs so that it can be utilized for the next set of updates
             loops = 0;
             
@@ -150,7 +146,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
                                 break;
 
                             case "CollisionSystem":
-                                InputProcessor.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
+                                TargetAchiever.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
                                 break;
                         }
                     }
@@ -190,24 +186,9 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
             fpsCounter.start();
 
             draw(interpolation);
-
-            //----set text info then draw the FPS and TPS numbers-----
-//            context.fillStyle = "blue";
-//            context.font = "20px Arial";        
-//            context.fillText("FPS: " + fpsCounter.getFPS(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.03);
-//            context.fillText("TPS: " + testTicksPerSecond, canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.06);
-//            context.fillText("ms: " + NetworkManager.getPing(), canvasWidth - (canvasWidth * 0.05), canvasHeight * 0.09);
-            //-------------------------------------
-            //console.log("FPS: " + fpsCounter.getFPS());
             
             if(!fpsHandler){
-                fpsHandler = ShaderProcessor.requestTextEffect();
-                fpsHandler.setText(fpsCounter.getFPS().toString());
-                fpsHandler.setX(canvasWidth * 0.9);
-                fpsHandler.setY(canvasHeight * 0.88);
-                fpsHandler.setFontTexture(fontImage, gl, 512, 512);
-                fpsHandler.setTextColor(0, 0, 1);
-                fpsHandler.shouldDraw(true);
+                fpsHandler = ShaderProcessor.requestTextEffect(true, gl, {}, canvasWidth * 0.9, canvasHeight * 0.88, fpsCounter.getFPS().toString());
             }
             fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
 
@@ -223,17 +204,11 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     
 
     function draw(interpolation){
-        //---clear screen---
-//        context.clearRect(0, 0, canvasWidth, canvasHeight);       
-//        context.fillStyle = "#a6a6a6";
-//        context.fillRect(0, 0, canvasWidth, canvasHeight);
-//        //--------------
-//
         Border.draw(interpolation);
-//        
+        
         TargetsController.draw(interpolation);
         Cursor.draw(interpolation);
-//
+
         ComboSystem.draw();
         //Box2DStuff.physicsWorld.DrawDebugData();  
         
@@ -256,9 +231,9 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function update(currentTick){        
-        SynchronizedTimers.updateAllTimers();
+        SynchronizedTimers.updateAllTimers(tickTimeMillis);
         
-        var inputInfo = InputHandler.notifyOfCurrentStateAndConsume();
+        var inputInfo = InputEventsManager.notifyOfCurrentStateAndConsume();
         
         if(inputInfo != undefined){
             inputInfo.updateCounter = updateCounter;
@@ -267,13 +242,13 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
             NetworkManager.sendToServer("input", "none");
         }
     
-        InputProcessor.update();
+        TargetAchiever.update();
         
+        ComboSystem.update();
         PhysicsSystem.update(1 / 20, 10, 6);
         Border.update();
         TargetsController.update();
         EventSystem.update();
-        
         
         
         //TESTING SHADERPROCESSOR MODULE
@@ -305,8 +280,14 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function networkEventListener(eventType, eventData){
-        if(eventType === "S_initialize"){            
-            initialize(eventData.TargetsController, eventData.nextTick);
+        if(eventType === "S_initialize"){
+            AssetManager.loadAllAssets(gl, function(){
+                //function for each asset loaded. DO LOADING GRAPHICS HERE~~~~
+            }, function(){
+                console.log("All assets loaded.");
+                initializationDone = true;
+                initialize(eventData.TargetsController, eventData.nextTick);    
+            });
         }else if(eventType === "S_gameupdate"){
 
             //PURELY FOR TESTING (DELETE THIS AFTER BREAKS ENCAPSULATION)------
@@ -323,16 +304,15 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'DrawPathWithGlow'
     }
     
     function initialize(TargetsControllerInfo, nextServerTick){
-        globalInfo.initialize(canvasWidth, canvasHeight);
-        SynchronizedTimers.initialize(tickTimeMillis);
+        appMetaData.initialize(canvasWidth, canvasHeight);
         ShaderLibrary.initialize(gl);
-        ComboSystem.initialize(gl);
-        Border.initialize(gl, canvasWidth, canvasHeight);
-        TargetsController.initialize(canvasWidth, canvasHeight, TargetsControllerInfo);
-        InputProcessor.initialize();      
-        InputHandler.initialize(canvas, canvasWidth, canvasHeight);
-        PhysicsSystem.initialize(canvasWidth, canvasHeight);
-        Cursor.initialize(canvasWidth, canvasHeight);
+        ShaderProcessor.initialize(ShaderLibrary, appMetaData, AssetManager);
+        Cursor.initialize(gl, appMetaData, ShaderProcessor);
+        Border.initialize(gl, appMetaData, AssetManager, ShaderProcessor);
+        TargetsController.initialize(gl, appMetaData, TargetsControllerInfo);  
+        ComboSystem.initialize(gl, ShaderProcessor, TargetsController, Border);
+        TargetAchiever.initialize(ComboSystem);
+        InputEventsManager.initialize(canvas, appMetaData);
         
         nextTick = Date.now();
     }
