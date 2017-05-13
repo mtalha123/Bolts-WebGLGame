@@ -188,7 +188,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
             draw(interpolation);
             
             if(!fpsHandler){
-                fpsHandler = ShaderProcessor.requestTextEffect(true, gl, {}, canvasWidth * 0.9, canvasHeight * 0.88, fpsCounter.getFPS().toString());
+                fpsHandler = ShaderProcessor.requestTextEffect(true, gl, 1, {}, canvasWidth * 0.9, canvasHeight * 0.88, fpsCounter.getFPS().toString());
             }
             fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
 

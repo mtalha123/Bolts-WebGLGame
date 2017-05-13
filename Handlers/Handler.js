@@ -1,5 +1,5 @@
 define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords'], function(getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords){ 
-    function Handler(shouldDraw, x, y, canvasWidth, canvasHeight){
+    function Handler(shouldDraw, x, y, zOrder, canvasWidth, canvasHeight){
         this._shouldDraw = shouldDraw;
         this._x = x;
         this._y = y;
@@ -12,6 +12,7 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
         this._shaderProgram = null;
+        this._zOrder = zOrder;
     }
     
     Handler.prototype.shouldDraw = function(shouldDrawOrNot){
@@ -32,6 +33,10 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
     
     Handler.prototype.getShaderProgram = function(){
         return this._shaderProgram;
+    }
+    
+    Handler.prototype.getZOrder = function(){
+        return this._zOrder;
     }
     
     return Handler;

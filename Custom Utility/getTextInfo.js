@@ -52,7 +52,6 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
     
     function getInfoForString(string){
         var returnObject = {};
-        
         for(var i = 0; i < string.length; i++){
             returnObject[string[i]] = fontInformation[string[i]];
         }

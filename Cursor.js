@@ -9,7 +9,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     
     function initialize(gl, p_appMetaData, ShaderProcessor){
         appMetaData = p_appMetaData;
-        handler = ShaderProcessor.requestCursorEffect(true, {}, gl, 100, 100);
+        handler = ShaderProcessor.requestCursorEffect(true, 5, {}, gl, 100, 100);
         handler.shouldDraw(true);
     }
     

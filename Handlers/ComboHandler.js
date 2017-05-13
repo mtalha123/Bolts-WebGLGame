@@ -1,7 +1,7 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
-    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, opts, ShaderLibrary, fontTextureData, comboText){
-        Handler.call(this, shouldDraw, 0, 0, canvasWidth, canvasHeight);   
+    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
         
@@ -18,13 +18,17 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 type: "float",
                 value: [0.5]
             },
+            time: {
+                type: "float",
+                value: [0]
+            },
             center: {
                 type: "vec2",
                 value: [300, 500]
             },
             radius: {
                 type: "float",
-                value: [80]
+                value: [50]
             },
             lineWidth: {
                 type: "float",
@@ -34,6 +38,11 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 type: "sampler2D",
                 value: fontTextureData.sampler,
                 texture: fontTextureData.fontTexture
+            },
+            effectTexture: {
+                type: "sampler2D",
+                value: effectTextureData.sampler,
+                texture: effectTextureData.effectTexture
             },
             firstTextCoords: {
                 type: "vec4",
@@ -71,7 +80,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
     ComboHandler.prototype.constructor = ComboHandler; 
     
     ComboHandler.prototype.setPosition = function(newX, newY){
-        var radiusWithLineWidth = this._uniforms.radius.value[0] + this._uniforms.lineWidth.value[0];
+        var radiusWithLineWidth = (this._uniforms.radius.value[0] + this._uniforms.lineWidth.value[0]) * 4;
         this._uniforms.center.value[0] = newX + radiusWithLineWidth;
         this._uniforms.center.value[1] = newY - radiusWithLineWidth;
 
@@ -88,6 +97,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         var secondCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[1]], this._fontTextureWidth, this._fontTextureHeight);
         this._uniforms.firstTextCoords.value = firstCharTextureCoords;
         this._uniforms.secondTextCoords.value = secondCharTextureCoords;
+    }
+    
+    ComboHandler.prototype.setTime = function(timeVal){
+        this._uniforms.time.value = [timeVal];
     }
     
     ComboHandler.prototype._getCharCoordsFromTextInfo = function(textInfoForSingleChar, fontTextureWidth, fontTextureHeight){

@@ -12,11 +12,12 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     var numTargetsAchievedSinceLastCombo = 0;
     var comboHandler;
     var TargetsController;
+    var time = 0;
     EventSystem.register(recieveEvent, "target_destroyed");
     
     function initialize(gl, ShaderProcessor, p_TargetsController, Border){
         TargetsController = p_TargetsController;
-        comboHandler = ShaderProcessor.requestComboEffect(false, gl, {}, "1x");
+        comboHandler = ShaderProcessor.requestComboEffect(true, gl, 0, {}, "1x");
         comboHandler.setPosition(Border.getLeftX(), Border.getTopY());
         targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;
         areaToAchieveReductionAmount = 0.04 * targetAreaToAchieve;
@@ -112,6 +113,8 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
         comboTxt = comboTxt.concat("x");
         comboHandler.setComboText(comboTxt);
         comboHandler.setCompletion(comboTimer.getTime() / timeUntilComboOver);   
+        time+=0.1;
+        comboHandler.setTime(time);
     }
     
     function getTargetAreaToAchieve(){

@@ -1,7 +1,7 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords){
     
-    function CursorHandler(shouldDraw, canvasWidth, canvasHeight, gl, opts, ShaderLibrary, x, y){
-        Handler.call(this, shouldDraw, 0, 0, canvasWidth, canvasHeight);   
+    function CursorHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, x, y){
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.CURSOR);
         

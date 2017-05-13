@@ -39,7 +39,7 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
                             (appMetaData.getCanvasWidth() - margin - (borderLength/2)) + (gapForScore/2), appMetaData.getCanvasHeight() - margin           
         ];
         
-        handler = ShaderProcessor.requestLightningEffect(true, gl, {}, borderPath);
+        handler = ShaderProcessor.requestLightningEffect(true, gl, 3, {}, borderPath);
         
         leftPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, margin, borderWidth, borderLength, 10, 0, 1);
         leftPhysicsBody.addToSimulation();
@@ -55,7 +55,7 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
         
         EventSystem.register(recieveEvent, "score_achieved");
         
-        scoreHandler = ShaderProcessor.requestTextEffect(true, gl, {}, 100, 100, "0");
+        scoreHandler = ShaderProcessor.requestTextEffect(true, gl, 4, {}, 100, 100, "0");
     }
     
     function draw(interpolation){        

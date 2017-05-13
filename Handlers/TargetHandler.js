@@ -1,7 +1,7 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise){
     
-    function TargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, opts, ShaderLibrary, noiseTextureData){
-        Handler.call(this, shouldDraw, 0, 0, canvasWidth, canvasHeight);   
+    function TargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, noiseTextureData){
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TARGET);
        

@@ -1,7 +1,7 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
-    function TextHandler(shouldDraw, canvasWidth, canvasHeight, gl, opts, ShaderLibrary, fontTextureData, x, y, text){
-        Handler.call(this, shouldDraw, 0, 0, canvasWidth, canvasHeight);   
+    function TextHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, fontTextureData, x, y, text){
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TEXT);
 

@@ -3,6 +3,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     
     var ShaderLibrary;
     var fontTexture;
+    var spiderWebTexture;
     var noiseTexture;
     var appMetaData;
     
@@ -12,41 +13,57 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         appMetaData = p_appMetaData;
         
         fontTexture = AssetManager.getTextureAsset("arial");
+        spiderWebTexture = AssetManager.getTextureAsset("spiderWeb");
         noiseTexture = AssetManager.getTextureAsset("noise");
     }    
     
-    function requestLightningEffect(shouldDraw, gl, opts, coords){
-        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, opts, coords, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 0}, 1);
+    function addHandler(handler){
+        if(allHandlers.length === 0){
+            allHandlers.push(handler);
+            return;
+        }
+        for(var i = 0; i < allHandlers.length; i++){
+            if(handler.getZOrder() <= allHandlers[i].getZOrder()){
+                allHandlers.splice(i, 0, handler);
+                return;
+            }   
+        }
         
         allHandlers.push(handler);
+    }
+    
+    function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords){
+        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 0}, 1);
+        
+        addHandler(handler);
         return handler;
     }
 
-    function requestTargetEffect(shouldDraw, gl, opts){
-        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, opts, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 2});
+    function requestTargetEffect(shouldDraw, gl, zOrder, opts){
+        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 2});
         
-        allHandlers.push(handler);
+        addHandler(handler);
         return handler;
     }
 
-    function requestTextEffect(shouldDraw, gl, opts, x, y, text){
-        var handler = new TextHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 3}, x, y, text);
+    function requestTextEffect(shouldDraw, gl, zOrder, opts, x, y, text){
+        var handler = new TextHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 3}, x, y, text);
         
-        allHandlers.push(handler);
+        addHandler(handler);
         return handler;
     }
 
-    function requestCursorEffect(shouldDraw, opts, gl, x, y){
-        var handler = new CursorHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, opts, ShaderLibrary, x, y);
+    function requestCursorEffect(shouldDraw, zOrder, opts, gl, x, y){
+        var handler = new CursorHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, x, y);
         
-        allHandlers.push(handler);
+        addHandler(handler);
         return handler;
     }
     
-    function requestComboEffect(shouldDraw, gl, opts, text){
-        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 4}, text);
+    function requestComboEffect(shouldDraw, gl, zOrder, opts, text){
+        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 4}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 5}, text);
         
-        allHandlers.push(handler);
+        addHandler(handler);
         return handler;
     }
     
@@ -93,6 +110,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
                         gl.activeTexture(gl.TEXTURE3);
                     }else if(uniforms[uniformVar].value === 4){
                         gl.activeTexture(gl.TEXTURE4);
+                    }else if(uniforms[uniformVar].value === 5){
+                        gl.activeTexture(gl.TEXTURE5);
                     }
                     
                     gl.bindTexture(gl.TEXTURE_2D, uniforms[uniformVar].texture);
