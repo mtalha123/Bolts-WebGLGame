@@ -104,7 +104,6 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSys
     
     Target.prototype.removeFromPhysicsSimulation = function(){
         this._physicsEntity.removeFromSimulation();
-        console.log("REMOVED FROM SIM");
         this.targetHandler.shouldDraw(false);
     }
     

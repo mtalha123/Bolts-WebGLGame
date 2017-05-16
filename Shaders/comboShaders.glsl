@@ -12,6 +12,58 @@ precision mediump float;
 
 #define PI 3.1415926535897932384626433832795
 
+vec2 computeQuadratic(float a, float b, float c){
+    float discriminant, firstAnswer, secondAnswer;
+
+    discriminant = pow(b, 2.0) - (4.0 * a * c);
+
+    if(discriminant < 0.0){
+        return vec2(-1.0);
+    }
+
+    firstAnswer = (-b) + sqrt(discriminant);
+    firstAnswer /= (2.0 * a);
+
+    secondAnswer = (-b) - sqrt(discriminant);
+    secondAnswer /= (2.0 * a);
+
+    return vec2(firstAnswer, secondAnswer);                              
+}
+
+
+float getSlope(vec2 first, vec2 second){
+	if((first.x - second.x) == 0.0){
+    	return -1.0;
+    }
+   
+	return (second.y - first.y) / (second.x - first.x);
+}
+
+float findYIntercept(float slope, vec2 point){
+	return point.y - (slope * point.x);
+}
+
+vec4 getIntersectionPoints(float m, float y_int, vec2 center, float radius){
+    float a = pow(m, 2.0) + 1.0;
+    float b = (2.0 * y_int * m) - (2.0 * center.x) - (2.0 * m * center.y);
+    float c = pow(y_int, 2.0) - (2.0 * y_int * center.y) + pow(center.y, 2.0) + pow(center.x, 2.0) - pow(radius, 2.0);
+	vec2 roots = computeQuadratic(a, b, c);
+    
+    vec2 answerOne = vec2(roots.x, m * roots.x + y_int);
+    vec2 answerTwo = vec2(roots.y, m * roots.y + y_int);
+    
+    return vec4(answerOne, answerTwo);
+}
+
+vec2 rotateCoord(vec2 point, float angle, vec2 center){
+    mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+    return ((point - center) * rotationMatrix) + center;
+}
+
+vec2 resizeVector(vec2 vector, float lengthToResizeTo){
+	return vector * (lengthToResizeTo / length(vector));
+}
+
 float getUVAngleDeg(vec2 uv, vec2 center){
 	vec2 uv_t = uv - center;
     
@@ -44,27 +96,111 @@ float map(float in_min, float in_max, float out_min, float out_max, float number
     return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+bool isInRect(vec2 testCoord, vec2 lowerLeftCoord, vec2 upperRightCoord){
+    if(testCoord.x >= lowerLeftCoord.x && testCoord.x <= upperRightCoord.x){
+        if(testCoord.y >= lowerLeftCoord.y && testCoord.y <= upperRightCoord.y){
+            return true;    
+        }
+    }
+    
+    return false;
+}
+
+float anotherApproach(vec2 uv, vec2 centerUV, float radiusFromTextUV, float radiusOfEdgeEffectUV, float spreadOfEdgeEffectUV, float time, sampler2D effectTexture){
+    float m = getSlope(uv, centerUV);
+    float b = findYIntercept(m, centerUV);
+    vec4 intersectionPoints = getIntersectionPoints(m, b, centerUV, radiusFromTextUV);
+    vec2 closestIntersectionPt;
+    if(distance(uv, intersectionPoints.rg) < distance(uv, intersectionPoints.ba)){
+    	closestIntersectionPt = intersectionPoints.rg;
+    }else{
+    	closestIntersectionPt = intersectionPoints.ba;
+    }
+    
+//    if(b <= (-300.0) || b >= 300.0){
+//        vec2 first = vec2(uv.x, centerUV.y + 0.2);
+//        vec2 second = vec2(uv.x, centerUV.y - 0.2 );
+//        if(distance(uv, first) < distance(uv, second)){
+//        	//closestIntersectionPt = first;
+//        }else{
+//        	//closestIntersectionPt = second;
+//        }
+//    }
+
+	vec2 uvOffset = (centerUV - uv);
+    vec2 signToUse = sign(uvOffset);
+    
+    vec2 textureCoord = uv + (vec2(time / 36.6, time / 38.2)) * signToUse;
+    float val = smoothstep(0.01,1.2,texture2D(effectTexture, textureCoord).r) * radiusOfEdgeEffectUV;
+    uv = uv + resizeVector(uvOffset, val);
+    
+    float d = distance(uv, closestIntersectionPt);
+    return smoothstep(spreadOfEdgeEffectUV, 0.09, d);
+}
+
+float getAlphaForCharacter(vec2 uv, vec2 startCoord, vec2 endCoord, vec2 startTexCoord, vec2 endTexCoord, sampler2D fontTexture){
+    float xMapped = map(startCoord.x, endCoord.x, startTexCoord.x, endTexCoord.x, uv.x);
+    float yMapped = map(startCoord.y, endCoord.y, startTexCoord.y, endTexCoord.y, uv.y);
+    vec4 texel = texture2D(fontTexture, vec2(xMapped, yMapped));
+    float dist = 1.0 - texel.a;
+    float alpha = 1.0 - smoothstep(0.5, 0.6, dist);
+    return alpha;
+}
+
+uniform float time;
 uniform vec2 center;
 uniform float completion;
 uniform vec2 iResolution;
-uniform float radius;
-uniform float lineWidth;
+uniform float radiusFromText;
+uniform float radiusOfEdgeEffect;
+uniform float spreadOfEdgeEffect;
 uniform vec4 firstTextCoords;
+uniform vec4 firstCharCoords;
 uniform vec4 secondTextCoords;
-uniform float uniformGap;
+uniform vec4 secondCharCoords;
+uniform vec4 thirdTextCoords;
+uniform vec4 thirdCharCoords;
 uniform sampler2D fontTexture;
+uniform sampler2D effectTexture;
 
 void main()
 {
-	vec2 uv = gl_FragCoord.xy / iResolution.xy;
+    vec2 uv = gl_FragCoord.xy / iResolution.xy;
     float aspectRatio = (iResolution.x / iResolution.y);
+    
+    //normalize
     vec2 centerUV = center.xy / iResolution.xy;
-    float radiusUV = radius / iResolution.y;
-    float lineWidthUV = lineWidth / iResolution.y;
-    float gap = uniformGap / iResolution.y;
+    float radiusFromTextUV = radiusFromText / iResolution.y;
+    float radiusOfEdgeEffectUV = radiusOfEdgeEffect / iResolution.y;
+    float spreadOfEdgeEffectUV = spreadOfEdgeEffect / iResolution.y;
+    vec4 firstCharCoordsUV = firstCharCoords / iResolution.xyxy;
+    vec4 secondCharCoordsUV = secondCharCoords / iResolution.xyxy;
+    vec4 thirdCharCoordsUV = thirdCharCoords / iResolution.xyxy;
+    
+    //take into account aspect ratio
     uv.x *= aspectRatio;
     centerUV.x *= aspectRatio;
-    vec4 color = vec4(0.0, 0.0, 1.0, 0.0);
+    firstCharCoordsUV.rb *= aspectRatio;
+    secondCharCoordsUV.rb *= aspectRatio;
+    thirdCharCoordsUV.rb *= aspectRatio;
+    
+    
+    vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+
+    if(isInRect(uv, firstCharCoordsUV.rg, firstCharCoordsUV.ba)){
+        float alpha = getAlphaForCharacter(uv, firstCharCoordsUV.rg, firstCharCoordsUV.ba, vec2(firstTextCoords.r, firstTextCoords.g), vec2(firstTextCoords.b, firstTextCoords.a), fontTexture);
+        color = vec4(1.0, 0.0, 0.0, alpha);
+    }
+
+    if(isInRect(uv, secondCharCoordsUV.rg, secondCharCoordsUV.ba)){
+        float alpha = getAlphaForCharacter(uv, secondCharCoordsUV.rg, secondCharCoordsUV.ba, vec2(secondTextCoords.r, secondTextCoords.g), vec2(secondTextCoords.b, secondTextCoords.a), fontTexture);
+        color = vec4(1.0, 0.0, 0.0, alpha);
+    }
+    
+    if(isInRect(uv, thirdCharCoordsUV.rg, thirdCharCoordsUV.ba)){
+        float alpha = getAlphaForCharacter(uv, thirdCharCoordsUV.rg, thirdCharCoordsUV.ba, vec2(thirdTextCoords.r, thirdTextCoords.g), vec2(thirdTextCoords.b, thirdTextCoords.a), fontTexture);
+        color = vec4(1.0, 0.0, 0.0, alpha);
+    }
     
     float distToCenter = distance(uv, centerUV);
     float angleOfCompletion = (PI/ 2.0) +  ( (-2.0 * PI) * completion );
@@ -74,56 +210,21 @@ void main()
     	uvAngle -= (2.0 * PI);
     }
     
-    
-    if(distToCenter > (radiusUV - lineWidthUV) && distToCenter < (radiusUV + lineWidthUV)){
-        if(uvAngle <= (PI / 2.0) && uvAngle >= angleOfCompletion){
-            //color = vec4(1.0);
-        }else{
-            float distFromCircOutline = abs(distToCenter - radiusUV);
-            float alpha = 1.0 - smoothstep(lineWidthUV - 0.003, lineWidthUV, distFromCircOutline);
-        	color = vec4(vec3(0.0, 0.59, 0.79), alpha);
+    if(distToCenter > (radiusFromTextUV)){
+        if(!(uvAngle <= (PI / 2.0) && uvAngle >= angleOfCompletion)){
+            if(anotherApproach(uv, centerUV, radiusFromTextUV, radiusOfEdgeEffectUV, spreadOfEdgeEffectUV, time, effectTexture) == 0.0){
+    	       color = vec4(0.3, 0.6, 1.0, 1.0); 
+            }   
         }
     }
     
-    vec2 firstCharStart = vec2( centerUV.x - (radiusUV / 2.0), centerUV.y - (radiusUV / 2.0) );
-    vec2 firstCharEnd = vec2( centerUV.x - (radiusUV / 2.0) + 0.04, centerUV.y + (radiusUV / 2.0) );
-    
-    if(uv.x >= firstCharStart.x && uv.x <= firstCharEnd.x){
-        if(uv.y >= firstCharStart.y && uv.y <= firstCharEnd.y){
-            float xMapped = map(firstCharStart.x, firstCharEnd.x, firstTextCoords.r, firstTextCoords.b, uv.x);
-            float yMapped = map(firstCharStart.y, firstCharEnd.y, firstTextCoords.g, firstTextCoords.a, uv.y);
-            vec4 texel = texture2D(fontTexture, vec2(xMapped, yMapped));
-            float dist = 1.0 - texel.a;
-            float alpha = 1.0 - smoothstep(0.5, 0.6, dist);
-            color = vec4(vec3(1.0, 0.0, 0.0), alpha); 
-        }
-    }
-    
-    vec2 secondCharStart = vec2( centerUV.x - (radiusUV / 2.0) + 0.04, centerUV.y - (radiusUV / 2.0) );
-    vec2 secondCharEnd = vec2( centerUV.x + (radiusUV / 2.0), centerUV.y + (radiusUV / 4.0) );
-    
-    if(uv.x >= secondCharStart.x && uv.x <= secondCharEnd.x){
-        if(uv.y >= secondCharStart.y && uv.y <= secondCharEnd.y){
-            float xMapped = map(secondCharStart.x, secondCharEnd.x, secondTextCoords.r, secondTextCoords.b, uv.x);
-            float yMapped = map(secondCharStart.y, secondCharEnd.y, secondTextCoords.g, secondTextCoords.a, uv.y);
-            vec4 texel = texture2D(fontTexture, vec2(xMapped, yMapped));
-            float dist = 1.0 - texel.a;
-            float alpha = 1.0 - smoothstep(0.5, 0.6, dist);
-            color = vec4(vec3(1.0, 0.0, 0.0), alpha); 
-        }
-    }
-    
-	gl_FragColor = color;//vec4(color.rgb, 1.0);
+	gl_FragColor = color;
 }
 
 
 
 
 /*
-#define RADIUS 0.75
-#define AB_SCALE 0.75
-#define PI 3.1415926535897932384626433832795
-
 vec2 computeQuadratic(float a, float b, float c){
     float discriminant, firstAnswer, secondAnswer;
 

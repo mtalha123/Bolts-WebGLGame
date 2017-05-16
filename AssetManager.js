@@ -8,6 +8,8 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
         //load images
         var arialPng = new Image();
         arialPng.src = "Assets/arial.png";
+        var spiderWebPng = new Image();
+        spiderWebPng.src = "Assets/spiderweb.png";
         
         Promise.all([
             new Promise(function(resolve, reject){
@@ -20,7 +22,16 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.15:4000/Assets/arial.fnt", function(error, text){
+                spiderWebPng.onload = function(){
+                    var spiderWebTexture = getGLTextureForImage(gl, spiderWebPng);
+                    textures.spiderWeb = spiderWebTexture;
+                    callbackForEachLoaded();
+                    resolve("Spider Web Texture Loaded");
+                }
+            }),
+            
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.19:4000/Assets/arial.fnt", function(error, text){
                     otherTextAssets.arial = text;
                     callbackForEachLoaded();
                     resolve("Arial Font Loaded");
@@ -28,7 +39,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
             }),
             
             new Promise(function(resolve, reject){
-               getTextResource("http://192.168.0.15:4000/Shaders/lightningShaders.glsl", function(error, text){                    
+               getTextResource("http://192.168.0.19:4000/Shaders/lightningShaders.glsl", function(error, text){                    
                     shaders.lightning = text;
                     callbackForEachLoaded();
                     resolve("Lightning Shader Loaded");
@@ -36,7 +47,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.15:4000/Shaders/targetShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.19:4000/Shaders/targetShaders.glsl", function(error, text){
                     shaders.target = text;
                     callbackForEachLoaded();
                     resolve("Target Shader Loaded");
@@ -44,7 +55,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.15:4000/Shaders/textShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.19:4000/Shaders/textShaders.glsl", function(error, text){
                     shaders.text = text;
                     callbackForEachLoaded();
                     resolve("Text Shader Loaded");
@@ -52,7 +63,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.15:4000/Shaders/cursorShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.19:4000/Shaders/cursorShaders.glsl", function(error, text){
                     shaders.cursor = text
                     callbackForEachLoaded();
                     resolve("Cursor Shader Loaded");
@@ -60,7 +71,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getNoiseTexture', 'Cus
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.15:4000/Shaders/comboShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.19:4000/Shaders/comboShaders.glsl", function(error, text){
                     shaders.combo = text;
                     callbackForEachLoaded();
                     resolve("Combo Shader Loaded");

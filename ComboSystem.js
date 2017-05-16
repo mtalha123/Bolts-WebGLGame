@@ -17,8 +17,7 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     
     function initialize(gl, ShaderProcessor, p_TargetsController, Border){
         TargetsController = p_TargetsController;
-        comboHandler = ShaderProcessor.requestComboEffect(true, gl, 0, {}, "1x");
-        comboHandler.setPosition(Border.getLeftX(), Border.getTopY());
+        comboHandler = ShaderProcessor.requestComboEffect(false, gl, 0, Border.getLeftX(), Border.getTopY(), {}, "1x");
         targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;
         areaToAchieveReductionAmount = 0.04 * targetAreaToAchieve;
     }
@@ -55,7 +54,7 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     
     function resetCombo(){        
         chargeMultiplier = 1;
-        timeUntilComboOver = 2000;
+        timeUntilComboOver = 4000;
         comboTimer.reset();
         currentComboLevel = 0;
         targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;

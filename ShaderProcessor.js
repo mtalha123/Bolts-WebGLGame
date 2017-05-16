@@ -60,8 +60,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
     
-    function requestComboEffect(shouldDraw, gl, zOrder, opts, text){
-        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 4}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 5}, text);
+    function requestComboEffect(shouldDraw, gl, zOrder, x, y, opts, text){
+        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 4}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 5}, text);
         
         addHandler(handler);
         return handler;
