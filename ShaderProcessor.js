@@ -39,15 +39,15 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
 
-    function requestTargetEffect(shouldDraw, gl, zOrder, opts){
-        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 2});
+    function requestTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
+        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 0});
         
         addHandler(handler);
         return handler;
     }
 
     function requestTextEffect(shouldDraw, gl, zOrder, opts, x, y, text){
-        var handler = new TextHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 3}, x, y, text);
+        var handler = new TextHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 0}, x, y, text);
         
         addHandler(handler);
         return handler;
@@ -61,7 +61,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestComboEffect(shouldDraw, gl, zOrder, x, y, opts, text){
-        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 4}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 5}, text);
+        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 0}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 1}, text);
         
         addHandler(handler);
         return handler;

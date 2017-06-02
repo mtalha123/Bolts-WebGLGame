@@ -1,12 +1,15 @@
-define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSystem, ShaderProcessor, CircleEntity){
+define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'], function(PhysicsSystem, ShaderProcessor, CircleEntity, SynchronizedTimers){
 
-    function Target(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed){
+    function Target(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, spawnDurationTime){
         this._id = id;
         this._radius = p_radius;        
         this._previousStates = [];
         this._numPrevStates = 20;
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
+        this._spawnDurationTime = spawnDurationTime;
+        this._spawnDurationTimer = SynchronizedTimers.getTimer();
+        this._callbackAfterSpawnEffect = null;
         
         this._serverTargetPositionX = 0, this._serverTargetPositionY = 0;
         
@@ -17,12 +20,17 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSys
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
         this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed; 
         
-        this.targetHandler = ShaderProcessor.requestTargetEffect(false, gl, 2, {x: [x], y: [y], radius: [p_radius], fluctuation: [20]});
+        this.targetHandler = ShaderProcessor.requestTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [10]});
         
         this._animationTime = 0;        
     }
     
-    Target.prototype.draw = function(interpolation){       
+    Target.prototype.draw = function(interpolation){
+        if(this._spawnDurationTimer.getTime() <= this._spawnDurationTime){
+            this.targetHandler.setCompletion(this._spawnDurationTimer.getTime() / this._spawnDurationTime);
+        }else{
+            this.targetHandler.setCompletion(1);
+        }
         this.targetHandler.setPosition( this._prevX + (interpolation * (this._x - this._prevX)), this._prevY + (interpolation * (this._y - this._prevY)) );
         this._animationTime++;
         this.targetHandler.setTime(this._animationTime);
@@ -30,11 +38,17 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSys
     
     Target.prototype.update = function(){
         this.saveCurrentState();
+
+        if(this._spawnDurationTimer.getTime() >= this._spawnDurationTime && this._callbackAfterSpawnEffect){         
+            this._physicsEntity.setDensity(1);
+            this._callbackAfterSpawnEffect(); 
+            this._callbackAfterSpawnEffect = null;
+        }
         
         this._physicsEntity.update();        
         this._setXWithInterpolation(this._physicsEntity.getX());
         this._setYWithInterpolation(this._physicsEntity.getY());
-    }
+    } 
     
     Target.prototype.serverUpdate = function(newX, newY, linearVelocityX, linearVelocityY){
         this._serverTargetPositionX = newX;
@@ -70,6 +84,13 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSys
         this._y = newY;
     }
     
+    Target.prototype.doSpawnEffect = function(callback){
+        this._spawnDurationTimer.reset();
+        this._spawnDurationTimer.start();
+        this._physicsEntity.setDensity(1000);
+        this._callbackAfterSpawnEffect = callback;
+    }
+    
     Target.prototype.getX = function(){
         return this._x;
     }
@@ -83,9 +104,10 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity'], function(PhysicsSys
         this._xUnits = Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._yUnits = Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._physicsEntity.setLinearVelocity(this._xUnits, this._yUnits);
+        console.log("ID: " + this._id + "    MOVEMENT ANGLE SET: " + this._currentMovementAngleInDeg + "       x: " + this._xUnits + "      y: " + this._yUnits);
     }
     
-     Target.prototype.getMovementAngle = function(){
+    Target.prototype.getMovementAngle = function(){
         return this._currentMovementAngleInDeg;
     }
     

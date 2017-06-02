@@ -11,7 +11,8 @@ define(['PhysicsSystem', 'Box2DStuff'], function(PhysicsSystem, Box2DStuff){
         } 
         //the following line will set all the targets to be "bullet bodies", meaning they will not overlap (the collision will be more accurate). **REDUCES PERFORMANCE***
         this._bodyDef.bullet = true;       
-        this._bodyDef.fixedRotation = true;       
+        this._bodyDef.fixedRotation = true;    
+        this._bodyDef.allowSleep = false;
         this._body = undefined;
         this._isInSimulation = false;
         this._fixtureDef = new Box2DStuff.b2FixtureDef();
@@ -69,6 +70,13 @@ define(['PhysicsSystem', 'Box2DStuff'], function(PhysicsSystem, Box2DStuff){
     PhysicsEntity.prototype.removeFromSimulation = function(){
         PhysicsSystem.removeEntityFromSimulation(this);
         this._isInSimulation = false;
+    }
+    
+    PhysicsEntity.prototype.setDensity = function(density){
+        if(this._body){
+            this._body.GetFixtureList().SetDensity(density);
+            this._body.ResetMassData();
+        }
     }
     
     return PhysicsEntity;

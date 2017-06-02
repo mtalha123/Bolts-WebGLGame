@@ -13,64 +13,64 @@ precision mediump float;
 #define PI 3.1415926535897932384626433832795
 
 //--------------------------------------------------------------------------------------------------------
-vec4 mod289(vec4 x)
-{
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 permute(vec4 x)
-{
-  return mod289(((x*34.0)+1.0)*x);
-}
-
-vec4 taylorInvSqrt(vec4 r)
-{
-  return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec2 fade(vec2 t) {
-  return t*t*t*(t*(t*6.0-15.0)+10.0);
-}
-
-// Classic Perlin noise
-float cnoise(vec2 P)
-{
-  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
-  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-  Pi = mod289(Pi); // To avoid truncation effects in permutation
-  vec4 ix = Pi.xzxz;
-  vec4 iy = Pi.yyww;
-  vec4 fx = Pf.xzxz;
-  vec4 fy = Pf.yyww;
-
-  vec4 i = permute(permute(ix) + iy);
-
-  vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
-  vec4 gy = abs(gx) - 0.5 ;
-  vec4 tx = floor(gx + 0.5);
-  gx = gx - tx;
-
-  vec2 g00 = vec2(gx.x,gy.x);
-  vec2 g10 = vec2(gx.y,gy.y);
-  vec2 g01 = vec2(gx.z,gy.z);
-  vec2 g11 = vec2(gx.w,gy.w);
-
-  vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
-  g00 *= norm.x;
-  g01 *= norm.y;
-  g10 *= norm.z;
-  g11 *= norm.w;
-
-  float n00 = dot(g00, vec2(fx.x, fy.x));
-  float n10 = dot(g10, vec2(fx.y, fy.y));
-  float n01 = dot(g01, vec2(fx.z, fy.z));
-  float n11 = dot(g11, vec2(fx.w, fy.w));
-
-  vec2 fade_xy = fade(Pf.xy);
-  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-  return 2.3 * n_xy;
-}
+//vec4 mod289(vec4 x)
+//{
+//  return x - floor(x * (1.0 / 289.0)) * 289.0;
+//}
+//
+//vec4 permute(vec4 x)
+//{
+//  return mod289(((x*34.0)+1.0)*x);
+//}
+//
+//vec4 taylorInvSqrt(vec4 r)
+//{
+//  return 1.79284291400159 - 0.85373472095314 * r;
+//}
+//
+//vec2 fade(vec2 t) {
+//  return t*t*t*(t*(t*6.0-15.0)+10.0);
+//}
+//
+//// Classic Perlin noise
+//float cnoise(vec2 P)
+//{
+//  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+//  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+//  Pi = mod289(Pi); // To avoid truncation effects in permutation
+//  vec4 ix = Pi.xzxz;
+//  vec4 iy = Pi.yyww;
+//  vec4 fx = Pf.xzxz;
+//  vec4 fy = Pf.yyww;
+//
+//  vec4 i = permute(permute(ix) + iy);
+//
+//  vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+//  vec4 gy = abs(gx) - 0.5 ;
+//  vec4 tx = floor(gx + 0.5);
+//  gx = gx - tx;
+//
+//  vec2 g00 = vec2(gx.x,gy.x);
+//  vec2 g10 = vec2(gx.y,gy.y);
+//  vec2 g01 = vec2(gx.z,gy.z);
+//  vec2 g11 = vec2(gx.w,gy.w);
+//
+//  vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+//  g00 *= norm.x;
+//  g01 *= norm.y;
+//  g10 *= norm.z;
+//  g11 *= norm.w;
+//
+//  float n00 = dot(g00, vec2(fx.x, fy.x));
+//  float n10 = dot(g10, vec2(fx.y, fy.y));
+//  float n01 = dot(g01, vec2(fx.z, fy.z));
+//  float n11 = dot(g11, vec2(fx.w, fy.w));
+//
+//  vec2 fade_xy = fade(Pf.xy);
+//  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+//  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+//  return 2.3 * n_xy;
+//}
 //-------------------------------------------------------------------------------------------------------------------
 
 
@@ -152,7 +152,7 @@ float getUVAngleDeg(vec2 uv, vec2 center){
     float angle;
     angle = atan(uv_t.y, uv_t.x);
     //convert to degrees
-    angle *= (180.0 / PI);
+    angle = degrees(angle);
     
     if(angle < 0.0){
     	angle = 180.0 + (180.0 - abs(angle));
@@ -160,9 +160,14 @@ float getUVAngleDeg(vec2 uv, vec2 center){
     return angle;
 }
 
-float improvedSin(float value){
+float sinPositive(float value){
 	return (sin(value) + 1.0) / 2.0;
 }
+
+float map(float in_min, float in_max, float out_min, float out_max, float number) {
+    return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 
 float lightningCos(float value, float lengthOfLightning){
     return (-cos( ((2.0 * PI) / lengthOfLightning) * value) + 1.0) / 2.0;
@@ -191,7 +196,6 @@ float getReferenceAngle(float angleInRadians){
 float numBolts = 6.0;
 
 const float glowFactor = 14.0;
-float fluctuation = 20.0;
 float lineWidth = 1.0;
 
 uniform vec2 iResolution;
@@ -200,10 +204,11 @@ uniform vec2 center;
 uniform float radius;
 uniform float circleLineWidth;
 uniform float circleGlowFactor;
+uniform float fluctuation;
+uniform float completion;
+uniform sampler2D noise;
 
-vec4 generateLightning(vec2 currentUV, vec2 startCoord, vec2 endCoord){
-	float aspectRatio = iResolution.x / iResolution.y;
-        
+vec4 generateLightning(float aspectRatio, vec2 currentUV, vec2 startCoord, vec2 endCoord){    
     float lightningAmount = 0.025 * iResolution.x;
     float lineWidthUV; 
 
@@ -235,12 +240,12 @@ vec4 generateLightning(vec2 currentUV, vec2 startCoord, vec2 endCoord){
 
     lineWidthUV = transformToAspectRatioMeasurement(aspectRatio, lineWidth / iResolution.y, angle);
     
-    fluctuation = fluctuation + (fluctuation *  cos(abs(angle)) * (aspectRatio - 1.0));
+    float fluctuation_t = fluctuation + (fluctuation *  cos(abs(angle)) * (aspectRatio - 1.0));
 
     vec2 currentUV_t = (currentUV - lightningStartUV) * rotationMatrix;
 
     xClamped = clamp(currentUV_t.x, 0.0, lengthOfLightning);
-    yNoiseVal = cnoise(vec2(lightningAmount * xClamped, iGlobalTime * 20.)) * ( (fluctuation * lightningCos(xClamped, lengthOfLightning)) / iResolution.x);
+    yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(xClamped * 6.0, iGlobalTime / 1024.0)).r) * ( (fluctuation_t * lightningCos(xClamped, lengthOfLightning)) / iResolution.x);//cnoise(vec2(lightningAmount * xClamped, iGlobalTime * 20.)) * ( (fluctuation_t * lightningCos(xClamped, lengthOfLightning)) / iResolution.x);
     pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV)); 
     distanceToPoint = distance(currentUV_t, pointOnLightning);
 
@@ -269,18 +274,26 @@ void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
     float aspectRatio = iResolution.x / iResolution.y;
+    
+    //normalize
+    vec2 centerUV = center.xy / iResolution.xy;
+    float radiusUV = radius / iResolution.y;
+    
+    //take aspect ratio into account
     uv.x *= aspectRatio;
+    centerUV.x *= aspectRatio;
     
     vec3 finalColor = vec3(0.0);
-    vec2 centerUV = vec2( (center.x / iResolution.x) * aspectRatio, center.y / iResolution.y);
-    float radiusUV = radius / iResolution.y;
     
     float angleMultipleDeg = 360.0 / numBolts;
     float UVAngleDeg = getUVAngleDeg(uv, centerUV);
     float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
 	vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + (radiusUV - ((circleLineWidth / iResolution.x) * 4.0)), centerUV.y), closestAngleMultiple, centerUV);
     
-    vec4 lightningContribution = generateLightning(uv, centerUV, rotatedCoord);
+    vec4 lightningContribution = vec4(0.0);
+    if(distance(uv, centerUV) <= (completion * radiusUV) ){
+        lightningContribution = generateLightning(aspectRatio, uv, centerUV, rotatedCoord);
+    }
     
     float minDist;
     
@@ -296,6 +309,10 @@ void main()
     }
     
     float alpha = 1.0 - smoothstep(circleLineWidth / iResolution.x, circleGlowFactor / iResolution.x, minDist);
+        float refAngle = getReferenceAngle(radians(UVAngleDeg));
+    if(refAngle > (completion * (PI / 2.0))){
+        alpha = 0.0;
+    }
 
     if(alpha >= 1.0){
         finalColor = vec3(0.0, 0.0, 1.0);
@@ -308,6 +325,10 @@ void main()
         finalColor = lightningContribution.rgb + (vec3(0.0, 0.2, 1.0) * alpha);
         alpha += lightningContribution.a;
     }
+    
+//    if(completion < 1.0){
+//        finalColor = vec3(1.0);
+//    }
     
 	gl_FragColor = vec4(finalColor, alpha);
 	//gl_FragColor = vec4(vec3(1.0), 1.0);

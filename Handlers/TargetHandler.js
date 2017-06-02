@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise){
     
-    function TargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, noiseTextureData){
+    function TargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, noiseTextureData){
         Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TARGET);
@@ -50,6 +50,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 type: "float",
                 value: [40]
             },
+            completion: {
+                type: "float",
+                value: [1.0]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,
@@ -65,7 +69,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
             }
         }
         
-        this._generateVerticesFromCurrentState();
+        this.setPosition(x, y);
+        //this._generateVerticesFromCurrentState();
     }
     
     //inherit from Handler
@@ -114,6 +119,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
     TargetHandler.prototype.setCircleGlowFactor = function(newGlowFactor){
         this._uniforms.setCircleGlowFactor.value = [newGlowFactor];
         this._generateVerticesFromCurrentState();
+    }
+    
+    TargetHandler.prototype.setCompletion = function(value){
+        this._uniforms.completion.value = [value];
     }
     
     TargetHandler.prototype._generateVerticesFromCurrentState = function(){
