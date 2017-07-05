@@ -30,11 +30,11 @@ define([], function(){
     function initialize(){
     }
     
-    function register(callback, eventType, object ){
+    function register(callback, eventType, optObject ){
         for(var key in subscribers){
             if(eventType === key){
-                if(object != undefined){
-                    subscribers[key].push(object);
+                if(optObject != undefined){
+                    subscribers[key].push(optObject);
                 }
                 subscribers[key].push(callback);
             } 

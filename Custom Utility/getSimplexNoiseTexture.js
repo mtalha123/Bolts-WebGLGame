@@ -88,7 +88,7 @@ define(['Custom Utility/map'], function(map){
     };
     
     
-    function getNoiseTexture(width, height){
+    function getSimplexNoiseTexture(width, height){
         var noise = new SimplexNoise();
             
         var textureData = [];
@@ -114,5 +114,5 @@ define(['Custom Utility/map'], function(map){
         return textureData;
     }
     
-    return getNoiseTexture;
+    return getSimplexNoiseTexture;
 });

@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.19:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.14:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -26,7 +26,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Random', 'Border', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'TargetAchiever', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'ShaderProcessor', 'appMetaData', 'AssetManager'], function(Timer, FPSCounter, Random, Border, Target, Cursor, TargetsController, EventSystem, TargetAchiever, PhysicsSystem, NetworkManager, isObjectEmpty, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, appMetaData, AssetManager){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Random', 'Border', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'TargetAchiever', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'ShaderProcessor', 'appMetaData', 'AssetManager', 'Background'], function(Timer, FPSCounter, Random, Border, Target, Cursor, TargetsController, EventSystem, TargetAchiever, PhysicsSystem, NetworkManager, isObjectEmpty, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, appMetaData, AssetManager, Background){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -211,6 +211,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
 
         ComboSystem.draw();
         //Box2DStuff.physicsWorld.DrawDebugData();  
+        Background.draw();
         
         
         gl.viewport(0, 0, canvasWidth, canvasHeight);
@@ -307,6 +308,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
         appMetaData.initialize(canvasWidth, canvasHeight);
         ShaderLibrary.initialize(gl);
         ShaderProcessor.initialize(ShaderLibrary, appMetaData, AssetManager);
+        Background.initialize(gl, ShaderProcessor);
         Cursor.initialize(gl, appMetaData, ShaderProcessor);
         Border.initialize(gl, appMetaData, AssetManager, ShaderProcessor);
         TargetsController.initialize(gl, appMetaData, TargetsControllerInfo);  

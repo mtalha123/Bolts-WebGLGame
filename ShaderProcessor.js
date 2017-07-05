@@ -1,10 +1,10 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler){
     var allHandlers = [];
     
     var ShaderLibrary;
     var fontTexture;
     var spiderWebTexture;
-    var noiseTexture;
+    var simplexNoiseTexture, worleyNoiseTexture;
     var appMetaData;
     
     
@@ -14,7 +14,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         
         fontTexture = AssetManager.getTextureAsset("arial");
         spiderWebTexture = AssetManager.getTextureAsset("spiderWeb");
-        noiseTexture = AssetManager.getTextureAsset("noise");
+        simplexNoiseTexture = AssetManager.getTextureAsset("simplexNoise");
+        worleyNoiseTexture = AssetManager.getTextureAsset("worleyNoise");
     }    
     
     function addHandler(handler){
@@ -33,14 +34,14 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords){
-        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 0}, 1);
+        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0}, 1);
         
         addHandler(handler);
         return handler;
     }
 
     function requestTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: noiseTexture, width: 1024, height: 1024, sampler: 0});
+        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0});
         
         addHandler(handler);
         return handler;
@@ -62,6 +63,13 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     
     function requestComboEffect(shouldDraw, gl, zOrder, x, y, opts, text){
         var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 0}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 1}, text);
+        
+        addHandler(handler);
+        return handler;
+    }
+    
+    function requestBackgroundFieldEffect(shouldDraw, gl, zOrder, opts){
+        var handler = new BackgroundFieldHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {noiseTexture: worleyNoiseTexture, sampler: 0});
         
         addHandler(handler);
         return handler;
@@ -145,7 +153,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestTargetEffect: requestTargetEffect,
         requestTextEffect: requestTextEffect,
         requestCursorEffect: requestCursorEffect,
-        requestComboEffect: requestComboEffect
+        requestComboEffect: requestComboEffect,
+        requestBackgroundFieldEffect: requestBackgroundFieldEffect
     };
     
 });
