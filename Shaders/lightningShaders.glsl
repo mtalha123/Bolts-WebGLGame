@@ -6,11 +6,20 @@ void main(){
 }
 
 
-
 //FRAGMENT SHADER
 precision mediump float;
 
 #define PI 3.1415926535897932384626433832795
+
+const int MAX_ITERATIONS = 10;
+
+float lightningCos(float value, float lengthOfLightning){
+    return ((-cos( ((2.0 * PI) / lengthOfLightning) * value) + 1.0) / 2.0);
+}
+
+float map(float in_min, float in_max, float out_min, float out_max, float number) {
+    return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 uniform float iGlobalTime;
 uniform vec2 iResolution;
@@ -24,125 +33,104 @@ uniform vec3 glowColor;
 uniform sampler2D noise;
 uniform sampler2D coords;
 
-const int MAX_ITERATIONS = 10;
-
-float improvedSin(float value){
-	return (sin(value) + 1.0) / 2.0;
-}
-
-float lightningCos(float value, float lengthOfLightning){
-    return ((-cos( ((2.0 * PI) / lengthOfLightning) * value) + 1.0) / 2.0);
-}
-
-float map(float in_min, float in_max, float out_min, float out_max, float number) {
-    return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-float transformToAspectRatioMeasurement(float aspectRatio, float baseMeasurement, float uvAngle){
-    return baseMeasurement + ( cos(abs(uvAngle)) * (aspectRatio - 1.0) * baseMeasurement );
-}
-
 void main(){
-	vec2 currentUV = gl_FragCoord.xy / iResolution.xy; 
+	vec2 uv = gl_FragCoord.xy / iResolution.xy; 
     float aspectRatio = iResolution.x / iResolution.y;
     
-    currentUV.x *= aspectRatio;
+    uv.x *= aspectRatio;
         
     float lightningAmount = 0.025 * iResolution.x;
-    float lineWidthUV, lineWidthUV_t; 
-    
-    vec2 t_currentUV_t, currentUV_t;
-    vec2 lightningStartCoord, lightningEndCoord, t_lightningStartUV, t_lightningEndUV; 
-    vec2 lightningStartUV, lightningEndUV; 
-    float t_lengthOfLightning, lengthOfLightning;
-    
+    float lineWidthUV = lineWidth / iResolution.y; 
+    vec2 uv_t;
+    vec2 lightningStart, lightningEnd; 
+    float lengthOfLightning;
     float testDistance, distanceToPoint = 1000.0;
     vec3 finalColor = vec3(1.0);
-    
-    vec2 t_lightningStartUV_t, lightningStartUV_t;
-
-    float t_xClamped, t_yNoiseVal;
     float xClamped, yNoiseVal;
-    vec2 t_pointOnLightning, pointOnLightning;
+    vec2 pointOnLightning;
        
-    float b = 0.0;
     for(int i = 0; i < MAX_ITERATIONS; i++){
         if(i == (numCoords - 1)){
             break;
         }
         
-        t_lightningStartUV = texture2D(coords, vec2(b * (1.0/widthOfCoordsTexture), 0.5) ).xy;
-        t_lightningEndUV = texture2D(coords, vec2((b+1.0) * (1.0/widthOfCoordsTexture), 0.5) ).xy;
+        lightningStart = texture2D(coords, vec2(float(i) * (1.0/widthOfCoordsTexture), 0.5) ).xy;
+        lightningEnd = texture2D(coords, vec2((float(i)+1.0) * (1.0/widthOfCoordsTexture), 0.5) ).xy;
         
-        if(t_lightningStartUV.x > t_lightningEndUV.x){
-        	float temp = t_lightningStartUV.x;
-            t_lightningStartUV.x = t_lightningEndUV.x;
-            t_lightningEndUV.x = temp;
+        if(lightningStart.x > lightningEnd.x){
+        	float temp = lightningStart.x;
+            lightningStart.x = lightningEnd.x;
+            lightningEnd.x = temp;
         }
 
-        t_lightningStartUV.x *= aspectRatio;
-        t_lightningEndUV.x *= aspectRatio;
+        lightningStart.x *= aspectRatio;
+        lightningEnd.x *= aspectRatio;
         
-        t_lengthOfLightning = distance(t_lightningStartUV, t_lightningEndUV);
+        lengthOfLightning = distance(lightningStart, lightningEnd);
         
-        float angle = asin( (t_lightningEndUV.y - t_lightningStartUV.y) / distance(t_lightningStartUV, t_lightningEndUV) );
+        float angle = asin( (lightningEnd.y - lightningStart.y) / distance(lightningStart, lightningEnd) );
         angle *= (-1.0);
         mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
         
-        lineWidthUV_t = lineWidth / iResolution.y;
+        uv_t = (uv - lightningStart) * rotationMatrix;
         
-        t_lightningStartUV_t = t_lightningStartUV * rotationMatrix;
-        t_currentUV_t = (currentUV - t_lightningStartUV) * rotationMatrix;
-        
-        t_xClamped = clamp(t_currentUV_t.x, 0.0, t_lengthOfLightning);
-        float pureNoiseVal = texture2D(noise, (vec2(clamp(t_currentUV_t.x / aspectRatio, 0.0, t_lengthOfLightning), iGlobalTime / 1024.0))).r;
+        xClamped = clamp(uv_t.x, 0.0, lengthOfLightning);
+        float pureNoiseVal = texture2D(noise, (vec2(clamp(uv_t.x / aspectRatio, 0.0, lengthOfLightning), iGlobalTime / 1024.0))).r;
         pureNoiseVal = map(0.0, 1.0, -1.0, 1.0, pureNoiseVal);
-    	t_yNoiseVal = pureNoiseVal * ( (fluctuation * lightningCos(t_xClamped, t_lengthOfLightning)) / iResolution.x);
-    	t_pointOnLightning = vec2(t_xClamped, clamp(t_currentUV_t.y, t_yNoiseVal - lineWidthUV_t, t_yNoiseVal + lineWidthUV_t)); 
-    	testDistance = distance(t_currentUV_t, t_pointOnLightning);
+    	yNoiseVal = pureNoiseVal * ( (fluctuation * lightningCos(xClamped, lengthOfLightning)) / iResolution.x);
+    	pointOnLightning = vec2(xClamped, clamp(uv_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV)); 
+    	testDistance = distance(uv_t, pointOnLightning);
         
         if(testDistance < distanceToPoint){
-        	lightningStartUV = t_lightningStartUV;
-            lightningEndUV = t_lightningEndUV;
-            lengthOfLightning = t_lengthOfLightning;
-            currentUV_t = t_currentUV_t;
-            xClamped = t_xClamped;
-            yNoiseVal = t_yNoiseVal;
-            pointOnLightning = t_pointOnLightning;
-            lineWidthUV = lineWidthUV_t;
-            
             distanceToPoint = testDistance;
         }
-        b+=1.0;
     }
     
-    float invertedDistance = smoothstep(0.0, 220.0, 1.0 / distanceToPoint);//clamp(1.0 / distanceToPoint, 1.0, 300.0);
-    float multiplier = invertedDistance;// * (glowFactor / iResolution.x);
+    float invertedDistance = smoothstep(0.0, 220.0, 1.0 / distanceToPoint);
+    float multiplier = invertedDistance;
     
     float alpha = 1.0;
     
-    if( (currentUV_t.y >= (yNoiseVal - lineWidthUV)) && (currentUV_t.y <= (yNoiseVal + lineWidthUV)) ){
-        finalColor = vec3(1.0, 1.0, 0.7);//multiplier * glowColor;
-        alpha *= multiplier;
-
-        if( (currentUV_t.x >= 0.0) && (currentUV_t.x <= lengthOfLightning) ){
-        	finalColor = boltColor;
-            alpha = 1.0;
-        }//else if(distance(currentUV, lightningEndUV) <= lineWidthUV){
-        //	finalColor = boltColor;
-       // }
+    if(distanceToPoint <= lineWidthUV){
+        finalColor = boltColor;
     }else{
-        finalColor = vec3(1.0, 1.0, 0.7);//multiplier * glowColor;
+        finalColor = vec3(1.0, 1.0, 0.7);
         alpha *= multiplier;
-    }  
-    
-   //alpha = 1.0 - smoothstep(0.001, 0.02, distanceToPoint);
-//   finalColor = vec3(1.0, 1.0, 0.0);
-//   if(alpha < 1.0){
-//        finalColor = vec3(1.0, 1.0, 0.9);
-//   }
-    
-   // finalColor = vec3(1.0, 0.0, 0.0);
+    }
 
-	gl_FragColor = vec4(finalColor, alpha);//0.5 * multiplier);
+	gl_FragColor = vec4(finalColor, alpha);
 }
+
+
+
+
+//float rand(vec2 co){
+//    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+//}
+//
+//vec2 getProjectionVector(vec2 a, vec2 bNormalized){
+//	return ( dot(a, bNormalized) / dot(bNormalized, bNormalized) ) * bNormalized;
+//}
+//
+//vec2 getPerpVec(vec2 vec){
+//	return vec2(vec.y * (-1.0), vec.x);
+//}
+//
+//vec2 ls = vec2(0.2);
+//vec2 le = vec2(0.8);
+//
+//void mainImage( out vec4 fragColor, in vec2 fragCoord )
+//{
+//	vec2 uv = fragCoord.xy / iResolution.xy;
+//    vec3 color;
+//    
+//    vec2 lgDirVec = normalize(le - ls);
+//    vec2 lsToUV = uv - ls;
+//    vec2 projectionVec = getProjectionVector(lsToUV, lgDirVec);
+//    projectionVec = clamp(ls + projectionVec, ls, le) - ls; 
+//    vec2 perpVec = getPerpVec(lgDirVec) * 0.1;
+//    
+//    float minDist = length(uv - (perpVec + ls + projectionVec));    
+//    color = vec3(1.0) * (1.0 / minDist) * 0.01;
+//	fragColor = vec4(color, 1.0);
+//}

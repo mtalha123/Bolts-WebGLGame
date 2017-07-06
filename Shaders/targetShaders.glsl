@@ -74,48 +74,48 @@ precision mediump float;
 //-------------------------------------------------------------------------------------------------------------------
 
 
-vec2 computeQuadratic(float a, float b, float c){
-    float discriminant, firstAnswer, secondAnswer;
-
-    discriminant = pow(b, 2.0) - (4.0 * a * c);
-
-    if(discriminant < 0.0){
-        return vec2(-1.0);
-    }
-
-    firstAnswer = (-b) + sqrt(discriminant);
-    firstAnswer /= (2.0 * a);
-
-    secondAnswer = (-b) - sqrt(discriminant);
-    secondAnswer /= (2.0 * a);
-
-    return vec2(firstAnswer, secondAnswer);                              
-}
-
-
-float getSlope(vec2 first, vec2 second){
-	if((first.x - second.x) == 0.0){
-    	return -1.0;
-    }
-   
-	return (second.y - first.y) / (second.x - first.x);
-}
-
-float findYIntercept(float slope, vec2 point){
-	return point.y - (slope * point.x);
-}
-
-vec4 getIntersectionPoints(float m, float y_int, vec2 center, float radius){
-    float a = pow(m, 2.0) + 1.0;
-    float b = (2.0 * y_int * m) - (2.0 * center.x) - (2.0 * m * center.y);
-    float c = pow(y_int, 2.0) - (2.0 * y_int * center.y) + pow(center.y, 2.0) + pow(center.x, 2.0) - pow(radius, 2.0);
-	vec2 roots = computeQuadratic(a, b, c);
-    
-    vec2 answerOne = vec2(roots.x, m * roots.x + y_int);
-    vec2 answerTwo = vec2(roots.y, m * roots.y + y_int);
-    
-    return vec4(answerOne, answerTwo);
-}
+//vec2 computeQuadratic(float a, float b, float c){
+//    float discriminant, firstAnswer, secondAnswer;
+//
+//    discriminant = pow(b, 2.0) - (4.0 * a * c);
+//
+//    if(discriminant < 0.0){
+//        return vec2(-1.0);
+//    }
+//
+//    firstAnswer = (-b) + sqrt(discriminant);
+//    firstAnswer /= (2.0 * a);
+//
+//    secondAnswer = (-b) - sqrt(discriminant);
+//    secondAnswer /= (2.0 * a);
+//
+//    return vec2(firstAnswer, secondAnswer);                              
+//}
+//
+//
+//float getSlope(vec2 first, vec2 second){
+//	if((first.x - second.x) == 0.0){
+//    	return -1.0;
+//    }
+//   
+//	return (second.y - first.y) / (second.x - first.x);
+//}
+//
+//float findYIntercept(float slope, vec2 point){
+//	return point.y - (slope * point.x);
+//}
+//
+//vec4 getIntersectionPoints(float m, float y_int, vec2 center, float radius){
+//    float a = pow(m, 2.0) + 1.0;
+//    float b = (2.0 * y_int * m) - (2.0 * center.x) - (2.0 * m * center.y);
+//    float c = pow(y_int, 2.0) - (2.0 * y_int * center.y) + pow(center.y, 2.0) + pow(center.x, 2.0) - pow(radius, 2.0);
+//	vec2 roots = computeQuadratic(a, b, c);
+//    
+//    vec2 answerOne = vec2(roots.x, m * roots.x + y_int);
+//    vec2 answerTwo = vec2(roots.y, m * roots.y + y_int);
+//    
+//    return vec4(answerOne, answerTwo);
+//}
 
 float getClosestMultiple(int number, int multiple){
     if(number == 0){
@@ -238,9 +238,9 @@ vec4 generateLightning(float aspectRatio, vec2 currentUV, vec2 startCoord, vec2 
     angle *= (-1.0);
     mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
 
-    lineWidthUV = transformToAspectRatioMeasurement(aspectRatio, lineWidth / iResolution.y, angle);
+    lineWidthUV = lineWidth / iResolution.y;//transformToAspectRatioMeasurement(aspectRatio, lineWidth / iResolution.y, angle);
     
-    float fluctuation_t = fluctuation + (fluctuation *  cos(abs(angle)) * (aspectRatio - 1.0));
+    float fluctuation_t = fluctuation; //+ (fluctuation *  cos(abs(angle)) * (aspectRatio - 1.0));
 
     vec2 currentUV_t = (currentUV - lightningStartUV) * rotationMatrix;
 
@@ -250,16 +250,7 @@ vec4 generateLightning(float aspectRatio, vec2 currentUV, vec2 startCoord, vec2 
     distanceToPoint = distance(currentUV_t, pointOnLightning);
 
     float invertedDistance = 1.0 / distanceToPoint;
-    float multiplier = invertedDistance * (glowFactor / iResolution.x);
-    
-    if( (currentUV_t.y >= (yNoiseVal - lineWidthUV)) && (currentUV_t.y <= (yNoiseVal + lineWidthUV)) ){
-        //colorToReturn = multiplier * vec3(1.0, 1.0, 0.7);
-        if( (currentUV_t.x >= 0.0) && (currentUV_t.x <= lengthOfLightning) ){
-        	//colorToReturn = vec3(1.0, 1.0, 0.0);
-        }
-    }else{
-        //colorToReturn = multiplier * vec3(1.0, 1.0, 0.7);
-    }  
+    float multiplier = invertedDistance * (glowFactor / iResolution.x); 
     
     float alpha = 1.0 - smoothstep(lineWidth / iResolution.x, glowFactor / iResolution.x, distanceToPoint);
     colorToReturn = vec3(1.0, 1.0, 0.0);
@@ -295,18 +286,7 @@ void main()
         lightningContribution = generateLightning(aspectRatio, uv, centerUV, rotatedCoord);
     }
     
-    float minDist;
-    
-    float m = getSlope(uv, centerUV);
-    float b = findYIntercept(m, uv);
-    if(b <= (-30.0) || b >= 30.0){
-        vec2 first = vec2(uv.x, centerUV.y + radiusUV );
-        vec2 second = vec2(uv.x, centerUV.y - radiusUV );
-    	minDist = min(distance(uv, first), distance(uv, second));
-    }else{
-    	vec4 intersectionPoints = getIntersectionPoints(m, b, centerUV, radiusUV);
-    	minDist = min( distance(uv, intersectionPoints.rg), distance(uv, intersectionPoints.ba) );
-    }
+    float minDist = distance( centerUV + (normalize(uv - centerUV) * radiusUV), uv );
     
     float alpha = 1.0 - smoothstep(circleLineWidth / iResolution.x, circleGlowFactor / iResolution.x, minDist);
         float refAngle = getReferenceAngle(radians(UVAngleDeg));
@@ -326,10 +306,5 @@ void main()
         alpha += lightningContribution.a;
     }
     
-//    if(completion < 1.0){
-//        finalColor = vec3(1.0);
-//    }
-    
 	gl_FragColor = vec4(finalColor, alpha);
-	//gl_FragColor = vec4(vec3(1.0), 1.0);
 }
