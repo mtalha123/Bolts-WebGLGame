@@ -6,7 +6,7 @@ define(['Third Party/tooloud.min.js', 'Custom Utility/map'], function(tooloud, m
         var noiseValue, color;
         
         for(var i = 0; i < ((width * height) * 3); i+=3){
-            noiseValue = tooloud.Worley.Euclidean(10 * (xVal / width), 10 * (yVal / height), 0)[0];
+            noiseValue = tooloud.Worley.Euclidean(7 * (xVal / width), 7 * (yVal / height), 0)[0];
             color = noiseValue * 255;
             
             textureData.push(color);
