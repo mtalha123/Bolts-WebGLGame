@@ -6,6 +6,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     EventSystem.register(recieveEvent, "combo_level_changed");
     var handler = null;
     var appMetaData;
+    var time = 0;
     
     function initialize(gl, p_appMetaData, ShaderProcessor){
         appMetaData = p_appMetaData;
@@ -20,6 +21,8 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
             handler.setClicked(false);
         } 
         handler.setPosition(x, y);
+        time++;
+        handler.setTime(time);
     }
     
     function isMouseButtonHeldDown(){
