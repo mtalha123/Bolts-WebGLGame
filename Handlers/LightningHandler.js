@@ -25,7 +25,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             },
             fluctuation: {
                 type: "float",
-                value: [40.0]
+                value: [25.0]
             },
             glowFactor: {
                 type: "float",

@@ -39,6 +39,14 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
+               getTextResource("http://192.168.0.18:4000/Shaders/commonFunctions.glsl", function(error, text){                    
+                    shaders.commonFunctions = text;
+                    callbackForEachLoaded();
+                    resolve("Common Shader Functions Loaded");
+                }); 
+            }),
+            
+            new Promise(function(resolve, reject){
                getTextResource("http://192.168.0.18:4000/Shaders/lightningShaders.glsl", function(error, text){                    
                     shaders.lightning = text;
                     callbackForEachLoaded();
@@ -87,8 +95,8 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                var noiseData = getSimplexNoiseTexture(1024, 1024);
-                var noiseTexture = getGLTextureForNoise(gl, noiseData, 1024, 1024);
+                var noiseData = getSimplexNoiseTexture(2048, 2048);
+                var noiseTexture = getGLTextureForNoise(gl, noiseData, 2048, 2048);
                 textures.simplexNoise = noiseTexture;
                 callbackForEachLoaded();
                 resolve("Simplex Noise Data Loaded");

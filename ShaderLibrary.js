@@ -24,8 +24,18 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     
     function initialize(gl){
         var allShaderSources = AssetManager.getShaderAsset(null, true);
+        var commonFunctionsSource = allShaderSources["commonFunctions"];
+        delete allShaderSources["commonFunctions"];
         
-        for(var shaderSource in allShaderSources){
+       // var commonFunctionsCompiled = gl.createShader(gl.FRAGMENT_SHADER);
+       // gl.shaderSource(commonFunctionsCompiled, commonFunctionsSource);
+       // gl.compileShader(commonFunctionsCompiled);
+//        if (!gl.getShaderParameter(commonFunctionsCompiled, gl.COMPILE_STATUS)) {
+//            alert("Could not compile fragment shader: " + gl.getShaderInfoLog(commonFunctionsCompiled));
+//        }
+        
+        
+        for(var shaderSource in allShaderSources){      
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
             var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
             
@@ -34,19 +44,22 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
             
             var vertexShaderSource = currShaderSource.substring(0, indexBeginFragShader);
             var fragmentShaderSource = currShaderSource.substring(indexBeginFragShader);
- 
+            fragmentShaderSource = [fragmentShaderSource.slice(0, "precision mediump float;".length), commonFunctionsSource, fragmentShaderSource.slice("precision mediump float;".length)].join("\n")
             gl.shaderSource(vertexShader, vertexShaderSource);
             gl.shaderSource(fragmentShader, fragmentShaderSource);
 
             gl.compileShader(vertexShader);
             if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-                alert("Could not compile vertex shader: " + gl.getShaderInfoLog(vertexShader));
+                alert(shaderSource + " shaders: " + "Could not compile vertex shader: " + gl.getShaderInfoLog(vertexShader));
             }
 
             gl.compileShader(fragmentShader);
-
             if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-                alert("Could not compile fragment shader: " + gl.getShaderInfoLog(fragmentShader));
+                var shaderErrLog = gl.getShaderInfoLog(fragmentShader);
+                var errorLineNumIndexStart = shaderErrLog.indexOf("ERROR: 0:") + "ERROR: 0:".length;
+                var errorLineNumIndexEnd = shaderErrLog.indexOf(":", errorLineNumIndexStart);
+                var errorLineNumber = parseInt(shaderErrLog.slice(errorLineNumIndexStart, errorLineNumIndexEnd));
+                alert(shaderSource.toUpperCase() + " shaders: " + "Could not compile fragment shader: " + shaderErrLog + "\n on line " + errorLineNumber + ": " + fragmentShaderSource.split("\n")[errorLineNumber-1]);
             }
 
 

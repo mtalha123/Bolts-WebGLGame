@@ -20,7 +20,7 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
         this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed; 
         
-        this.targetHandler = ShaderProcessor.requestTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [10]});
+        this.targetHandler = ShaderProcessor.requestTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});
         
         this._animationTime = 0;        
     }

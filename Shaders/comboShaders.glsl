@@ -10,38 +10,8 @@ void main(){
 //FRAGMENT SHADER
 precision mediump float;
 
-#define PI 3.1415926535897932384626433832795
-
 vec2 resizeVector(vec2 vector, float lengthToResizeTo){
 	return vector * (lengthToResizeTo / length(vector));
-}
-
-float getUVAngleDeg(vec2 uv, vec2 center){
-	vec2 uv_t = uv - center;
-    
-    if(uv_t.x == 0.0){
-        if(uv_t.y >= 0.0){
-        	return 90.0;
-        }
-        
-        if(uv_t.y < 0.0){
-        	return -90.0;
-        }
-    }
-    
-    float angle;
-    angle = atan(uv_t.y, uv_t.x);
-    //convert to degrees
-    angle *= (180.0 / PI);
-    
-    if(angle < 0.0){
-    	angle = 180.0 + (180.0 - abs(angle));
-    }
-    return angle;
-}
-
-float map(float in_min, float in_max, float out_min, float out_max, float number) {
-    return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 bool isInRect(vec2 testCoord, vec2 lowerLeftCoord, vec2 upperRightCoord){

@@ -10,70 +10,6 @@ void main(){
 //FRAGMENT SHADER
 precision mediump float;
 
-#define PI 3.1415926535897932384626433832795
-
-//--------------------------------------------------------------------------------------------------------
-//vec4 mod289(vec4 x)
-//{
-//  return x - floor(x * (1.0 / 289.0)) * 289.0;
-//}
-//
-//vec4 permute(vec4 x)
-//{
-//  return mod289(((x*34.0)+1.0)*x);
-//}
-//
-//vec4 taylorInvSqrt(vec4 r)
-//{
-//  return 1.79284291400159 - 0.85373472095314 * r;
-//}
-//
-//vec2 fade(vec2 t) {
-//  return t*t*t*(t*(t*6.0-15.0)+10.0);
-//}
-//
-//// Classic Perlin noise
-//float cnoise(vec2 P)
-//{
-//  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
-//  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-//  Pi = mod289(Pi); // To avoid truncation effects in permutation
-//  vec4 ix = Pi.xzxz;
-//  vec4 iy = Pi.yyww;
-//  vec4 fx = Pf.xzxz;
-//  vec4 fy = Pf.yyww;
-//
-//  vec4 i = permute(permute(ix) + iy);
-//
-//  vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
-//  vec4 gy = abs(gx) - 0.5 ;
-//  vec4 tx = floor(gx + 0.5);
-//  gx = gx - tx;
-//
-//  vec2 g00 = vec2(gx.x,gy.x);
-//  vec2 g10 = vec2(gx.y,gy.y);
-//  vec2 g01 = vec2(gx.z,gy.z);
-//  vec2 g11 = vec2(gx.w,gy.w);
-//
-//  vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
-//  g00 *= norm.x;
-//  g01 *= norm.y;
-//  g10 *= norm.z;
-//  g11 *= norm.w;
-//
-//  float n00 = dot(g00, vec2(fx.x, fy.x));
-//  float n10 = dot(g10, vec2(fx.y, fy.y));
-//  float n01 = dot(g01, vec2(fx.z, fy.z));
-//  float n11 = dot(g11, vec2(fx.w, fy.w));
-//
-//  vec2 fade_xy = fade(Pf.xy);
-//  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-//  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-//  return 2.3 * n_xy;
-//}
-//-------------------------------------------------------------------------------------------------------------------
-
-
 //vec2 computeQuadratic(float a, float b, float c){
 //    float discriminant, firstAnswer, secondAnswer;
 //
@@ -136,47 +72,6 @@ vec2 rotateCoord(vec2 point, float angle, vec2 center){
     return ((point - center) * rotationMatrix) + center;
 }
 
-float getUVAngleDeg(vec2 uv, vec2 center){
-	vec2 uv_t = uv - center;
-    
-    if(uv_t.x == 0.0){
-        if(uv_t.y >= 0.0){
-        	return 90.0;
-        }
-        
-        if(uv_t.y < 0.0){
-        	return -90.0;
-        }
-    }
-    
-    float angle;
-    angle = atan(uv_t.y, uv_t.x);
-    //convert to degrees
-    angle = degrees(angle);
-    
-    if(angle < 0.0){
-    	angle = 180.0 + (180.0 - abs(angle));
-    }
-    return angle;
-}
-
-float sinPositive(float value){
-	return (sin(value) + 1.0) / 2.0;
-}
-
-float map(float in_min, float in_max, float out_min, float out_max, float number) {
-    return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-
-float lightningCos(float value, float lengthOfLightning){
-    return (-cos( ((2.0 * PI) / lengthOfLightning) * value) + 1.0) / 2.0;
-}
-
-float transformToAspectRatioMeasurement(float aspectRatio, float baseMeasurement, float uvAngle){
-    return baseMeasurement + ( cos(abs(uvAngle)) * (aspectRatio - 1.0) * baseMeasurement );
-}
-
 float getReferenceAngle(float angleInRadians){
     if(angleInRadians >= ( (3.0 * PI) / 2.0) ){
         return (2.0 * PI) - angleInRadians;
@@ -193,11 +88,6 @@ float getReferenceAngle(float angleInRadians){
     return angleInRadians;
 }
 
-float numBolts = 6.0;
-
-const float glowFactor = 14.0;
-float lineWidth = 1.0;
-
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform vec2 center;
@@ -208,58 +98,10 @@ uniform float fluctuation;
 uniform float completion;
 uniform sampler2D noise;
 
-vec4 generateLightning(float aspectRatio, vec2 currentUV, vec2 startCoord, vec2 endCoord){    
-    float lightningAmount = 0.025 * iResolution.x;
-    float lineWidthUV; 
+float numBolts = 6.0;
 
-    vec2 lightningStartUV = startCoord; 
-    vec2 lightningEndUV = endCoord; 
-    float lengthOfLightning;
-    
-    float distanceToPoint;
-    vec3 colorToReturn = vec3(0.0);
-    
-    float xClamped, yNoiseVal;
-    vec2 pointOnLightning;
-        
-    if(lightningStartUV.x > lightningEndUV.x){
-        float temp = lightningStartUV.x;
-        lightningStartUV.x = lightningEndUV.x;
-        lightningEndUV.x = temp;
-        
-        temp = lightningStartUV.y;
-        lightningStartUV.y = lightningEndUV.y;
-        lightningEndUV.y = temp;
-    }
-
-	lengthOfLightning = distance(lightningStartUV, lightningEndUV);
-
-    float angle = asin( (lightningEndUV.y - lightningStartUV.y) / distance(lightningStartUV, lightningEndUV) );
-    angle *= (-1.0);
-    mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-
-    lineWidthUV = lineWidth / iResolution.y;//transformToAspectRatioMeasurement(aspectRatio, lineWidth / iResolution.y, angle);
-    
-    float fluctuation_t = fluctuation; //+ (fluctuation *  cos(abs(angle)) * (aspectRatio - 1.0));
-
-    vec2 currentUV_t = (currentUV - lightningStartUV) * rotationMatrix;
-
-    xClamped = clamp(currentUV_t.x, 0.0, lengthOfLightning);
-    yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(xClamped * 6.0, iGlobalTime / 1024.0)).r) * ( (fluctuation_t * lightningCos(xClamped, lengthOfLightning)) / iResolution.x);//cnoise(vec2(lightningAmount * xClamped, iGlobalTime * 20.)) * ( (fluctuation_t * lightningCos(xClamped, lengthOfLightning)) / iResolution.x);
-    pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV)); 
-    distanceToPoint = distance(currentUV_t, pointOnLightning);
-
-    float invertedDistance = 1.0 / distanceToPoint;
-    float multiplier = invertedDistance * (glowFactor / iResolution.x); 
-    
-    float alpha = 1.0 - smoothstep(lineWidth / iResolution.x, glowFactor / iResolution.x, distanceToPoint);
-    colorToReturn = vec3(1.0, 1.0, 0.0);
-    colorToReturn *= alpha;
-    if(alpha < 1.0){
-        colorToReturn = vec3(1.0, 1.0, 0.7);
-    }
-	return vec4(colorToReturn, alpha);
-}
+const float glowFactor = 14.0;
+float lineWidth = 1.0;
 
 void main()
 {
@@ -269,6 +111,8 @@ void main()
     //normalize
     vec2 centerUV = center.xy / iResolution.xy;
     float radiusUV = radius / iResolution.y;
+    float lineWidthUV = lineWidth / iResolution.y;
+    float fluctuationUV = fluctuation / iResolution.y;
     
     //take aspect ratio into account
     uv.x *= aspectRatio;
@@ -283,7 +127,13 @@ void main()
     
     vec4 lightningContribution = vec4(0.0);
     if(distance(uv, centerUV) <= (completion * radiusUV) ){
-        lightningContribution = generateLightning(aspectRatio, uv, centerUV, rotatedCoord);
+        float distToLg = genLightningAndGetDist(uv, centerUV, rotatedCoord, lineWidthUV, fluctuationUV, 4.0, noise, iGlobalTime, iResolution);
+        float alpha = 1.0 - smoothstep(lineWidthUV, glowFactor / iResolution.x, distToLg);
+        lightningContribution = vec4(1.0, 1.0, 0.0, alpha);
+        lightningContribution.rgb *= alpha;
+        if(alpha < 1.0){
+            lightningContribution = vec4(1.0, 1.0, 0.7, alpha);
+        }
     }
     
     float minDist = distance( centerUV + (normalize(uv - centerUV) * radiusUV), uv );
