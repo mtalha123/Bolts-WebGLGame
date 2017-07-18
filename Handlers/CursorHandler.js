@@ -4,7 +4,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.CURSOR);
-        this._padding = 0.02 * canvasHeight;
+        this._padding = 0.03 * canvasHeight;
         
         this._uniforms = {
             iResolution: {
