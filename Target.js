@@ -1,17 +1,53 @@
-define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'], function(PhysicsSystem, ShaderProcessor, CircleEntity, SynchronizedTimers){
+define(['CircleEntity', 'SynchronizedTimers'], function(CircleEntity, SynchronizedTimers){
 
-    function Target(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, spawnDurationTime){
+    function TargetDestructionState(targetHandler){
+        this._targetHandler = targetHandler;
+        this._timer = SynchronizedTimers.getTimer();
+        this._callback = null;
+    }
+    
+    TargetDestructionState.prototype.draw = function(){
+        if(this._timer.getTime() >= 2000){
+            this._timer.reset();
+            this._callback();
+        }
+        this._targetHandler.update();
+    }
+
+    TargetDestructionState.prototype.update = function(){ }
+    
+    TargetDestructionState.prototype.startDestruction = function(callback, x, y){
+        this._timer.start();
+        this._targetHandler.doDestroyEffect(x, y);
+        this._callback = callback;
+    }
+    
+    
+    function TargetNormalState(target){
+        this._target = target;
+        this._targetHandler = target._targetHandler;
+        this._physicsEntity = target._physicsEntity;
+    }
+    
+    TargetNormalState.prototype.draw = function(interpolation){
+        this._targetHandler.setPosition( this._target._prevX + (interpolation * (this._target._x - this._target._prevX)), this._target._prevY + (interpolation * (this._target._y - this._target._prevY)) );
+        this._targetHandler.update();        
+    }
+
+    TargetNormalState.prototype.update = function(){
+        this._physicsEntity.update();        
+        this._target._setXWithInterpolation(this._physicsEntity.getX());
+        this._target._setYWithInterpolation(this._physicsEntity.getY());        
+    }
+    
+    
+    function Target(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, spawnDurationTime, EffectsManager){
         this._id = id;
         this._radius = p_radius;        
-        this._previousStates = [];
-        this._numPrevStates = 20;
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         this._spawnDurationTime = spawnDurationTime;
         this._spawnDurationTimer = SynchronizedTimers.getTimer();
-        this._callbackAfterSpawnEffect = null;
-        
-        this._serverTargetPositionX = 0, this._serverTargetPositionY = 0;
         
         this._physicsEntity = new CircleEntity("dynamic", x, y, canvasHeight, p_radius + 10, 1, 0, 1);
         
@@ -20,53 +56,21 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'
         this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
         this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed; 
         
-        this.targetHandler = ShaderProcessor.requestTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});
+        this._targetHandler = EffectsManager.requestTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  
+       // this._targetHandler.setCompletion(1);
         
-        this._animationTime = 0;        
+        this._normalState = new TargetNormalState(this);
+        this._destructionState = new TargetDestructionState(this._targetHandler);
+        this._currentState = this._normalState;
     }
     
     Target.prototype.draw = function(interpolation){
-        if(this._spawnDurationTimer.getTime() <= this._spawnDurationTime){
-            this.targetHandler.setCompletion(this._spawnDurationTimer.getTime() / this._spawnDurationTime);
-        }else{
-            this.targetHandler.setCompletion(1);
-        }
-        this.targetHandler.setPosition( this._prevX + (interpolation * (this._x - this._prevX)), this._prevY + (interpolation * (this._y - this._prevY)) );
-        this._animationTime++;
-        this.targetHandler.setTime(this._animationTime);
+        this._currentState.draw(interpolation);
     }
     
-    Target.prototype.update = function(){
-        this.saveCurrentState();
-
-        if(this._spawnDurationTimer.getTime() >= this._spawnDurationTime && this._callbackAfterSpawnEffect){         
-            this._physicsEntity.setDensity(1);
-            this._callbackAfterSpawnEffect(); 
-            this._callbackAfterSpawnEffect = null;
-        }
-        
-        this._physicsEntity.update();        
-        this._setXWithInterpolation(this._physicsEntity.getX());
-        this._setYWithInterpolation(this._physicsEntity.getY());
+    Target.prototype.update = function(){        
+        this._currentState.update();
     } 
-    
-    Target.prototype.serverUpdate = function(newX, newY, linearVelocityX, linearVelocityY){
-        this._serverTargetPositionX = newX;
-        this._serverTargetPositionY = newY;
-
-        if(!this._checkWithPastAndCurrentStatesAndDeleteAnyIrrelevant(newX, newY)){
-            //logs message in case newX and newY don't match with any previous states
-            console.log("SERVER COORDINATES IN THE FUTURE! AT: " + Date.now());
-
-            this._previousStates = [];
-
-            this._setXWithInterpolation(newX);
-            this._setYWithInterpolation(newY);
-
-            this._physicsEntity.setX(newX + this._radius);
-            this._physicsEntity.setY(newY + this._radius);
-        }
-    }
     
     Target.prototype.setPosition = function(newX, newY){
         this._x = this._prevX = newX;  
@@ -85,10 +89,8 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'
     }
     
     Target.prototype.doSpawnEffect = function(callback){
-        this._spawnDurationTimer.reset();
-        this._spawnDurationTimer.start();
-        this._physicsEntity.setDensity(1000);
-        this._callbackAfterSpawnEffect = callback;
+        this._targetHandler.doSpawnEffect(this._x, this._y);
+        callback();
     }
     
     Target.prototype.getX = function(){
@@ -104,7 +106,6 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'
         this._xUnits = Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._yUnits = Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._physicsEntity.setLinearVelocity(this._xUnits, this._yUnits);
-        console.log("ID: " + this._id + "    MOVEMENT ANGLE SET: " + this._currentMovementAngleInDeg + "       x: " + this._xUnits + "      y: " + this._yUnits);
     }
     
     Target.prototype.getMovementAngle = function(){
@@ -121,60 +122,32 @@ define(['PhysicsSystem', 'ShaderProcessor', 'CircleEntity', 'SynchronizedTimers'
     
     Target.prototype.addToPhysicsSimulation = function(){
         this._physicsEntity.addToSimulation();
-        this.targetHandler.shouldDraw(true);
+        this._targetHandler.shouldDraw(true);
     }
     
     Target.prototype.removeFromPhysicsSimulation = function(){
         this._physicsEntity.removeFromSimulation();
-        this.targetHandler.shouldDraw(false);
+        this._targetHandler.shouldDraw(false);
     }
     
-    Target.prototype.saveCurrentState = function(){
-        if(this._previousStates.length >= this._numPrevStates){
-            this._previousStates.splice(0, 1);
+    Target.prototype.setAchievementPercentage = function(percent){
+        if(percent >= 0.75){
+            this._targetHandler.setNumBolts(7);
+        }else if(percent >= 0.50){
+            this._targetHandler.setNumBolts(6);
         }
-        this._previousStates.push({x: this._x, y: this._y});
+    
+        this._targetHandler.increaseLgGlowFactor(percent / 2.0);
     }
     
-    Target.prototype.getPastState = function(index){
-        return this._previousStates[index - 1];
-    }
-    
-    Target.prototype._checkWithPastAndCurrentStatesAndDeleteAnyIrrelevant = function(x, y){
-        //testing
-        return true;
+    Target.prototype.destroyAndReset = function(callback){
+        this._currentState = this._destructionState;
         
-        //check if passed in arg. match with current state
-        if(x === this._x && y === this._y){
-            this._previousStates = [];
-            return true;
-        }
-        
-        //check if passed in arg. match with any past state
-        for(var i = 0; i < this._previousStates.length; i++){
-            if(x === this._previousStates[i].x && y === this._previousStates[i].y){
-                this._previousStates.splice(0, i + 1);
-                return true;
-            }    
-        }
-        
-        //there was no match so all past states considered to be irrelevant, therefore all past states deleted
-        this._previousStates = [];
-        
-        //no match for arg. passed in found with current or previous states, therefore return false
-        return false;
-    }
-    
-    //testing - display a lot of physics info in relation to this target
-    Target.prototype._displayPhysicsBodyInfo = function(){
-        console.log("Linear Damping: " + this._physicsEntity._body.GetLinearDamping());
-        console.log("Inertia: " + this._physicsEntity._body.GetInertia());
-        console.log("Angular Damping: " + this._physicsEntity._body.GetAngularDamping());
-        console.log("Angular Velocity: " + this._physicsEntity._body.GetAngularVelocity());
-        console.log("Mass: " + this._physicsEntity._body.GetMass());
-    }
-    
-    Target.prototype._drawTargetFromServerPosition = function(context){
+        this._currentState.startDestruction(function(){
+            this._targetHandler.resetProperties();
+            this._currentState = this._normalState;
+            callback();
+        }.bind(this), this._x, this._y);
     }
     
     return Target;

@@ -1,118 +1,212 @@
 define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'], function(Target, SynchronizedTimers, Border, Random, EventSystem){
-    var targetsPool = [];
-    var targetsActivated = [];
-    var numTargets = 2;
-    var authUpdateData = {};
-    var previousStates = [];
-    var targetRadius;
-
-    var spawnDelay = 1000;
-    var spawnTimer = SynchronizedTimers.getTimer();
+   
+    function distance(startX, startY, endX, endY){
+        return Math.sqrt( Math.pow((endX - startX), 2) + Math.pow((endY - startY), 2) );
+    }
     
-    function initialize(gl, appMetaData, initializeData){
+    function isInsideTargetBoundary(target, checkX, checkY){
+        if( distance(checkX, checkY, target.getX() + target.getRadius(), target.getY() - target.getRadius()) <= target.getRadius() ){
+            return true;
+        }
+        
+        return false;
+    }
+    
+    function TargetFocusedState(TargetsController){
+        this._targetsController = TargetsController;
+        this._focusedTarget = undefined;
+        this._startXInTarget = undefined;
+        this._startYInTarget = undefined; 
+        this._targetDistCovered = 0;
+        this._targetAreaToAchieve = undefined;
+    }
+    
+    TargetFocusedState.prototype.setTargetFocused = function(target, focusX, focusY, targetAreaToAchieve){
+        this._focusedTarget = target;
+        this._startXInTarget = focusX - target.getX();
+        this._startYInTarget = focusY - target.getY();
+        this._targetDistCovered = 0;
+        this._targetAreaToAchieve = targetAreaToAchieve;
+    }
+    
+    TargetFocusedState.prototype.processInput = function(inputData){        
+        var mouseState = inputData.mouseState;
+        
+        switch(mouseState.type){
+            case "mouse_held_down":
+            case "mouse_down":
+                if(isInsideTargetBoundary(this._focusedTarget, mouseState.x, mouseState.y)){
+                    this.handleMouseCoordsInsideCurrFocusedTarget(mouseState.x, mouseState.y);
+                }else{
+                    this.unfocusTarget();
+                }
+                break;
+            case "mouse_up":
+                this.unfocusTarget();
+        }
+    }
+    
+    TargetFocusedState.prototype.recieveEvent = function(eventInfo){
+        if(eventInfo.eventType === "combo_level_increased"){
+            this._targetAreaToAchieve -= this._areaToAchieveReductionAmount;
+        }else if(eventInfo.eventType === "combo_level_reset"){
+            this._targetAreaToAchieve = this._targetsController._targetRadius * 4;
+        }else{
+            var inputToBeProcessed = {};
+            inputToBeProcessed.mouseState = eventInfo.eventData;
+            inputToBeProcessed.mouseState.type = eventInfo.eventType;
+            this.processInput(inputToBeProcessed);   
+        }
+    }
+    
+    TargetFocusedState.prototype.handleMouseCoordsInsideCurrFocusedTarget = function(mouseX, mouseY){
+        var mouseXRelativeToTarget = mouseX - this._focusedTarget.getX();
+        var mouseYRelativeToTarget = mouseY - this._focusedTarget.getY();
+        this._targetDistCovered += distance(this._startXInTarget, this._startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
+        
+        this._focusedTarget.setAchievementPercentage(this._targetDistCovered / this._targetAreaToAchieve);
+        
+        this._startXInTarget = mouseXRelativeToTarget;
+        this._startYInTarget = mouseYRelativeToTarget;
+
+        if(this._targetDistCovered >= this._targetAreaToAchieve){
+            this.achieveTarget();
+        }
+    }
+    
+    TargetFocusedState.prototype.achieveTarget = function(){
+        EventSystem.publishEventImmediately("target_destroyed", {target: this._focusedTarget});
+        
+        for(var a = 0; a < this._targetsController._targetsActivated.length; a++){
+            if(this._targetsController._targetsActivated[a]._id === this._focusedTarget._id){
+                this._targetsController._targetsActivated[a].removeFromPhysicsSimulation();
+                this._targetsController._targetsInTransition.push(this._targetsController._targetsActivated.splice(a, 1)[0]);
+            }
+        }
+          
+        this._focusedTarget.destroyAndReset(function(){
+            //targetsInTransition array acts in FIFO manner, so index of currently pushed target will be 0 because all previous objects will be spliced before this one
+            var indexOfTarget = 0;     
+            this._targetsController._targetsPool.push(this._targetsController._targetsInTransition.splice(indexOfTarget, 1)[0]); 
+        }.bind(this));
+        
+        this._targetDistCovered = 0; 
+        this._targetsController._currentState = this._targetsController._unFocusedState;
+    }
+    
+    TargetFocusedState.prototype.unfocusTarget = function(){
+        this._targetsController._currentState = this._targetsController._unFocusedState;
+    }
+    
+    
+    
+    function TargetUnfocusedState(TargetsController){
+        this._targetsController = TargetsController;
+    }
+    
+    TargetUnfocusedState.prototype.processInput = function(inputData){        
+        var mouseState = inputData.mouseState;
+        
+        switch(mouseState.type){
+            case "mouse_held_down":
+            case "mouse_down":
+                var entityPossiblyFocused = this.isInsideAnyEntityBoundary(mouseState.x, mouseState.y);
+                if(entityPossiblyFocused){
+                    this._targetsController._currentState = this._targetsController._focusedState;
+                    this._targetsController._currentState.setTargetFocused(entityPossiblyFocused, mouseState.x, mouseState.y, this._targetsController._targetAreaToAchieve);
+                }
+                break;
+        }
+    }
+    
+    TargetUnfocusedState.prototype.recieveEvent = function(eventInfo){
+        if(eventInfo.eventType != "combo_level_increased" && eventInfo.eventType != "combo_level_reset"){
+            var inputToBeProcessed = {};
+            inputToBeProcessed.mouseState = eventInfo.eventData;
+            inputToBeProcessed.mouseState.type = eventInfo.eventType;
+            this.processInput(inputToBeProcessed); 
+        }
+    }
+    
+    TargetUnfocusedState.prototype.isInsideAnyEntityBoundary = function(checkX, checkY){
+        var targetsActivated = this._targetsController._targetsActivated;
+        for(var i = 0; i < targetsActivated.length; i++){             
+            if(isInsideTargetBoundary(targetsActivated[i], checkX, checkY)){
+                return targetsActivated[i];
+            }
+        }
+        return false;
+    }
+    
+    
+    function TargetsController(gl, appMetaData, initializeData, EffectsManager){
+        this._targetsPool = [];
+        this._targetsActivated = [];
+        this._targetsInTransition = [];
+        this._spawnDelay = 1000;
+        this._spawnTimer = SynchronizedTimers.getTimer();        
+        this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
+        this._targetAreaToAchieve = this._targetRadius * 4;
+        this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
+        
         var i = 0;
-        targetRadius = appMetaData.getCanvasHeight() * 0.06;
         for(var key in initializeData){
-            targetsPool[i] = new Target(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed, 1000);
+            this._targetsPool[i] = new Target(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed / 2, 1000, EffectsManager);
+            
             i++;
         }
         
-        console.log("INITIALIZEDATA: " + JSON.stringify(initializeData));
+        this._targetAreaToAchieve = this._targetRadius * 4;
+        this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
+        
+        EventSystem.register(this.recieveEvent, "mouse_move", this);
+        EventSystem.register(this.recieveEvent, "mouse_down", this);
+        EventSystem.register(this.recieveEvent, "mouse_up", this);
+        EventSystem.register(this.recieveEvent, "mouse_held_down", this); 
+        EventSystem.register(this.recieveEvent, "combo_level_increased", this);
+        EventSystem.register(this.recieveEvent, "combo_level_reset", this);
+        
+        this._spawnTimer.start();
+        
+        this._focusedState = new TargetFocusedState(this);
+        this._unFocusedState = new TargetUnfocusedState(this);
+        this._currentState = this._unFocusedState;
+    }
+    
+    TargetsController.prototype.draw = function(interpolation){
+        for(var a = 0; a < this._targetsActivated.length; a++){
+            this._targetsActivated[a].draw(interpolation);
+        }
+        
+        for(var a = 0; a < this._targetsInTransition.length; a++){
+            this._targetsInTransition[a].draw(interpolation);
+        }
+    }
+    
+    TargetsController.prototype.update = function(){
+        if(this._targetsPool.length > 0){
+            if(this._spawnTimer.getTime() >= this._spawnDelay){
+                this._spawn();
+                this._spawnTimer.reset();
+            }
+            this._spawnTimer.start();
+        }
 
-        EventSystem.register(recieveEvent, "target_destroyed");
-        EventSystem.register(recieveEvent, "S_game_update");
-        EventSystem.register(recieveEvent, "S_initialize");
-        spawnTimer.start();
-    }
-    
-    function draw(interpolation){
-        for(var a = 0; a < targetsActivated.length; a++){
-            targetsActivated[a].draw(interpolation);
-        }
-    }
-    
-    function update(){
-        if(targetsPool.length > 0){
-            if(spawnTimer.getTime() >= spawnDelay){
-                spawn();
-                spawnTimer.reset();
-            }
-            spawnTimer.start();
-        }
-
-        for(var a = 0; a < targetsActivated.length; a++){
-            targetsActivated[a].update();
-        }
-    }
-    
-    function serverUpdate(data){        
-        for(var key in data){
-            if(data[key].type === "spawn"){                
-                if(!checkInPreviousStatesAndDeletePriorStatesIfSuccess(key, data[key].x, data[key].y)){
-                
-                    console.error("TargetsController - Server stuff not detected in previous states!");
-                    
-                    for(var b = 0; b < targetsPool.length; b++){
-                        if(key === targetsPool[b].getId()){
-                            var newlyActivatedTarget = targetsPool.splice(b, 1)[0];
-                            newlyActivatedTarget.addToPhysicsSimulation();
-                            newlyActivatedTarget.setMovementAngle(data[key].movementAngle);
-                            newlyActivatedTarget.serverUpdate(data[key].x, data[key].y, key, data[key].linX, data[key].linY);
-                            targetsActivated.push(newlyActivatedTarget);
-                            
-                            saveCurrentState(newlyActivatedTarget.getId(), data[key].x, data[key].y);
-                            
-                            EventSystem.publishEvent("target_spawned", {
-                                Target: newlyActivatedTarget,
-                                x: data[key].x,
-                                y: data[key].y
-                            });
-                        }
-                    }
-                }                
-                
-            }else{
-                for(var i = 0; i < targetsActivated.length; i++){
-                    if(key === targetsActivated[i].getId()){
-                        targetsActivated[i].serverUpdate(data[key].x, data[key].y, key, data[key].linX, data[key].linY);
-                    }
-                }
-            }
-        }
-    }
-    
-    function checkIfTargetIsActivated(targetId){
-        for(var i = 0; i < targetsActivated.length; i++){
-            if(targetId === targetsActivated[i].getId()){
-                return true;       
-            }
+        for(var a = 0; a < this._targetsActivated.length; a++){
+            this._targetsActivated[a].update();
         }
         
-        return false;
-    }
-    
-    function getTargetById(targetId){
-        
-    }
-    
-    function checkInPreviousStatesAndDeletePriorStatesIfSuccess(targetid, x, y){
-        return true;
-        for(var a = 0; a < previousStates.length; a++){
-            if(targetid === previousStates[a].targetId && x === previousStates[a].spawnX && y === previousStates[a].spawnY){
-                previousStates.splice(0, a + 1);
-                return true;                
-            }
+        for(var a = 0; a < this._targetsInTransition.length; a++){
+            this._targetsInTransition[a].update();
         }
-        
-        return false;
     }
     
-    function spawn(){
+    TargetsController.prototype._spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         var movementAngle;
         
-        var newlyActivatedTarget = targetsPool.shift();   
+        var newlyActivatedTarget = this._targetsPool.shift();   
         newlyActivatedTarget.addToPhysicsSimulation();
         
         switch(random){
@@ -142,56 +236,25 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
         }
         
         newlyActivatedTarget.setPosition(spawnX, spawnY);        
-        targetsActivated.push(newlyActivatedTarget);
+        this._targetsActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.doSpawnEffect(function(){
             newlyActivatedTarget.setMovementAngle(movementAngle);
         });
-        
-        saveCurrentState(newlyActivatedTarget.getId(), spawnX, spawnY);
-        
-        EventSystem.publishEvent("target_spawned", {
-            Target: newlyActivatedTarget,
-            x: spawnX,
-            y: spawnY
-        });
-    }
+    } 
     
-    //currently saves a spawn state
-    function saveCurrentState(targetid, spawnx, spawny){
-        previousStates.push(
-            {   
-                targetId: targetid, 
-                spawnX: spawnx,
-                spawnY: spawny
-            }
-        );
-    }
-    
-    function recieveEvent(eventInfo){
-        if(eventInfo.eventType === "target_destroyed"){
-            for(var a = 0; a < targetsActivated.length; a++){
-                if(targetsActivated[a]._id === eventInfo.eventData.target._id){
-                    targetsActivated[a].removeFromPhysicsSimulation();
-                    targetsPool.push(targetsActivated.splice(a, 1)[0]);  
-                }
-            }
-        }else if(eventInfo.eventType === "S_initialize"){
-           
-        }else if(eventInfo.eventType === "S_game_update"){
-          
+    TargetsController.prototype.recieveEvent = function(eventInfo){
+        if(eventInfo.eventType === "combo_level_increased"){
+            this._targetAreaToAchieve -= this._areaToAchieveReductionAmount;
+        }else if(eventInfo.eventType === "combo_level_reset"){
+            this._targetAreaToAchieve = this._targetRadius * 4;
+        }else{
+            var inputToBeProcessed = {};
+            inputToBeProcessed.mouseState = eventInfo.eventData;
+            inputToBeProcessed.mouseState.type = eventInfo.eventType;
+            this._currentState.processInput(inputToBeProcessed);   
         }
     }
     
-    function getRadiusOfTarget(){
-        return targetRadius;
-    }
-    
-    return {
-        initialize: initialize,
-        draw: draw,
-        update: update,
-        serverUpdate: serverUpdate,
-        getRadiusOfTarget: getRadiusOfTarget
-    }
+    return TargetsController;
 });

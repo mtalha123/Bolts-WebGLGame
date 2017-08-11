@@ -53,25 +53,6 @@ precision mediump float;
 //    return vec4(answerOne, answerTwo);
 //}
 
-float getClosestMultiple(int number, int multiple){
-    if(number == 0){
-    	return 0.0;
-    }
-	int remainder = int(mod(float(number), float(multiple)));
-    
-    if(remainder < (multiple / 2)){
-    	return float(number - remainder);
-    }else{
-    	return float(number + (multiple - remainder)); 
-    } 
-    
-}
-
-vec2 rotateCoord(vec2 point, float angle, vec2 center){
-    mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-    return ((point - center) * rotationMatrix) + center;
-}
-
 float getReferenceAngle(float angleInRadians){
     if(angleInRadians >= ( (3.0 * PI) / 2.0) ){
         return (2.0 * PI) - angleInRadians;
@@ -96,12 +77,10 @@ uniform float circleLineWidth;
 uniform float circleGlowFactor;
 uniform float fluctuation;
 uniform float completion;
+uniform float lgLineWidth;
+uniform float numBolts;
+uniform float lgGlowFactor;
 uniform sampler2D noise;
-
-float numBolts = 6.0;
-
-const float glowFactor = 14.0;
-float lineWidth = 1.0;
 
 void main()
 {
@@ -111,49 +90,70 @@ void main()
     //normalize
     vec2 centerUV = center.xy / iResolution.xy;
     float radiusUV = radius / iResolution.y;
-    float lineWidthUV = lineWidth / iResolution.y;
+    float lgLineWidthUV = lgLineWidth / iResolution.y;
     float fluctuationUV = fluctuation / iResolution.y;
+    float circleLineWidthUV = circleLineWidth / iResolution.y;
+    float circleGlowFactor = circleGlowFactor / iResolution.y;
+    float lgGlowFactor = lgGlowFactor / iResolution.y;
     
     //take aspect ratio into account
     uv.x *= aspectRatio;
     centerUV.x *= aspectRatio;
     
     vec3 finalColor = vec3(0.0);
+    float alpha = 1.0;
     
     float angleMultipleDeg = 360.0 / numBolts;
     float UVAngleDeg = getUVAngleDeg(uv, centerUV);
     float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
-	vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + (radiusUV - ((circleLineWidth / iResolution.x) * 4.0)), centerUV.y), closestAngleMultiple, centerUV);
+	vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + (radiusUV - (circleLineWidthUV)), centerUV.y), closestAngleMultiple, centerUV);
     
     vec4 lightningContribution = vec4(0.0);
     if(distance(uv, centerUV) <= (completion * radiusUV) ){
-        float distToLg = genLightningAndGetDist(uv, centerUV, rotatedCoord, lineWidthUV, fluctuationUV, 4.0, noise, iGlobalTime, iResolution);
-        float alpha = 1.0 - smoothstep(lineWidthUV, glowFactor / iResolution.x, distToLg);
-        lightningContribution = vec4(1.0, 1.0, 0.0, alpha);
-        lightningContribution.rgb *= alpha;
-        if(alpha < 1.0){
-            lightningContribution = vec4(1.0, 1.0, 0.7, alpha);
+        
+        /* Dealing with lightning */
+        
+        float distToLg = genLightningAndGetDist(uv, centerUV, rotatedCoord, lgLineWidthUV, fluctuationUV, 4.0, noise, iGlobalTime, iResolution);
+        if(distToLg == 0.0){
+            distToLg = 0.0000001;
         }
+
+        vec3 glowColor = vec3(1.0, 1.0, 0.7);
+        vec3 solidColor = vec3(1.0, 1.0, 0.0);
+
+        float edgeBlurWidth = min(lgLineWidthUV, 0.005);
+        float smthVal = 1.0 - smoothstep(lgLineWidthUV - edgeBlurWidth, lgLineWidthUV, distToLg);  
+        float invertedDist = 1.0 / (distToLg - ((1.0 - smthVal) * (lgLineWidthUV - edgeBlurWidth)));
+        float glowMultiplier = pow(invertedDist * lgGlowFactor, 1.5);
+        
+        lightningContribution.rgb = (smthVal * solidColor) + ((1.0 - smthVal) * glowColor * glowMultiplier); 
+        lightningContribution.a = glowMultiplier;
+        
     }
     
-    float minDist = distance( centerUV + (normalize(uv - centerUV) * radiusUV), uv );
+    vec2 circPt = centerUV + (normalize(uv - centerUV) * radiusUV);
+    float distToCircle = distance(circPt, uv);    
+    float refAngle = getReferenceAngle(radians(UVAngleDeg));
     
-    float alpha = 1.0 - smoothstep(circleLineWidth / iResolution.x, circleGlowFactor / iResolution.x, minDist);
-        float refAngle = getReferenceAngle(radians(UVAngleDeg));
     if(refAngle > (completion * (PI / 2.0))){
         alpha = 0.0;
-    }
+    }else{ 
+        
+        /* Dealing with circle */
+        
+        vec3 glowColor = vec3(0.0, 0.3, 1.0);
+        vec3 solidColor = vec3(0.0, 0.0, 1.0);
 
-    if(alpha >= 1.0){
-        finalColor = vec3(0.0, 0.0, 1.0);
-    }else if(lightningContribution.a > 0.0){
-        finalColor = lightningContribution.rgb;
-        alpha = lightningContribution.a;
-    }else if(alpha > 0.0){
-        finalColor = vec3(0.0, 0.2, 1.0);
-    }else{
-        finalColor = lightningContribution.rgb + (vec3(0.0, 0.2, 1.0) * alpha);
-        alpha += lightningContribution.a;
+        float edgeBlurWidth = min(circleLineWidthUV, 0.005);
+        float smthVal = 1.0 - smoothstep(circleLineWidthUV - edgeBlurWidth, circleLineWidthUV, distToCircle);  
+        float invertedDist = 1.0 / (distToCircle - ((1.0 - smthVal) * (circleLineWidthUV - edgeBlurWidth)));
+        float glowMultiplier = pow(invertedDist * circleGlowFactor, 1.3);
+        finalColor = smthVal * solidColor + ((1.0 - smthVal) * glowColor * glowMultiplier);
+        alpha = glowMultiplier;   
+        
+        finalColor += (1.0 - glowMultiplier) * lightningContribution.rgb;
+        alpha += lightningContribution.a * (1.0 - glowMultiplier);
+        
     }
     
 	gl_FragColor = vec4(finalColor, alpha);
