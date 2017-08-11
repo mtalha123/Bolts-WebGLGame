@@ -18,12 +18,10 @@ define([], function(){
         S_game_update: [],
         border_collision: [],  
         entity_collision: [],    
-        target_out_of_focus: [],  
         target_destroyed: [],
-        target_spawned: [],
-        target_in_focus: [],
         score_achieved: [],
-        combo_level_changed: []
+        combo_level_increased: [],
+        combo_level_reset: []
     };
     
     

@@ -7,19 +7,12 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     var numTargetsNeededHigherCombo = 1;
     var currentComboLevel = 0;
     var maxComboLevel = 8;
-    var targetAreaToAchieve;
-    var areaToAchieveReductionAmount;
     var numTargetsAchievedSinceLastCombo = 0;
     var comboHandler;
-    var TargetsController;
-    var time = 0;
     EventSystem.register(recieveEvent, "target_destroyed");
     
-    function initialize(gl, ShaderProcessor, p_TargetsController, Border){
-        TargetsController = p_TargetsController;
-        comboHandler = ShaderProcessor.requestComboEffect(false, gl, 0, Border.getLeftX(), Border.getTopY(), {}, "1x");
-        targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;
-        areaToAchieveReductionAmount = 0.04 * targetAreaToAchieve;
+    function initialize(gl, EffectsManager, Border){
+        comboHandler = EffectsManager.requestComboEffect(false, gl, 0, Border.getLeftX(), Border.getTopY(), {}, "1x");
     }
     
     function update(){
@@ -37,14 +30,12 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
                 chargeMultiplier = currentComboLevel + 1;    
             }else{
                 chargeMultiplier = maxChargeMultiplier;
-                areaToAchieveReductionAmount = 0.22;
             }
-            
-            targetAreaToAchieve -= areaToAchieveReductionAmount;
+        
             setTimeAmountsBasedOnComboLevel();
             setNumTargetsToAchieveBasedOnComboLevel();
 
-            EventSystem.publishEventImmediately("combo_level_changed", {comboLevel: currentComboLevel, timeUntilComboOver: timeUntilComboOver});
+            EventSystem.publishEventImmediately("combo_level_increased", {comboLevel: currentComboLevel, timeUntilComboOver: timeUntilComboOver});
         }
         
         comboHandler.shouldDraw(true);
@@ -57,13 +48,11 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
         timeUntilComboOver = 4000;
         comboTimer.reset();
         currentComboLevel = 0;
-        targetAreaToAchieve = TargetsController.getRadiusOfTarget() * 4;
-        areaToAchieveReductionAmount = 0.04 * targetAreaToAchieve;
         numTargetsNeededHigherCombo = 1;
         
         comboHandler.shouldDraw(false);
         
-        EventSystem.publishEventImmediately("combo_level_changed", {comboLevel: currentComboLevel, timeUntilComboOver: timeUntilComboOver});
+        EventSystem.publishEventImmediately("combo_level_reset", {comboLevel: currentComboLevel, timeUntilComboOver: timeUntilComboOver});
     }
     
     function decreaseComboLevel(){
@@ -112,8 +101,7 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
         comboTxt = comboTxt.concat("x");
         comboHandler.setComboText(comboTxt);
         comboHandler.setCompletion(comboTimer.getTime() / timeUntilComboOver);   
-        time+=0.1;
-        comboHandler.setTime(time);
+        comboHandler.update();
     }
     
     function getTargetAreaToAchieve(){
