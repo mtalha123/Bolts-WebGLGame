@@ -164,7 +164,7 @@ float Kzo = 0.416666666667; // 1/2-1/6*2
 }
 
 uniform vec2 iResolution;
-uniform float time;
+uniform float iGlobalTime;
 uniform sampler2D worleyNoise;
 uniform float completion;
 
@@ -181,7 +181,7 @@ void main()
     
     float noiseValueWeak = pow(noiseVal, 2.0);
     float noiseValueStrong = pow(noiseVal, 1.0);
-    float blueColorStrength = sinPositive(time * 2.0);
+    float blueColorStrength = sinPositive(iGlobalTime * 2.0);
     vec3 color;
     
     vec2 closestPointOnCircle = center + (normalize(uv - center) * radius);
@@ -192,5 +192,6 @@ void main()
     color = (  ( 1.0 - smoothstep(0.0, thickness, distance(closestPointOnCircle, uv)) ) * vec3(1.0, 1.0, 0.0) * noiseValueStrong ) +
         (smoothstep(0.0, thickness, distance(closestPointOnCircle, uv)) * vec3(0.0, 0.0, 1.0) * noiseValueWeak * blueColorStrength );
     
+   // color = vec3(1.0, 1.0, 1.0);
 	gl_FragColor = vec4(color, 1.0);
 }
