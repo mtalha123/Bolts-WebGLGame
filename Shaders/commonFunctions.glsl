@@ -37,6 +37,33 @@ float getUVAngleDeg(vec2 uv, vec2 center){
     return angle;
 }
 
+float getClosestMultiple(int number, int multiple){
+    if(number == 0){
+    	return 0.0;
+    }
+	int remainder = int(mod(float(number), float(multiple)));
+    
+    if(remainder < (multiple / 2)){
+    	return float(number - remainder);
+    }else{
+    	return float(number + (multiple - remainder)); 
+    } 
+    
+}
+
+vec2 rotateCoord(vec2 point, float angle, vec2 center){
+    mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+    return ((point - center) * rotationMatrix) + center;
+}
+
+vec2 getClosestAnglePointToUV(vec2 uv, vec2 center, float radius, float numPoints){
+    float angleMultipleDeg = 360.0 / numPoints;
+    float UVAngleDeg = getUVAngleDeg(uv, center);
+    float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
+    
+	return rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
+}
+
 float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float lineWidthUV, float fluctuationUV, float noiseXMultiplier, sampler2D noise, float iGlobalTime, vec2 iResolution){
     if(lgStartUV.x > lgEndUV.x){
         float temp = lgStartUV.x;
@@ -60,4 +87,18 @@ float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float
     float yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(noiseXMultiplier * xClamped, iGlobalTime / 1024.0)).r) * (fluctuationUV * lightningCos(xClamped, lengthOfLightning));
     vec2 pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV)); 
     return distance(currentUV_t, pointOnLightning);
+}
+
+vec4 genLightningAndGetColor(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float lineWidthUV, float fluctuationUV, float noiseXMultiplier, sampler2D noise, float iGlobalTime, vec2 iResolution, vec3 solidColor, vec3 glowColor, float glowMultiplier){
+    float distToLg = genLightningAndGetDist(currentUV, lgStartUV, lgEndUV, lineWidthUV, fluctuationUV, noiseXMultiplier, noise, iGlobalTime, iResolution);
+    
+    vec4 color = vec4(0.0);
+    if(distToLg <= lineWidthUV){
+        color += vec4( solidColor, 1.0 );
+    }else{
+        float m = (1.0 / distToLg) * glowMultiplier;
+        color += vec4( glowColor * m, m );   
+    }
+    
+    return color;
 }
