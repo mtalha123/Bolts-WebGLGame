@@ -14,13 +14,12 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
     
     var borderPath;
     var handler;
-    var animationTime = 0;
     var scoreHandler;
     var appMetaData;
     
     EventSystem.register(recieveEvent, "initialize");
     
-    function initialize(gl, p_appMetaData, AssetManager, ShaderProcessor){     
+    function initialize(gl, p_appMetaData, AssetManager, EffectsManager){     
         appMetaData = p_appMetaData;
         
         margin = 0.05 * appMetaData.getCanvasHeight();
@@ -39,7 +38,7 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
                             (appMetaData.getCanvasWidth() - margin - (borderLength/2)) + (gapForScore/2), appMetaData.getCanvasHeight() - margin           
         ];
         
-        handler = ShaderProcessor.requestLightningEffect(true, gl, 3, {}, borderPath);
+        handler = EffectsManager.requestLightningEffect(true, gl, 3, {}, borderPath);
         
         leftPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, margin, borderWidth, borderLength, 10, 0, 1);
         leftPhysicsBody.addToSimulation();
@@ -55,23 +54,18 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
         
         EventSystem.register(recieveEvent, "score_achieved");
         
-        scoreHandler = ShaderProcessor.requestTextEffect(true, gl, 4, {}, 100, 100, "0");
+        scoreHandler = EffectsManager.requestTextEffect(true, gl, 4, {}, 100, 100, "0");
     }
     
     function draw(interpolation){        
         scoreHandler.setText(score.toString());
         //FIX: SHOULD BE "scoreHandler.width / 2"
         scoreHandler.setPosition(scoreX - (scoreHandler.getWidth() / 3.5), appMetaData.getCanvasHeight() - scoreY);
+        handler.update();
         
     }
     
     function update(){        
-        animationTime++;
-        //make sure the number doesn't get too big
-        if(animationTime > 1000){
-            animationTime = 0;
-        }
-        handler.setTime(animationTime);
     }
     
     

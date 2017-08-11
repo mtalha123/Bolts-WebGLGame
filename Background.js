@@ -1,25 +1,17 @@
-define(['SynchronizedTimers', 'EventSystem'], function(SynchronizedTimers, EventSystem){
+define(['EventSystem'], function(EventSystem){
     var handler;
-    var time = 1;
-    var timerForEffect = SynchronizedTimers.getTimer();
-    var effectDuration = 1000;
     EventSystem.register(recieveEvent, "target_destroyed");
     
-    function initialize(gl, ShaderProcessor){
-        handler = ShaderProcessor.requestBackgroundFieldEffect(true, gl, -10, {});
+    function initialize(gl, EffectsManager){
+        handler = EffectsManager.requestBackgroundFieldEffect(true, gl, -10, {});
     }
     
     function draw(){
-        time+=0.01;
-        handler.setTime(time);
-        handler.setCompletion(timerForEffect.getTime() / effectDuration);
-        if(timerForEffect.getTime() >= effectDuration){
-            timerForEffect.reset();
-        }
+        handler.update();
     }
     
     function recieveEvent(eventInfo){
-        timerForEffect.start();
+        handler.doEffect();
     }
     
     return {
