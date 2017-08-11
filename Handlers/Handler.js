@@ -13,6 +13,8 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         this._canvasHeight = canvasHeight;
         this._shaderProgram = null;
         this._zOrder = zOrder;
+        this._handlers = [this];
+        this._time = 1;
     }
     
     Handler.prototype.shouldDraw = function(shouldDrawOrNot){
@@ -37,6 +39,15 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
     
     Handler.prototype.getZOrder = function(){
         return this._zOrder;
+    }
+    
+    Handler.prototype.getAllHandlers = function(){
+        return this._handlers;
+    }
+    
+    Handler.prototype.update = function(){
+        this._time++;
+        this._uniforms.iGlobalTime.value[0] = this._time;
     }
     
     return Handler;
