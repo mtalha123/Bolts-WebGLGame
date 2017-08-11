@@ -72,7 +72,7 @@ float cnoise(vec2 P)
 uniform vec2 iResolution;
 uniform float clicked;
 uniform vec2 mouseCoords;
-uniform float time;
+uniform float iGlobalTime;
 uniform float radius;
 float numBolts = 5.0;
 float lineWidth = 0.001;
@@ -102,10 +102,10 @@ void main()
         float arcLength = radians(angle) * radius;
         float halfCircumference = (PI * (radius * 2.0)) / 2.0;
         if(angle <= 180.0){
-            noiseVal = cnoise(vec2(arcLength * 105.0, time / 4.0));
+            noiseVal = cnoise(vec2(arcLength * 105.0, iGlobalTime / 4.0));
         }else{
             float leftOverArc = radians((angle - 180.0)) * radius; 
-            noiseVal = cnoise(vec2((halfCircumference - leftOverArc) * 105.0, time / 4.0));
+            noiseVal = cnoise(vec2((halfCircumference - leftOverArc) * 105.0, iGlobalTime / 4.0));
         }
         noiseVal *= 0.01;
         vec2 closestPoint = center + (normalize(uv - center) * radius); 

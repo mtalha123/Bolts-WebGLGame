@@ -47,7 +47,7 @@ float getAlphaForCharacter(vec2 uv, vec2 startCoord, vec2 endCoord, vec2 startTe
     return alpha;
 }
 
-uniform float time;
+uniform float iGlobalTime;
 uniform vec2 center;
 uniform float completion;
 uniform vec2 iResolution;
@@ -112,7 +112,7 @@ void main()
     
     if(distToCenter > (radiusFromTextUV)){
         if(!(uvAngle <= (PI / 2.0) && uvAngle >= angleOfCompletion)){
-            if(anotherApproach(uv, centerUV, radiusFromTextUV, radiusOfEdgeEffectUV, spreadOfEdgeEffectUV, time, effectTexture) == 0.0){
+            if(anotherApproach(uv, centerUV, radiusFromTextUV, radiusOfEdgeEffectUV, spreadOfEdgeEffectUV, iGlobalTime, effectTexture) == 0.0){
     	       color = vec4(1.0, 0.0, 0.4, 1.0); 
             }   
         }
