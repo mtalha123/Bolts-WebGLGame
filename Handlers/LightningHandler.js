@@ -112,10 +112,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._uniforms.lineWidth.value = [newLineWidth];
     }
     
-    LightningHandler.prototype.setTime = function(newTime){
-        this._uniforms.iGlobalTime.value = [newTime];
-    }
-    
     LightningHandler.prototype.setGlowColor = function(newGlowColor){
         this._uniforms.glowColor.value = newGlowColor;
     }

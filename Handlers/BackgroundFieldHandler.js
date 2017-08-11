@@ -1,16 +1,18 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'SynchronizedTimers'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, SynchronizedTimers){
     
     function BackgroundFieldHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, worleyNoiseInfo){
         Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.BACKGROUND_FIELD);
         
+        this._effectTimer = SynchronizedTimers.getTimer();
+        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
                 value: [canvasWidth, canvasHeight]
             },
-            time: {
+            iGlobalTime: {
                 type: "float",
                 value: [0.0]
             },
@@ -41,12 +43,18 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     BackgroundFieldHandler.prototype = Object.create(Handler.prototype);
     BackgroundFieldHandler.prototype.constructor = BackgroundFieldHandler; 
     
-    BackgroundFieldHandler.prototype.setTime = function(newTime){
-        this._uniforms.time.value = [newTime];
+    BackgroundFieldHandler.prototype.update = function(){
+        this._time+=0.01;
+        this._uniforms.iGlobalTime.value[0] = this._time;
+        
+        this._uniforms.completion.value[0] = this._effectTimer.getTime() / 1000;
+        if(this._effectTimer.getTime() >= 1000){
+            this._effectTimer.reset();
+        }
     }
     
-    BackgroundFieldHandler.prototype.setCompletion = function(completion){
-        this._uniforms.completion.value = [completion];
+    BackgroundFieldHandler.prototype.doEffect = function(){
+        this._effectTimer.start();
     }
     
     return BackgroundFieldHandler;

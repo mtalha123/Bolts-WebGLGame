@@ -23,7 +23,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "float",
                 value: [35]
             },
-            time: {
+            iGlobalTime: {
                 type: "float",
                 value: [0.0]
             }
@@ -58,10 +58,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         }else{
             this._uniforms.clicked.value[0] = 0.0;
         }
-    }
-    
-    CursorHandler.prototype.setTime = function(newTime){
-        this._uniforms.time.value[0] = newTime;
     }
     
     CursorHandler.prototype.setRadius = function(newRadius){

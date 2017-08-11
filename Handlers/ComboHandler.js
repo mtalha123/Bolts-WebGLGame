@@ -17,7 +17,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 type: "float",
                 value: [0.5]
             },
-            time: {
+            iGlobalTime: {
                 type: "float",
                 value: [0]
             },
@@ -102,6 +102,11 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         
         //make sure text appears in right spot
         this._setPositionOfChars();
+    }
+    
+    ComboHandler.prototype.update = function(){
+        this._time+=0.1;
+        this._uniforms.iGlobalTime.value[0] = this._time;
     }
     
     ComboHandler.prototype.setCompletion = function(completionVal){
