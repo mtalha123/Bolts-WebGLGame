@@ -3,14 +3,14 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     var x = 0, y = 0; 
     var mouseHeldDown = false;  
     var radius = 20;
-    EventSystem.register(recieveEvent, "combo_level_changed");
+    EventSystem.register(recieveEvent, "combo_level_increased");
+    EventSystem.register(recieveEvent, "combo_level_reset");
     var handler = null;
     var appMetaData;
-    var time = 0;
     
-    function initialize(gl, p_appMetaData, ShaderProcessor){
+    function initialize(gl, p_appMetaData, EffectsManager){
         appMetaData = p_appMetaData;
-        handler = ShaderProcessor.requestCursorEffect(true, 5, {}, gl, 100, 100);
+        handler = EffectsManager.requestCursorEffect(true, 5, {}, gl, 100, 100);
         handler.shouldDraw(true);
     }
     
@@ -21,8 +21,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
             handler.setClicked(false);
         } 
         handler.setPosition(x, y);
-        time++;
-        handler.setTime(time);
+        handler.update();
     }
     
     function isMouseButtonHeldDown(){
