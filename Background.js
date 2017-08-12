@@ -1,6 +1,6 @@
 define(['EventSystem'], function(EventSystem){
     var handler;
-    EventSystem.register(recieveEvent, "target_destroyed");
+    EventSystem.register(recieveEvent, "entity_destroyed");
     
     function initialize(gl, EffectsManager){
         handler = EffectsManager.requestBackgroundFieldEffect(true, gl, -10, {});

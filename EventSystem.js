@@ -18,7 +18,7 @@ define([], function(){
         S_game_update: [],
         border_collision: [],  
         entity_collision: [],    
-        target_destroyed: [],
+        entity_destroyed: [],
         score_achieved: [],
         combo_level_increased: [],
         combo_level_reset: []

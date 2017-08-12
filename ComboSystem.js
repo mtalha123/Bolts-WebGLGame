@@ -9,7 +9,7 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     var maxComboLevel = 8;
     var numTargetsAchievedSinceLastCombo = 0;
     var comboHandler;
-    EventSystem.register(recieveEvent, "target_destroyed");
+    EventSystem.register(recieveEvent, "entity_destroyed");
     
     function initialize(gl, EffectsManager, Border){
         comboHandler = EffectsManager.requestComboEffect(false, gl, 0, Border.getLeftX(), Border.getTopY(), {}, "1x");
