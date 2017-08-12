@@ -1,4 +1,4 @@
-define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Custom Utility/distance'], function(Target, SynchronizedTimers, Border, Random, EventSystem, distance){
+define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Custom Utility/distance'], function(SynchronizedTimers, Border, Random, EventSystem, distance){
     
     function FocusedState(EntityController){
         this._entityController = EntityController;

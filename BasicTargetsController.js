@@ -1,7 +1,7 @@
-define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Custom Utility/distance'], function(Target, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
+define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Custom Utility/distance'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
     
-    function TargetFocusedState(TargetsController){
-        EntityController.FocusedState.call(this, TargetsController);
+    function BasicTargetFocusedState(BasicTargetsController){
+        EntityController.FocusedState.call(this, BasicTargetsController);
         this._startXInTarget = undefined;
         this._startYInTarget = undefined; 
         this._targetDistCovered = 0;
@@ -9,21 +9,21 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
     }
     
     //inherit from FocusedState
-    TargetFocusedState.prototype = Object.create(EntityController.FocusedState.prototype);
-    TargetFocusedState.prototype.constructor = TargetFocusedState;
+    BasicTargetFocusedState.prototype = Object.create(EntityController.FocusedState.prototype);
+    BasicTargetFocusedState.prototype.constructor = BasicTargetFocusedState;
     
-    TargetFocusedState.prototype.setEntityFocused = function(target, hitBox, focusX, focusY){
+    BasicTargetFocusedState.prototype.setEntityFocused = function(target, hitBox, focusX, focusY){
         EntityController.FocusedState.prototype.setEntityFocused.call(this, target, hitBox);
         this._startXInTarget = focusX - target.getX();
         this._startYInTarget = focusY - target.getY();
         this._targetDistCovered = 0;
     }
     
-    TargetFocusedState.prototype.processInput = function(inputData){     
+    BasicTargetFocusedState.prototype.processInput = function(inputData){     
         EntityController.FocusedState.prototype.processInput.call(this, inputData);
     }
     
-    TargetFocusedState.prototype.handleMouseCoordsInsideHitBox = function(mouseX, mouseY){
+    BasicTargetFocusedState.prototype.handleMouseCoordsInsideHitBox = function(mouseX, mouseY){
         var mouseXRelativeToTarget = mouseX - this._focusedEntity.getX();
         var mouseYRelativeToTarget = mouseY - this._focusedEntity.getY();
         this._targetDistCovered += distance(this._startXInTarget, this._startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
@@ -34,37 +34,37 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
         this._startYInTarget = mouseYRelativeToTarget;
 
         if(this._targetDistCovered >= this._targetAreaToAchieve){
-            this.achieveTarget();
+            this.achieveBasicTarget();
         }
     }
     
-    TargetFocusedState.prototype.achieveTarget = function(){
+    BasicTargetFocusedState.prototype.achieveBasicTarget = function(){
         EntityController.FocusedState.prototype.achieveEntity.call(this);
         
         this._targetDistCovered = 0;
     }
     
-    TargetFocusedState.prototype.setParameters = function(targetAreaToAchieve){
+    BasicTargetFocusedState.prototype.setParameters = function(targetAreaToAchieve){
         this._targetAreaToAchieve = targetAreaToAchieve;
     } 
     
-    TargetFocusedState.prototype.unfocusEntity = function(){
+    BasicTargetFocusedState.prototype.unfocusEntity = function(){
         EntityController.FocusedState.prototype.unfocusEntity.call(this);
         
         this._focusedEntity.resetVisual();
     }
     
     
-    function TargetUnfocusedState(TargetsController){
-        EntityController.UnFocusedState.call(this, TargetsController);
+    function BasicTargetUnfocusedState(BasicTargetsController){
+        EntityController.UnFocusedState.call(this, BasicTargetsController);
     }
     
     //inherit from unFocusedState
-    TargetUnfocusedState.prototype = Object.create(EntityController.UnFocusedState.prototype);
-    TargetUnfocusedState.prototype.constructor = TargetUnfocusedState;
+    BasicTargetUnfocusedState.prototype = Object.create(EntityController.UnFocusedState.prototype);
+    BasicTargetUnfocusedState.prototype.constructor = BasicTargetUnfocusedState;
     
     
-    function TargetsController(gl, appMetaData, initializeData, EffectsManager){
+    function BasicTargetsController(gl, appMetaData, initializeData, EffectsManager){
         EntityController.EntityController.call(this); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._targetAreaToAchieve = this._targetRadius * 4;
@@ -72,24 +72,24 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
         
         var i = 0;
         for(var key in initializeData){
-            this._entitiesPool[i] = new Target(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed / 2, EffectsManager);
+            this._entitiesPool[i] = new BasicTarget(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed / 2, EffectsManager);
             
             i++;
         }
         
         this._spawnTimer.start();
         
-        this._focusedState = new TargetFocusedState(this);
+        this._focusedState = new BasicTargetFocusedState(this);
         this._focusedState.setParameters(this._targetAreaToAchieve);
-        this._unFocusedState = new TargetUnfocusedState(this);
+        this._unFocusedState = new BasicTargetUnfocusedState(this);
         this._currentState = this._unFocusedState;
     }
     
     //inherit from EntityController
-    TargetsController.prototype = Object.create(EntityController.EntityController.prototype);
-    TargetsController.prototype.constructor = TargetsController;
+    BasicTargetsController.prototype = Object.create(EntityController.EntityController.prototype);
+    BasicTargetsController.prototype.constructor = BasicTargetsController;
     
-    TargetsController.prototype._spawn = function(){
+    BasicTargetsController.prototype._spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         var movementAngle;
@@ -131,7 +131,7 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
         });
     } 
     
-    TargetsController.prototype.recieveEvent = function(eventInfo){
+    BasicTargetsController.prototype.recieveEvent = function(eventInfo){
         EntityController.EntityController.prototype.recieveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "combo_level_increased"){
@@ -145,5 +145,5 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
         }
     }
     
-    return TargetsController;
+    return BasicTargetsController;
 });

@@ -52,7 +52,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
 
-    function requestTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
+    function requestBasicTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
@@ -214,7 +214,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         getHandlers: getHandlers,
         setUpAttributesAndUniforms: setUpAttributesAndUniforms,
         requestLightningEffect: requestLightningEffect,
-        requestTargetEffect: requestTargetEffect,
+        requestBasicTargetEffect: requestBasicTargetEffect,
         requestTextEffect: requestTextEffect,
         requestCursorEffect: requestCursorEffect,
         requestComboEffect: requestComboEffect,
