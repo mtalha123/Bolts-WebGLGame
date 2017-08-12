@@ -49,7 +49,6 @@ define(['Target', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'Even
     } 
     
     TargetFocusedState.prototype.unfocusEntity = function(){
-        console.log("UNFOCUSED!");
         EntityController.FocusedState.prototype.unfocusEntity.call(this);
         
         this._focusedEntity.resetVisual();
