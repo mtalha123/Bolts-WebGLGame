@@ -1,14 +1,11 @@
-define(['PhysicsEntity', 'Border'], function(PhysicsEntity, Border){
+define(['Border'], function(Border){
     
     function CircleEntity(x, y, canvasHeight, radius, velocity){
         this._radius = radius;
         this._velocity = velocity;
         this.setPosition(x, y);
+        this._isInSimulation = false;
     }
-    
-    //inherit from PhysicsEntity
-    CircleEntity.prototype = Object.create(PhysicsEntity.prototype);
-    CircleEntity.prototype.constructor = CircleEntity; 
     
     CircleEntity.prototype.setPosition = function(newX, newY){
         this._x = newX;
@@ -44,6 +41,22 @@ define(['PhysicsEntity', 'Border'], function(PhysicsEntity, Border){
     
     CircleEntity.prototype.setLinearVelocity = function(velX, velY){
         this._velocity = [velX, velY];
+    }
+    
+    CircleEntity.prototype.addToSimulation = function(){
+        this._isInSimulation = true;
+    }
+    
+    CircleEntity.prototype.removeFromSimulation = function(){
+        this._isInSimulation = false;
+    }
+    
+    CircleEntity.prototype.getX = function(){
+        return this._x;
+    }
+    
+    CircleEntity.prototype.getY = function(){
+        return this._y;
     }
     
     return CircleEntity;

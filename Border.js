@@ -1,4 +1,4 @@
-define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/getSimplexNoiseTexture', 'RectangleEntity'], function(PhysicsSystem, EventSystem, coordsToRGB, getSimplexNoiseTexture, RectangleEntity){
+define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/getSimplexNoiseTexture'], function(EventSystem, coordsToRGB, getSimplexNoiseTexture){
     
     var margin;    
     var borderLength;
