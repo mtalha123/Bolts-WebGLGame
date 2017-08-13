@@ -142,6 +142,10 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         return this._hitBoxRegions.isInAnyRegion(checkX, checkY);
     }
     
+    Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY){
+        //override
+    }
+    
     return {
         Entity: Entity,
         EntityNormalState: EntityNormalState,

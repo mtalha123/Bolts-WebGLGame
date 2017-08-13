@@ -1,4 +1,4 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions){
+define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance){
 
     function BasicTargetDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
@@ -31,6 +31,11 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._normalState = new BasicTargetNormalState(this);
         this._destructionState = new BasicTargetDestructionState(this._handler);
         this._currentState = this._normalState;
+        
+        this._targetDistCovered = 0;
+        this._startXInTarget = undefined;
+        this._startYInTargetInTarget = undefined;
+        this._targetAreaToAchieve = 228;
     }
     
     //inherit from Entity
@@ -61,6 +66,38 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         }
     
         this._handler.increaseLgGlowFactor(percent / 2.0);
+    }
+    
+    BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY){
+        if(this.areCoordsInHitRegions(mouseX, mouseY)){
+            if(!(this._startXInTarget && this._startYInTarget)){
+                this._startXInTarget = mouseX - this._x;;
+                this._startYInTarget = mouseY - this._y;;
+            }
+            
+            var mouseXRelativeToTarget = mouseX - this._x;
+            var mouseYRelativeToTarget = mouseY - this._y;
+            this._targetDistCovered += distance(this._startXInTarget, this._startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
+
+            this.setAchievementPercentage(this._targetDistCovered / this._targetAreaToAchieve);
+
+            this._startXInTarget = mouseXRelativeToTarget;
+            this._startYInTarget = mouseYRelativeToTarget;
+
+            if(this._targetDistCovered >= this._targetAreaToAchieve){
+                this._targetDistCovered = 0;
+                return true;
+            }
+        }else{
+            this._startXInTarget = undefined;
+            this._startYInTarget = undefined;
+        }
+        
+        return false;
+    }
+    
+    BasicTarget.prototype.setAchievementParameters = function(targetAreaToAchieve){
+        this._targetAreaToAchieve = targetAreaToAchieve;
     }
     
     return BasicTarget;
