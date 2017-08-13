@@ -24,7 +24,7 @@ define(['CircleEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/Circular
         this._hitBoxRegions = new CircularHitRegions(x + p_radius, y - p_radius);
         this._hitBoxRegions.addRegion(x + p_radius, y - p_radius, p_radius);
         
-        this._physicsEntity = new CircleEntity("dynamic", x, y, canvasHeight, p_radius + 10, 1, 0, 1);
+        this._physicsEntity = new CircleEntity(x, y, canvasHeight, p_radius + 10, [0, 0]);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  
        // this._targetHandler.setCompletion(1);
         

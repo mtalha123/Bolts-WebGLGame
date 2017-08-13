@@ -72,7 +72,7 @@ define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 
         
         var i = 0;
         for(var key in initializeData){
-            this._entitiesPool[i] = new BasicTarget(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed / 2, EffectsManager);
+            this._entitiesPool[i] = new BasicTarget(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed * 4, EffectsManager);
             
             i++;
         }

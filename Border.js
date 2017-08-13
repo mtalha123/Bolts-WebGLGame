@@ -7,11 +7,6 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
     var score = 0;
     var scoreX, scoreY;
     
-    var leftPhysicsBody;  
-    var topPhysicsBody;  
-    var rightPhysicsBody;  
-    var bottomPhysicsBody;  
-    
     var borderPath;
     var handler;
     var scoreHandler;
@@ -39,18 +34,6 @@ define(['PhysicsSystem', 'EventSystem', 'Custom Utility/coordsToRGB', 'Custom Ut
         ];
         
         handler = EffectsManager.requestLightningEffect(true, gl, 3, {}, borderPath);
-        
-        leftPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, margin, borderWidth, borderLength, 10, 0, 1);
-        leftPhysicsBody.addToSimulation();
-        
-        rightPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), appMetaData.getCanvasWidth() - (margin + borderWidth), margin, borderWidth, borderLength, 10, 0, 1);
-        rightPhysicsBody.addToSimulation();
-        
-        topPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, appMetaData.getCanvasHeight() - (margin + borderWidth), borderLength, borderWidth, 10, 0, 1);
-        topPhysicsBody.addToSimulation();
-        
-        bottomPhysicsBody = new RectangleEntity("static", appMetaData.getCanvasHeight(), margin, margin, borderLength, borderWidth, 10, 0, 1);
-        bottomPhysicsBody.addToSimulation();
         
         EventSystem.register(recieveEvent, "score_achieved");
         
