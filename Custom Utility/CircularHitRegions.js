@@ -58,5 +58,9 @@ define(['Custom Utility/distance'], function(distance){
         }
     }
     
+    CircularHitRegions.prototype.getPosition = function(){
+        return [this._centerX, this._centerY];
+    }
+    
     return CircularHitRegions;
 });

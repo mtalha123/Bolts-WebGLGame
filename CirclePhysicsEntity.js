@@ -12,43 +12,33 @@ define(['Border'], function(Border){
         this._y = newY;
     }
     
-    CircleEntity.prototype.update = function(){
-        if(this._isInSimulation){            
-            if(this._x <= Border.getLeftX()){
-                this._x += 5;
-                this._velocity[0] *= -1;
-            }
-            
-            if(this._y >= Border.getTopY()){
-                this._y -= 5;
-                this._velocity[1] *= -1;
-            }
-            
-            if(this._x + this._radius * 2 >= Border.getRightX()){
-                this._x -= 5;
-                this._velocity[0] *= -1;
-            }
-            
-            if(this._y - this._radius * 2 <= Border.getBottomY()){
-                this._y += 5;
-                this._velocity[1] *= -1;
-            }
-            
-            this._x += this._velocity[0];
-            this._y += this._velocity[1];
+    CircleEntity.prototype.update = function(){          
+        if( (this._x - this._radius) <= Border.getLeftX()){
+            this._x += 5;
+            this._velocity[0] *= -1;
         }
+
+        if( (this._y + this._radius) >= Border.getTopY()){
+            this._y -= 5;
+            this._velocity[1] *= -1;
+        }
+
+        if( (this._x + this._radius) >= Border.getRightX()){
+            this._x -= 5;
+            this._velocity[0] *= -1;
+        }
+
+        if(this._y - this._radius <= Border.getBottomY()){
+            this._y += 5;
+            this._velocity[1] *= -1;
+        }
+
+        this._x += this._velocity[0];
+        this._y += this._velocity[1];
     }
     
     CircleEntity.prototype.setLinearVelocity = function(velX, velY){
         this._velocity = [velX, velY];
-    }
-    
-    CircleEntity.prototype.addToSimulation = function(){
-        this._isInSimulation = true;
-    }
-    
-    CircleEntity.prototype.removeFromSimulation = function(){
-        this._isInSimulation = false;
     }
     
     CircleEntity.prototype.getX = function(){

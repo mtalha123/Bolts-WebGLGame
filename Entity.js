@@ -6,7 +6,7 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         this._callback = null;
     }
     
-    EntityDestructionState.prototype.draw = function(){
+    EntityDestructionState.prototype.prepareForDrawing = function(){
         if(this._timer.getTime() >= 2000){
             this._timer.reset();
             this._callback();
@@ -29,7 +29,7 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         this._physicsEntity = entity._physicsEntity;
     }
     
-    EntityNormalState.prototype.draw = function(interpolation){
+    EntityNormalState.prototype.prepareForDrawing = function(interpolation){
         this._handler.setPosition( this._entity._prevX + (interpolation * (this._entity._x - this._entity._prevX)), this._entity._prevY + (interpolation * (this._entity._y - this._entity._prevY)) );
         this._handler.update();        
     }
@@ -60,8 +60,8 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         this._currentState = this._normalState;
     }
     
-    Entity.prototype.draw = function(interpolation){
-        this._currentState.draw(interpolation);
+    Entity.prototype.prepareForDrawing = function(interpolation){
+        this._currentState.prepareForDrawing(interpolation);
     }
     
     Entity.prototype.update = function(){        
@@ -80,11 +80,6 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         
         this._prevY = this._y;
         this._y = newY;
-    }
-    
-    Entity.prototype.doSpawnEffect = function(callback){
-        this._handler.doSpawnEffect(this._x, this._y);
-        callback();
     }
     
     Entity.prototype.getX = function(){
@@ -110,22 +105,13 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         return this._id;
     }
     
-    Entity.prototype.addToPhysicsSimulation = function(){
-        this._physicsEntity.addToSimulation();
-        this._handler.shouldDraw(true);
-    }
-    
-    Entity.prototype.removeFromPhysicsSimulation = function(){
-        this._physicsEntity.removeFromSimulation();
-        this._handler.shouldDraw(false);
+    Entity.prototype.spawn = function(callback){
+        this._handler.doSpawnEffect(this._x, this._y);
+        callback();
     }
     
     Entity.prototype.setAchievementPercentage = function(percent){
         //override
-    }
-    
-    Entity.prototype.resetVisual = function(){
-        this._handler.resetProperties();
     }
     
     Entity.prototype.destroyAndReset = function(callback){

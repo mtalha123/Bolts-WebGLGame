@@ -21,12 +21,11 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
     function BasicTarget(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
         Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._radius = p_radius;
-        this._hitBoxRegions = new CircularHitRegions(x + p_radius, y - p_radius);
-        this._hitBoxRegions.addRegion(x + p_radius, y - p_radius, p_radius);
+        this._hitBoxRegions = new CircularHitRegions(x, y);
+        this._hitBoxRegions.addRegion(x, y, p_radius);
         
         this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + 10, [0, 0]);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  
-       // this._targetHandler.setCompletion(1);
         
         this._normalState = new BasicTargetNormalState(this);
         this._destructionState = new BasicTargetDestructionState(this._handler);
@@ -49,13 +48,13 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
     BasicTarget.prototype.setPosition = function(newX, newY){
         Entity.Entity.prototype.setPosition.call(this, newX, newY);
         
-        this._hitBoxRegions.setPosition(newX + this._radius, newY - this._radius);
+        this._hitBoxRegions.setPosition(newX, newY);
     }
     
     BasicTarget.prototype._setPositionWithInterpolation = function(newX, newY){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
-        this._hitBoxRegions.setPosition(newX + this._radius, newY - this._radius);
+        this._hitBoxRegions.setPosition(newX, newY);
     }
     
     BasicTarget.prototype.setAchievementPercentage = function(percent){
@@ -68,7 +67,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._handler.increaseLgGlowFactor(percent / 2.0);
     }
     
-    BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY){
+    BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY, callback){
         if(this.areCoordsInHitRegions(mouseX, mouseY)){
             if(!(this._startXInTarget && this._startYInTarget)){
                 this._startXInTarget = mouseX - this._x;;
@@ -86,6 +85,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
 
             if(this._targetDistCovered >= this._targetAreaToAchieve){
                 this._targetDistCovered = 0;
+                Entity.Entity.prototype.destroyAndReset.call(this, callback);
                 return true;
             }
         }else{

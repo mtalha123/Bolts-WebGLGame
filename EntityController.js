@@ -15,23 +15,23 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         EventSystem.register(this.recieveEvent, "combo_level_reset", this);
     }
     
-    EntityController.prototype.draw = function(interpolation){
+    EntityController.prototype.prepareForDrawing = function(interpolation){
         for(var a = 0; a < this._entitiesActivated.length; a++){
-            this._entitiesActivated[a].draw(interpolation);
+            this._entitiesActivated[a].prepareForDrawing(interpolation);
         }
         
         for(var a = 0; a < this._entitiesInTransition.length; a++){
-            this._entitiesInTransition[a].draw(interpolation);
+            this._entitiesInTransition[a].prepareForDrawing(interpolation);
         }
     }
     
     EntityController.prototype.update = function(){
         if(this._entitiesPool.length > 0){
+            this._spawnTimer.start();
             if(this._spawnTimer.getTime() >= this._spawnDelay){
                 this._spawn();
                 this._spawnTimer.reset();
             }
-            this._spawnTimer.start();
         }
 
         for(var a = 0; a < this._entitiesActivated.length; a++){
@@ -53,27 +53,17 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
             var inputToBeProcessed = {};
             inputToBeProcessed.mouseState = eventInfo.eventData;
             inputToBeProcessed.mouseState.type = eventInfo.eventType;
-           // this._currentState.processInput(inputToBeProcessed); 
+            
             for(var i = 0; i < this._entitiesActivated.length; i++){
-                if(this._entitiesActivated[i].runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState.x, inputToBeProcessed.mouseState.y)){
-                    this.achieveEntity(i);   
+                if(this._entitiesActivated[i].runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState.x, inputToBeProcessed.mouseState.y, function(){
+                    var indexOfTarget = 0;     
+                    this._entitiesPool.push(this._entitiesInTransition.splice(indexOfTarget, 1)[0]); 
+                }.bind(this))){
+                    EventSystem.publishEventImmediately("entity_destroyed", {entity: this._entitiesActivated[i]});
+                    this._entitiesInTransition.push(this._entitiesActivated.splice(i, 1)[0]);
                 }
             }
         }
-    }
-    
-    EntityController.prototype.achieveEntity = function(indexOfEntity){
-        var entity = this._entitiesActivated[indexOfEntity];
-        
-        EventSystem.publishEventImmediately("entity_destroyed", {entity: entity});        
-        entity.removeFromPhysicsSimulation();
-        this._entitiesInTransition.push(this._entitiesActivated.splice(indexOfEntity, 1)[0]);
-          
-        entity.destroyAndReset(function(){
-            //entitiesInTransition array acts in FIFO manner, so index of currently pushed entity will be 0 because all previous objects will be spliced before this one
-            var indexOfTarget = 0;     
-            this._entitiesPool.push(this._entitiesInTransition.splice(indexOfTarget, 1)[0]); 
-        }.bind(this));
     }
     
     return {

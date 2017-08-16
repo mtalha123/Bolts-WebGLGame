@@ -1,4 +1,4 @@
-define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Custom Utility/distance'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
+define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BasicTargetsController(gl, appMetaData, initializeData, EffectsManager){
         EntityController.EntityController.call(this); 
@@ -26,7 +26,6 @@ define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 
         var movementAngle;
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
-        newlyActivatedTarget.addToPhysicsSimulation();
         
         switch(random){
             case 1:
@@ -58,7 +57,7 @@ define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 
         newlyActivatedTarget.setAchievementParameters(this._targetAreaToAchieve);
         this._entitiesActivated.push(newlyActivatedTarget);
 
-        newlyActivatedTarget.doSpawnEffect(function(){
+        newlyActivatedTarget.spawn(function(){
             newlyActivatedTarget.setMovementAngle(movementAngle);
         });
     } 
