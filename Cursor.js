@@ -10,7 +10,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     
     function initialize(gl, p_appMetaData, EffectsManager){
         appMetaData = p_appMetaData;
-        handler = EffectsManager.requestCursorEffect(true, 5, {}, gl, 100, 100);
+        handler = EffectsManager.requestCursorEffect(true, 100, {}, gl, 100, 100);
         handler.shouldDraw(true);
     }
     
