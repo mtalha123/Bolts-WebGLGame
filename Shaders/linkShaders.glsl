@@ -17,18 +17,6 @@ vec2 getProjectedVector(vec2 a, vec2 bNorm){
 }
 
 vec2 getPointOnSegment(vec2 startCoord, vec2 endCoord, vec2 projVec){
-//    if(normalize(projVec) == normalize(endCoord - startCoord)){
-//        //same direction
-//        
-//        if(length(projVec) > length(endCoord - startCoord)){
-//            return endCoord;  
-//        }else{
-//            return startCoord + projVec;
-//        }
-//    }else{
-//        return startCoord;
-//    }
-    
     return clamp(startCoord + projVec, min(startCoord, endCoord), max(startCoord, endCoord));
 }
 
