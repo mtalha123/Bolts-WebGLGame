@@ -104,7 +104,7 @@ void main()
     particleCenter.x *= aspectRatio;
         
     float dist = distance(uv, particleCenter);
-    float m = (1.0 / dist) * 0.003 * sizeFactor;
+    float m = (1.0 / dist) * 0.007 * sizeFactor;
     color = vec4(m * particlesColor, m);
     
 	gl_FragColor = color;

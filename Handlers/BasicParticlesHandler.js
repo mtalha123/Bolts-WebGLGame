@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'ParticleEngine', 'Custom Utility/Timer'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, ParticleEngine, Timer){
     
-    function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, x, y, ShaderLibrary){
+    function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary){
         Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);
@@ -44,7 +44,15 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "vec3",
                 value: [1.0, 1.0, 1.0]
             }
-        };       
+        };  
+        
+        for(var option in opts){
+            for(var uniform in this._uniforms){
+                if(option === uniform){
+                    this._uniforms[uniform].value = opts[option];
+                }
+            }
+        }
         
         var randVals = [];
         for(var i = 0; i < numParticles; i++){
@@ -79,8 +87,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     
     
     BasicParticlesHandler.prototype.setPosition = function(newX, newY){
-        this._uniforms.center.value[0] = newX + this._uniforms.radius.value[0];
-        this._uniforms.center.value[1] = newY - this._uniforms.radius.value[0];
+        this._uniforms.center.value[0] = newX;
+        this._uniforms.center.value[1] = newY;
         this._generateVerticesFromCurrentState();
     }
     
