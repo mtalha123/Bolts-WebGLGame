@@ -1,7 +1,7 @@
 define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSystem', 'Custom Utility/Vector'], function(CircularHitRegions, distance, EventSystem, Vector){
     
     function Link(gl, x1, y1, x2, y2, EffectsManager){
-        this._handler = new EffectsManager.requestLinkHandler(false, gl, 30, x1, y1, x2, y2, EffectsManager);
+        this._handler = new EffectsManager.requestLinkHandler(false, gl, 10, x1, y1, x2, y2, EffectsManager);
         this.setCoords(x1, y1, x2, y2);
     }
     
