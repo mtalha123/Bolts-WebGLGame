@@ -46,7 +46,7 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         this._y = this._prevY = y;
         this._hitBoxRegions = null;
         
-        this._physicsEntity = null;//new CircleEntity("dynamic", x, y, canvasHeight, p_radius + 10, 1, 0, 1);
+        this._physicsEntity = null;//new CircleEntity("dynamic", x, y, canvasHeight, p_radius + (0.02 * canvasHeight), 1, 0, 1);
         
         this._currentMovementAngleInDeg = movementangle;
         this._speed = speed;

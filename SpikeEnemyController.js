@@ -5,6 +5,8 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
+        this._canvasWidth = appMetaData.getCanvasWidth();
+        this._canvasHeight = appMetaData.getCanvasHeight();
 
         for(var i = 0; i < 2; i++){
             this._entitiesPool[i] = new SpikeEnemy(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 5, EffectsManager);
@@ -18,8 +20,8 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
     SpikeEnemyController.prototype.constructor = SpikeEnemyController;
     
     SpikeEnemyController.prototype._spawn = function(){
-        var spawnX = Random.getRandomInt(200, 1500);
-        var spawnY = Random.getRandomInt(300, 700);
+        var spawnX = Random.getRandomInt(0.2 * this._canvasWidth, 0.7 * this._canvasWidth);
+        var spawnY = Random.getRandomInt(0.3 * this._canvasHeight, 0.7 * this._canvasHeight);
         var movementAngle;
         
         var newlyActivatedTarget = this._entitiesPool.shift();   

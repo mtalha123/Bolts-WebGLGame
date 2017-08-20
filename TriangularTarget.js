@@ -41,7 +41,7 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
         this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3);
         this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3);
         
-        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + 10, [0, 0]);
+        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, x, y, {radius: [p_radius]});
         
         this._normalState = new TriangularTargetNormalState(this);

@@ -24,7 +24,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._hitBoxRegions = new CircularHitRegions(x, y);
         this._hitBoxRegions.addRegion(x, y, p_radius);
         
-        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + 10, [0, 0]);
+        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, x, y, {});
         
         this._normalState = new BonusTargetBubblyOrbNormalState(this);

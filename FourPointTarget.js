@@ -39,7 +39,7 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
         this._hitBoxRegions.addRegion(x - p_radius, y, p_radius / 2.5);
         this._hitBoxRegions.addRegion(x, y - p_radius, p_radius / 2.5);
         
-        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + 10, [0, 0]);
+        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, x, y, {radius: [p_radius]});
         
         this._normalState = new FourPointTargetNormalState(this);
