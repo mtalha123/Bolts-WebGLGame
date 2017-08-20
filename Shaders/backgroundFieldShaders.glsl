@@ -180,7 +180,7 @@ void main()
     float radius = completion;
     
     float noiseValueWeak = pow(noiseVal, 2.0);
-    float noiseValueStrong = pow(noiseVal, 1.0);
+    float noiseValueStrong = noiseVal;
     float blueColorStrength = sinPositive(iGlobalTime * 2.0);
     vec3 color;
     
