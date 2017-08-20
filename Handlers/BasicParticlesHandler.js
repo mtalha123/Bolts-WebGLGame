@@ -1,4 +1,4 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'ParticleEngine', 'Custom Utility/Timer'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, ParticleEngine, Timer){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer){
     
     function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary){
         Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);
