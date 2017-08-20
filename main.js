@@ -23,7 +23,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Random', 'Border', 'BasicTarget', 'Cursor', 'BasicTargetsController', 'EventSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'Background', 'BonusTargetOrb', 'BonusTargetOrbStreak', 'BonusTargetBubblyOrb', 'TriangularTarget', 'FourPointTarget', 'SpikeEnemy', 'Handlers/BasicParticlesHandler', 'BonusTargetOrbsController', 'Link', 'BonusTargetOrbsStreakController', 'BonusTargetBubblyOrbsController', 'TriangularTargetController', 'FourPointTargetController', 'SpikeEnemyController'], function(Timer, FPSCounter, Random, Border, BasicTarget, Cursor, BasicTargetsController, EventSystem, NetworkManager, isObjectEmpty, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, EffectsManager, appMetaData, AssetManager, Background, BonusTargetOrb, BonusTargetOrbStreak, BonusTargetBubblyOrb, TriangularTarget, FourPointTarget, SpikeEnemy, BasicParticlesHandler, BonusTargetOrbsController, Link, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor', 'BasicTargetsController', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'Background', 'Handlers/BasicParticlesHandler', 'BonusTargetOrbsController', 'BonusTargetOrbsStreakController', 'BonusTargetBubblyOrbsController', 'TriangularTargetController', 'FourPointTargetController', 'SpikeEnemyController'], function(Timer, FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, EffectsManager, appMetaData, AssetManager, Background, BasicParticlesHandler, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -72,17 +72,11 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
         
     NetworkManager.initializeAndConnect(canvasWidth, canvasHeight, networkEventListener);
     
-    var mostRecentServerUpdateInfo = {};
-    var mostRecentServerUpdateReceiptTime = 0; 
-    
     var updateCounter = 0;
     
     var fpsHandler = null;
     
     var initializationDone = false;
-    
-    //testing
-    var timeForUpdateToBeSlowedAt = Date.now() + 5000;
     
     //testing shaderprocessor module
     var handler = null
@@ -108,8 +102,6 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
             
             //update loop
             while(currentTime > nextTick && loops < maxFrameSkip){
-
-                   // console.log("currentTick: " + nextTick + "   Current Time: " + Date.now() + "  timeCurrUpdateLate: " + (Date.now() - nextTick) + "   nextTick: " + (nextTick + tickTimeMillis));
                 tickCounter+=1;
                 var currentTickTime = nextTick;
                 update(currentTickTime);
@@ -117,48 +109,11 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
                 loops++;
                 updateCounter++;
                 
-                //console.log("Update Counter: " + updateCounter + " at time: " + (nextTick - tickTimeMillis));
-                
                 var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
-                
-              //  console.log("LATE BY: " + updatesLateBy);
-                
-                //log how much time current update is late by in ms
-                //console.log("Update late by: " + (Date.now() - currentTickTime));
                 
                 if(loops > 1){
                     console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
                 }
-                
-                if(mostRecentServerUpdateInfo.currentTickTimestamp > currentTickTime){
-                    console.log("LOOP CONTINUED!");
-                                        
-                    continue; 
-                }
-
-                if(!isObjectEmpty(mostRecentServerUpdateInfo)){
-                    for(var key in mostRecentServerUpdateInfo){
-                        switch(key){
-                            case "TargetsController":
-                                //basicTargetsController.serverUpdate(mostRecentServerUpdateInfo.basicTargetsController);
-                                break;
-
-                            case "CollisionSystem":
-                               // TargetAchiever.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
-                                break;
-                        }
-                    }
-                    mostRecentServerUpdateInfo = {};
-                }
-                
-                //Use following if statement to slow down execution of an update so as to simulate a "late" update
-//                if(currentTime >= timeForUpdateToBeSlowedAt){
-//                    console.log("SLOWED!!!!!!!")
-//                    timeForUpdateToBeSlowedAt += 5000;
-//                    for(var a = 0; a < 5; a++){
-//                        DrawPathsWithGlow(context, [[0,10], [400,500], [1500,300], [10,10]]);
-//                    }
-//                }
             }
 
             interpolation = ( (Date.now() + tickTimeMillis) - nextTick ) / ( tickTimeMillis );
@@ -204,12 +159,12 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
     function draw(interpolation){
         Border.draw(interpolation);
         
-//        basicTargetsController.prepareForDrawing(interpolation);
-//        bonusTargetOrbsController.prepareForDrawing(interpolation);
-//        bonusTargetOrbsStreakController.prepareForDrawing(interpolation);
-//        bonusTargetBubblyOrbsController.prepareForDrawing(interpolation);
-//        triangularTargetController.prepareForDrawing(interpolation);
-//        fourPointTargetController.prepareForDrawing(interpolation);
+        basicTargetsController.prepareForDrawing(interpolation);
+        bonusTargetOrbsController.prepareForDrawing(interpolation);
+        bonusTargetOrbsStreakController.prepareForDrawing(interpolation);
+        bonusTargetBubblyOrbsController.prepareForDrawing(interpolation);
+        triangularTargetController.prepareForDrawing(interpolation);
+        fourPointTargetController.prepareForDrawing(interpolation);
         spikeEnemyController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
 
@@ -252,12 +207,12 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
         
         ComboSystem.update();
         Border.update();
-//        basicTargetsController.update();
-//        bonusTargetOrbsController.update();
-//        bonusTargetOrbsStreakController.update();
-//        bonusTargetBubblyOrbsController.update();
-//        triangularTargetController.update();
-//        fourPointTargetController.update();
+        basicTargetsController.update();
+        bonusTargetOrbsController.update();
+        bonusTargetOrbsStreakController.update();
+        bonusTargetBubblyOrbsController.update();
+        triangularTargetController.update();
+        fourPointTargetController.update();
         spikeEnemyController.update();
         EventSystem.update();
         
@@ -268,28 +223,6 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
         }
     }
     
-    function getPixelsFromPercent(widthOrHeight, percentage){
-        if(widthOrHeight === "width"){
-            return (percentage/100) * canvasWidth;
-        }else if(widthOrHeight === "height"){
-            return (percentage/100) * canvasHeight;
-        }
-    }
-    
-    function doServerUpdateFrom(serverUpdateObject){
-        for(var key in serverUpdateObject){
-            switch(key){
-                case "targetsController":
-                    basicTargetsController.serverUpdate(serverUpdateObject.targetsController);
-                    break;
-
-                case "CollisionSystem":
-                    CollisionSystem.recieveFromServer(serverUpdateObject.CollisionSystem);
-                    break;
-            }
-        }
-    }
-    
     function networkEventListener(eventType, eventData){
         if(eventType === "S_initialize"){
             AssetManager.loadAllAssets(gl, function(){
@@ -297,24 +230,12 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
             }, function(){
                 console.log("All assets loaded.");
                 initializationDone = true;
-                initialize(eventData.TargetsController, eventData.nextTick);    
+                initialize();    
             });
-        }else if(eventType === "S_gameupdate"){
-
-            //PURELY FOR TESTING (DELETE THIS AFTER BREAKS ENCAPSULATION)------
-            for(var test in mostRecentServerUpdateInfo.TargetsController){
-                if(mostRecentServerUpdateInfo.TargetsController[test].type === "spawn"){
-                    console.log("SPAWN SKIPPED!!!!!");
-                }
-            }
-            //-----
-            
-            mostRecentServerUpdateInfo = eventData;
-            mostRecentServerUpdateReceiptTime = Date.now();
         }
     }
     
-    function initialize(TargetsControllerInfo, nextServerTick){
+    function initialize(){
         appMetaData.initialize(canvasWidth, canvasHeight);
         ShaderLibrary.initialize(gl);
         EffectsManager.initialize(ShaderLibrary, appMetaData, AssetManager);
@@ -322,7 +243,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
         Cursor.initialize(gl, appMetaData, EffectsManager);
         Border.initialize(gl, appMetaData, AssetManager, EffectsManager);
         ComboSystem.initialize(gl, EffectsManager, Border);
-        basicTargetsController = new BasicTargetsController(gl, appMetaData, TargetsControllerInfo, EffectsManager); 
+        basicTargetsController = new BasicTargetsController(gl, appMetaData, EffectsManager); 
         bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, EffectsManager); 
         bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, EffectsManager); 
         bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, EffectsManager);

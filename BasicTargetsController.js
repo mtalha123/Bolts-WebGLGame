@@ -1,16 +1,13 @@
 define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
-    function BasicTargetsController(gl, appMetaData, initializeData, EffectsManager){
+    function BasicTargetsController(gl, appMetaData, EffectsManager){
         EntityController.EntityController.call(this); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
-        
-        var i = 0;
-        for(var key in initializeData){
-            this._entitiesPool[i] = new BasicTarget(key, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, initializeData[key].x, appMetaData.getCanvasHeight() - initializeData[key].y, initializeData[key].movementAngle, initializeData[key].speed * 4, EffectsManager);
-            
-            i++;
+
+        for(var i = 0; i < 5; i++){
+            this._entitiesPool[i] = new BasicTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, 0, 0, 30, 10, EffectsManager);
         }
         
         this._spawnTimer.start();
