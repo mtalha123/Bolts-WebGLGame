@@ -97,6 +97,7 @@ define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random
         for(var i = 0; i < this._config.length; i++){
             this._config[i].spawn(function(){});
         }
+        this._config[0].turnOnLightning();
     }
     
     BonusTargetOrbConfig.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY, callback){
