@@ -31,7 +31,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.18:4000/Assets/arial.fnt", function(error, text){
+                getTextResource("http://192.168.0.14:4000/Assets/arial.fnt", function(error, text){
                     otherTextAssets.arial = text;
                     callbackForEachLoaded();
                     resolve("Arial Font Loaded");
@@ -39,7 +39,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-               getTextResource("http://192.168.0.18:4000/Shaders/commonFunctions.glsl", function(error, text){                    
+               getTextResource("http://192.168.0.14:4000/Shaders/commonFunctions.glsl", function(error, text){                    
                     shaders.commonFunctions = text;
                     callbackForEachLoaded();
                     resolve("Common Shader Functions Loaded");
@@ -47,7 +47,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-               getTextResource("http://192.168.0.18:4000/Shaders/lightningShaders.glsl", function(error, text){                    
+               getTextResource("http://192.168.0.14:4000/Shaders/lightningShaders.glsl", function(error, text){                    
                     shaders.lightning = text;
                     callbackForEachLoaded();
                     resolve("Lightning Shader Loaded");
@@ -55,7 +55,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.18:4000/Shaders/targetShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.14:4000/Shaders/targetShaders.glsl", function(error, text){
                     shaders.target = text;
                     callbackForEachLoaded();
                     resolve("Target Shader Loaded");
@@ -63,7 +63,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.18:4000/Shaders/textShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.14:4000/Shaders/textShaders.glsl", function(error, text){
                     shaders.text = text;
                     callbackForEachLoaded();
                     resolve("Text Shader Loaded");
@@ -71,7 +71,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.18:4000/Shaders/cursorShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.14:4000/Shaders/cursorShaders.glsl", function(error, text){
                     shaders.cursor = text
                     callbackForEachLoaded();
                     resolve("Cursor Shader Loaded");
@@ -79,7 +79,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.18:4000/Shaders/comboShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.14:4000/Shaders/comboShaders.glsl", function(error, text){
                     shaders.combo = text;
                     callbackForEachLoaded();
                     resolve("Combo Shader Loaded");
@@ -87,13 +87,77 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.18:4000/Shaders/backgroundFieldShaders.glsl", function(error, text){
+                getTextResource("http://192.168.0.14:4000/Shaders/backgroundFieldShaders.glsl", function(error, text){
                     shaders.background_field = text;
                     callbackForEachLoaded();
                     resolve("Background Field Shader Loaded");
                 });
             }),
             
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/lightningOrbShaders.glsl", function(error, text){
+                    shaders.lightning_orb = text;
+                    callbackForEachLoaded();
+                    resolve("Lightning Orb Shader Loaded");
+                });
+            }),
+            
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/spikeEnemyShaders.glsl", function(error, text){
+                    shaders.enemy_spike = text;
+                    callbackForEachLoaded();
+                    resolve("Spike Enemy Shader Loaded");
+                });
+            }),
+
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/orbWithLightningStreakShaders.glsl", function(error, text){
+                    shaders.orb_lightning_streak = text;
+                    callbackForEachLoaded();
+                    resolve("Orb With Lightning Streak Shader Loaded");
+                });
+            }),
+
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/bubblyOrbShaders.glsl", function(error, text){
+                    shaders.bubbly_orb = text;
+                    callbackForEachLoaded();
+                    resolve("Bubbly Orb Shader Loaded");
+                });
+            }),
+
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/triangularTargetShaders.glsl", function(error, text){
+                    shaders.triangular_target = text;
+                    callbackForEachLoaded();
+                    resolve("Triangular Target Shader Loaded");
+                });
+            }),
+
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/fourPointTargetShaders.glsl", function(error, text){
+                    shaders.four_point_target = text;
+                    callbackForEachLoaded();
+                    resolve("Four Point Target Shader Loaded");
+                });
+            }),
+            
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/particleShaders.glsl", function(error, text){
+                    shaders.particle = text;
+                    callbackForEachLoaded();
+                    resolve("Particle Shader Loaded");
+                });
+            }),
+            
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.14:4000/Shaders/linkShaders.glsl", function(error, text){
+                    shaders.link = text;
+                    callbackForEachLoaded();
+                    resolve("Link Shader Loaded");
+                });
+            }),
+
             new Promise(function(resolve, reject){
                 var noiseData = getSimplexNoiseTexture(2048, 2048);
                 var noiseTexture = getGLTextureForNoise(gl, noiseData, 2048, 2048);

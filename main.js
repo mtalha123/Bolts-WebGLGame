@@ -9,14 +9,11 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.18:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.14:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
             exports: 'Matrix' // what variable does the library export to the global scope?
-        },
-        'Third Party/Box2d.min': {
-            exports: 'Box2D' // what variable does the library export to the global scope?
         },
         'socketio': {
             exports: "io"
@@ -26,7 +23,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Random', 'Border', 'Target', 'Cursor', 'TargetsController', 'EventSystem', 'TargetAchiever', 'PhysicsSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'ShaderProcessor', 'appMetaData', 'AssetManager', 'Background'], function(Timer, FPSCounter, Random, Border, Target, Cursor, TargetsController, EventSystem, TargetAchiever, PhysicsSystem, NetworkManager, isObjectEmpty, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, ShaderProcessor, appMetaData, AssetManager, Background){
+require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Random', 'Border', 'BasicTarget', 'Cursor', 'BasicTargetsController', 'EventSystem', 'NetworkManager', 'Custom Utility/isObjectEmpty', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'Background', 'BonusTargetOrb', 'BonusTargetOrbStreak', 'BonusTargetBubblyOrb', 'TriangularTarget', 'FourPointTarget', 'SpikeEnemy', 'BasicParticleEffect', 'Handlers/BasicParticlesHandler', 'BonusTargetOrbsController', 'Link', 'BonusTargetOrbsStreakController', 'BonusTargetBubblyOrbsController', 'TriangularTargetController', 'FourPointTargetController', 'SpikeEnemyController'], function(Timer, FPSCounter, Random, Border, BasicTarget, Cursor, BasicTargetsController, EventSystem, NetworkManager, isObjectEmpty, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, EffectsManager, appMetaData, AssetManager, Background, BonusTargetOrb, BonusTargetOrbStreak, BonusTargetBubblyOrb, TriangularTarget, FourPointTarget, SpikeEnemy, BasicParticleEffect, BasicParticlesHandler, BonusTargetOrbsController, Link, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -76,15 +73,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
     NetworkManager.initializeAndConnect(canvasWidth, canvasHeight, networkEventListener);
     
     var mostRecentServerUpdateInfo = {};
-    var mostRecentServerUpdateReceiptTime = 0;
-    
-//    var debugDraw = new Box2DStuff.b2DebugDraw();
-//    debugDraw.SetSprite (context);
-//    debugDraw.SetDrawScale(100);
-//    debugDraw.SetFillAlpha(0.3);
-//    debugDraw.SetLineThickness(1.0);
-//    debugDraw.SetFlags(Box2DStuff.b2DebugDraw.e_shapeBit | Box2DStuff.b2DebugDraw.e_jointBit);
-//    Box2DStuff.physicsWorld.SetDebugDraw(debugDraw)    
+    var mostRecentServerUpdateReceiptTime = 0; 
     
     var updateCounter = 0;
     
@@ -96,7 +85,16 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
     var timeForUpdateToBeSlowedAt = Date.now() + 5000;
     
     //testing shaderprocessor module
-    var handler = null;
+    var handler = null
+    
+    var basicTargetsController;
+    var bonusTargetOrbsController;
+    var bonusTargetOrbsStreakController;
+    var bonusTargetOrbsStreakController;
+    var bonusTargetBubblyOrbsController;
+    var triangularTargetController;
+    var fourPointTargetController;
+    var spikeEnemyController;
     
     function gameLoop(){
         if(NetworkManager.connectedToServer() && initializationDone){
@@ -142,11 +140,11 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
                     for(var key in mostRecentServerUpdateInfo){
                         switch(key){
                             case "TargetsController":
-                                TargetsController.serverUpdate(mostRecentServerUpdateInfo.TargetsController);
+                                //basicTargetsController.serverUpdate(mostRecentServerUpdateInfo.basicTargetsController);
                                 break;
 
                             case "CollisionSystem":
-                                TargetAchiever.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
+                               // TargetAchiever.recieveFromServer(mostRecentServerUpdateInfo.CollisionSystem);
                                 break;
                         }
                     }
@@ -188,7 +186,7 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
             draw(interpolation);
             
             if(!fpsHandler){
-                fpsHandler = ShaderProcessor.requestTextEffect(true, gl, 1, {}, canvasWidth * 0.9, canvasHeight * 0.88, fpsCounter.getFPS().toString());
+                fpsHandler = EffectsManager.requestTextEffect(true, gl, 1, {}, canvasWidth * 0.9, canvasHeight * 0.88, fpsCounter.getFPS().toString());
             }
             fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
 
@@ -206,27 +204,36 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
     function draw(interpolation){
         Border.draw(interpolation);
         
-        TargetsController.draw(interpolation);
+//        basicTargetsController.prepareForDrawing(interpolation);
+//        bonusTargetOrbsController.prepareForDrawing(interpolation);
+//        bonusTargetOrbsStreakController.prepareForDrawing(interpolation);
+//        bonusTargetBubblyOrbsController.prepareForDrawing(interpolation);
+//        triangularTargetController.prepareForDrawing(interpolation);
+//        fourPointTargetController.prepareForDrawing(interpolation);
+        spikeEnemyController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
 
         ComboSystem.draw();
-        //Box2DStuff.physicsWorld.DrawDebugData();  
         Background.draw();
-        
         
         gl.viewport(0, 0, canvasWidth, canvasHeight);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.clearColor(0.65, 0.65, 0.65, 1.0);
         gl.enable(gl.BLEND);
+        //normal blending
         gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
        // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    
-        var handlers = ShaderProcessor.getHandlers();
+        
+        var handlers = EffectsManager.getHandlers();
         var numVerticesDone = 0;
         for(var i = 0; i < handlers.length; i++){
+            if(handlers[i] instanceof BasicParticlesHandler){
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            }
             gl.useProgram(handlers[i]._shaderProgram);
-            ShaderProcessor.setUpAttributesAndUniforms(gl, handlers[i]);
+            EffectsManager.setUpAttributesAndUniforms(gl, handlers[i]);
             gl.drawArrays(gl.TRIANGLES, 0, handlers[i].getNumVertices());
+           // console.log("num vertices: " + handlers[i].getNumVertices());
             numVerticesDone += handlers[i].getNumVertices();
         }       
     }
@@ -242,19 +249,22 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
         }else{
             NetworkManager.sendToServer("input", "none");
         }
-    
-        TargetAchiever.update();
         
         ComboSystem.update();
-        PhysicsSystem.update(1 / 20, 10, 6);
         Border.update();
-        TargetsController.update();
+//        basicTargetsController.update();
+//        bonusTargetOrbsController.update();
+//        bonusTargetOrbsStreakController.update();
+//        bonusTargetBubblyOrbsController.update();
+//        triangularTargetController.update();
+//        fourPointTargetController.update();
+        spikeEnemyController.update();
         EventSystem.update();
         
         
         //TESTING SHADERPROCESSOR MODULE
         if(!handler){
-            //handler = ShaderProcessor.requestComboEffect(gl, 300, 700, 80, 0.1, 3, "2x");
+            //handler = EffectsManager.requestComboEffect(gl, 300, 700, 80, 0.1, 3, "2x");
         }
     }
     
@@ -269,8 +279,8 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
     function doServerUpdateFrom(serverUpdateObject){
         for(var key in serverUpdateObject){
             switch(key){
-                case "TargetsController":
-                    TargetsController.serverUpdate(serverUpdateObject.TargetsController);
+                case "targetsController":
+                    basicTargetsController.serverUpdate(serverUpdateObject.targetsController);
                     break;
 
                 case "CollisionSystem":
@@ -307,13 +317,19 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Custom Utility/Ra
     function initialize(TargetsControllerInfo, nextServerTick){
         appMetaData.initialize(canvasWidth, canvasHeight);
         ShaderLibrary.initialize(gl);
-        ShaderProcessor.initialize(ShaderLibrary, appMetaData, AssetManager);
-        Background.initialize(gl, ShaderProcessor);
-        Cursor.initialize(gl, appMetaData, ShaderProcessor);
-        Border.initialize(gl, appMetaData, AssetManager, ShaderProcessor);
-        TargetsController.initialize(gl, appMetaData, TargetsControllerInfo);  
-        ComboSystem.initialize(gl, ShaderProcessor, TargetsController, Border);
-        TargetAchiever.initialize(ComboSystem);
+        EffectsManager.initialize(ShaderLibrary, appMetaData, AssetManager);
+        Background.initialize(gl, EffectsManager);
+        Cursor.initialize(gl, appMetaData, EffectsManager);
+        Border.initialize(gl, appMetaData, AssetManager, EffectsManager);
+        ComboSystem.initialize(gl, EffectsManager, Border);
+        basicTargetsController = new BasicTargetsController(gl, appMetaData, TargetsControllerInfo, EffectsManager); 
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, EffectsManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, EffectsManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, EffectsManager);
+        triangularTargetController = new TriangularTargetController(gl, appMetaData, EffectsManager);
+        fourPointTargetController = new FourPointTargetController(gl, appMetaData, EffectsManager);
+        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, EffectsManager);
+        
         InputEventsManager.initialize(canvas, appMetaData);
         
         nextTick = Date.now();

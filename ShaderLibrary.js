@@ -5,6 +5,14 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var TEXT = "TEXT"; 
     var CURSOR = "CURSOR";
     var COMBO = "COMBO";
+    var LIGHTNING_ORB = "LIGHTNING_ORB";
+    var ORB_LIGHTNING_STREAK = "ORB_LIGHTNING_STREAK";
+    var BUBBLY_ORB = "BUBBLY_ORB";
+    var TRIANGULAR_TARGET = "TRIANGULAR_TARGET";
+    var FOUR_POINT_TARGET = "FOUR_POINT_TARGET";
+    var ENEMY_SPIKE = "ENEMY_SPIKE";
+    var PARTICLE = "PARTICLE";
+    var LINK = "LINK";
     
     var vertexShaderSources = [], fragmentShadersInfo = [];
     var allPrograms = {};    
@@ -44,7 +52,7 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
             
             var vertexShaderSource = currShaderSource.substring(0, indexBeginFragShader);
             var fragmentShaderSource = currShaderSource.substring(indexBeginFragShader);
-            fragmentShaderSource = [fragmentShaderSource.slice(0, "precision mediump float;".length), commonFunctionsSource, fragmentShaderSource.slice("precision mediump float;".length)].join("\n")
+            fragmentShaderSource = [fragmentShaderSource.slice(0, "precision mediump float;".length), commonFunctionsSource, fragmentShaderSource.slice("precision mediump float;".length)].join("\n");
             gl.shaderSource(vertexShader, vertexShaderSource);
             gl.shaderSource(fragmentShader, fragmentShaderSource);
 
@@ -88,6 +96,14 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         TARGET: TARGET,
         TEXT: TEXT,
         CURSOR: CURSOR,
-        COMBO: COMBO
+        COMBO: COMBO,
+        LIGHTNING_ORB: LIGHTNING_ORB,
+        ORB_LIGHTNING_STREAK: ORB_LIGHTNING_STREAK,
+        BUBBLY_ORB: BUBBLY_ORB,
+        TRIANGULAR_TARGET: TRIANGULAR_TARGET,
+        FOUR_POINT_TARGET: FOUR_POINT_TARGET,
+        ENEMY_SPIKE: ENEMY_SPIKE,
+        PARTICLE: PARTICLE,
+        LINK: LINK
     };
 });
