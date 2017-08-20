@@ -49,13 +49,13 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
     EntityController.prototype.recieveEvent = function(eventInfo){
         if(eventInfo.eventType === "combo_level_increased"){
         }else if(eventInfo.eventType === "combo_level_reset"){
-        }else if(eventInfo.eventType === "mouse_down" || eventInfo.eventType === "mouse_held_down"){
+        }else{
             var inputToBeProcessed = {};
             inputToBeProcessed.mouseState = eventInfo.eventData;
             inputToBeProcessed.mouseState.type = eventInfo.eventType;
             
             for(var i = 0; i < this._entitiesActivated.length; i++){
-                if(this._entitiesActivated[i].runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState.x, inputToBeProcessed.mouseState.y, function(){
+                if(this._entitiesActivated[i].runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(){
                     var indexOfTarget = 0;     
                     this._entitiesPool.push(this._entitiesInTransition.splice(indexOfTarget, 1)[0]); 
                 }.bind(this))){

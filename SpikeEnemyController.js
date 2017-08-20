@@ -65,11 +65,6 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
         }else if(eventInfo.eventType === "combo_level_reset"){
             this._targetAreaToAchieve = this._targetRadius * 4;
       //      this._setAchievementParamtersForAllActiveTargets();
-        }else if(eventInfo.eventType === "mouse_up"){
-            this._entitiesActivated = this._entitiesActivated.map(function(currValue){
-                currValue.unfocus();
-                return currValue;
-            });
         }
     }
     

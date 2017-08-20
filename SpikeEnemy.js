@@ -84,32 +84,39 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
 //        this._handler.increaseLgGlowFactor(percent / 2.0);
     }
     
-    SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY, callback){
-        if(this.areCoordsInHitRegions(mouseX, mouseY)){
-            this._inputArray.push(new Vector(mouseX, mouseY));
-            if(this._inputArray.length > 8){
-                this._inputArray.shift();
-            }
-    
+    SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+            var mouseX = mouseInputObj.x;
+            var mouseY = mouseInputObj.y;
             
-            var lastIndex = this._inputArray.length - 1;
-            if(distance(this._inputArray[0].getX(), this._inputArray[0].getY(), this._inputArray[lastIndex].getX(), this._inputArray[lastIndex].getY()) >= this._radius * 2){
-                var achieved = true;
-                this._inputArray.map(function(val, index, array){
-                    var startToCurr = array[0].subtractFrom(val);
-                    var startToLast = array[0].subtractFrom(array[array.length-1]);
-                    var projection = startToCurr.projectOnto(startToLast);
-                    var pointOnLine = array[0].addTo(projection);
-                    var dist = distance(val.getX(), val.getY(), pointOnLine.getX(), pointOnLine.getY());
-                    
-                    if(dist >= 15){
-                        achieved = false;
-                    }
-                });
-                if(achieved){
-                    this.destroyAndReset(callback);
-                    return true;   
+            if(this.areCoordsInHitRegions(mouseX, mouseY)){
+                this._inputArray.push(new Vector(mouseX, mouseY));
+                if(this._inputArray.length > 8){
+                    this._inputArray.shift();
                 }
+
+
+                var lastIndex = this._inputArray.length - 1;
+                if(distance(this._inputArray[0].getX(), this._inputArray[0].getY(), this._inputArray[lastIndex].getX(), this._inputArray[lastIndex].getY()) >= this._radius * 2){
+                    var achieved = true;
+                    this._inputArray.map(function(val, index, array){
+                        var startToCurr = array[0].subtractFrom(val);
+                        var startToLast = array[0].subtractFrom(array[array.length-1]);
+                        var projection = startToCurr.projectOnto(startToLast);
+                        var pointOnLine = array[0].addTo(projection);
+                        var dist = distance(val.getX(), val.getY(), pointOnLine.getX(), pointOnLine.getY());
+
+                        if(dist >= 15){
+                            achieved = false;
+                        }
+                    });
+                    if(achieved){
+                        this.destroyAndReset(callback);
+                        return true;   
+                    }
+                }
+            }else{
+                this._inputArray = [];
             }
         }else{
             this._inputArray = [];
@@ -120,10 +127,6 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
     
     SpikeEnemy.prototype.setAchievementParameters = function(targetAreaToAchieve){
     //    this._targetAreaToAchieve = targetAreaToAchieve;
-    }
-    
-    SpikeEnemy.prototype.unfocus = function(targetAreaToAchieve){
-        this._inputArray = [];
     }
     
     SpikeEnemy.prototype.setDestination = function(x, y){

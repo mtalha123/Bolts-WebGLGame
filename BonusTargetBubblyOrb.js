@@ -61,30 +61,35 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._handler.increaseGlow(percent / 3.0);
     }
     
-    BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY, callback){
-        if(this.areCoordsInHitRegions(mouseX, mouseY)){
-            if(!(this._startXInTarget && this._startYInTarget)){
-                this._startXInTarget = mouseX - this._x;;
-                this._startYInTarget = mouseY - this._y;;
+    BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+            var mouseX = mouseInputObj.x;
+            var mouseY = mouseInputObj.y;
+        
+            if(this.areCoordsInHitRegions(mouseX, mouseY)){
+                if(!(this._startXInTarget && this._startYInTarget)){
+                    this._startXInTarget = mouseX - this._x;;
+                    this._startYInTarget = mouseY - this._y;;
+                }
+
+                var mouseXRelativeToTarget = mouseX - this._x;
+                var mouseYRelativeToTarget = mouseY - this._y;
+                this._targetDistCovered += distance(this._startXInTarget, this._startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
+
+                this.setAchievementPercentage(this._targetDistCovered / this._targetAreaToAchieve);
+
+                this._startXInTarget = mouseXRelativeToTarget;
+                this._startYInTarget = mouseYRelativeToTarget;
+
+                if(this._targetDistCovered >= this._targetAreaToAchieve){
+                    this._targetDistCovered = 0;
+                    Entity.Entity.prototype.destroyAndReset.call(this, callback);
+                    return true;
+                }
+            }else{
+                this._startXInTarget = undefined;
+                this._startYInTarget = undefined;
             }
-            
-            var mouseXRelativeToTarget = mouseX - this._x;
-            var mouseYRelativeToTarget = mouseY - this._y;
-            this._targetDistCovered += distance(this._startXInTarget, this._startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
-
-            this.setAchievementPercentage(this._targetDistCovered / this._targetAreaToAchieve);
-
-            this._startXInTarget = mouseXRelativeToTarget;
-            this._startYInTarget = mouseYRelativeToTarget;
-
-            if(this._targetDistCovered >= this._targetAreaToAchieve){
-                this._targetDistCovered = 0;
-                Entity.Entity.prototype.destroyAndReset.call(this, callback);
-                return true;
-            }
-        }else{
-            this._startXInTarget = undefined;
-            this._startYInTarget = undefined;
         }
         
         return false;

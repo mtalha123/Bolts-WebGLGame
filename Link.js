@@ -5,24 +5,29 @@ define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSy
         this.setCoords(x1, y1, x2, y2);
     }
     
-    Link.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY){
-        var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
-        if(possibleHitBox){
-            var currHitBoxPosition = this._hitBoxRegions.getPosition();
-            var currHitBoxPosToMouse = (new Vector(currHitBoxPosition[0], currHitBoxPosition[1])).subtractFrom(new Vector(mouseX, mouseY));
-            var projection = currHitBoxPosToMouse.projectOnto(this._dirVec);
-            
-            if(projection.hasSameDirection(this._dirVec)){
-                var newHitBoxPosition = (new Vector(currHitBoxPosition[0], currHitBoxPosition[1])).addTo(projection);
-                if( (this._startPosition.subtractFrom(newHitBoxPosition)).getMagnitude() >= this._lineLength){
-                    this._handler.setCompletion(1.5); 
-                    this.destroyAndReset();
-                    return true;
-                }else{
-                    this._hitBoxRegions.setPosition(newHitBoxPosition.getX(), newHitBoxPosition.getY());
+    Link.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+            var mouseX = mouseInputObj.x;
+            var mouseY = mouseInputObj.y;
+        
+            var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
+            if(possibleHitBox){
+                var currHitBoxPosition = this._hitBoxRegions.getPosition();
+                var currHitBoxPosToMouse = (new Vector(currHitBoxPosition[0], currHitBoxPosition[1])).subtractFrom(new Vector(mouseX, mouseY));
+                var projection = currHitBoxPosToMouse.projectOnto(this._dirVec);
 
-                    var completion = distance(this._startPosition.getX(), this._startPosition.getY(), newHitBoxPosition.getX(), newHitBoxPosition.getY()) / this._lineLength;
-                    this._handler.setCompletion(completion);   
+                if(projection.hasSameDirection(this._dirVec)){
+                    var newHitBoxPosition = (new Vector(currHitBoxPosition[0], currHitBoxPosition[1])).addTo(projection);
+                    if( (this._startPosition.subtractFrom(newHitBoxPosition)).getMagnitude() >= this._lineLength){
+                        this._handler.setCompletion(1.5); 
+                        this.destroyAndReset();
+                        return true;
+                    }else{
+                        this._hitBoxRegions.setPosition(newHitBoxPosition.getX(), newHitBoxPosition.getY());
+
+                        var completion = distance(this._startPosition.getX(), this._startPosition.getY(), newHitBoxPosition.getX(), newHitBoxPosition.getY()) / this._lineLength;
+                        this._handler.setCompletion(completion);   
+                    }
                 }
             }
         }

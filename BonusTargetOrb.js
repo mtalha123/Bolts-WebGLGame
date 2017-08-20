@@ -75,9 +75,14 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions'], fu
     }
     
     
-    BonusTargetOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY){
-        if(this.areCoordsInHitRegions(mouseX, mouseY)){
-            return true;
+    BonusTargetOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+            var mouseX = mouseInputObj.x;
+            var mouseY = mouseInputObj.y;
+            
+            if(this.areCoordsInHitRegions(mouseX, mouseY)){
+                return true;
+            }
         }
         
         return false;

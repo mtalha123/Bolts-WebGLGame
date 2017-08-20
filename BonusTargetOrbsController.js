@@ -100,19 +100,24 @@ define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random
         this._config[0].turnOnLightning();
     }
     
-    BonusTargetOrbConfig.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY, callback){
-        if(this._config[this._currentWorkingIndex].runAchievementAlgorithmAndReturnStatus(mouseX, mouseY)){   
-            if(this._currentWorkingIndex === this._config.length - 1){
-                this._config[this._currentWorkingIndex].destroyAndReset(callback);
-                this._currentWorkingIndex = 0;
-                return true;
+    BonusTargetOrbConfig.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+            var mouseX = mouseInputObj.x;
+            var mouseY = mouseInputObj.y;
+            
+            if(this._config[this._currentWorkingIndex].runAchievementAlgorithmAndReturnStatus(mouseInputObj)){   
+                if(this._currentWorkingIndex === this._config.length - 1){
+                    this._config[this._currentWorkingIndex].destroyAndReset(callback);
+                    this._currentWorkingIndex = 0;
+                    return true;
+                }else{
+                    this._config[this._currentWorkingIndex].destroyAndReset(function(){});
+                    this._currentWorkingIndex++;
+                }
             }else{
-                this._config[this._currentWorkingIndex].destroyAndReset(function(){});
-                this._currentWorkingIndex++;
-            }
-        }else{
-            if(this._config[this._currentWorkingIndex] instanceof BonusTargetOrb){
-                this._config[this._currentWorkingIndex].turnOnLightning();
+                if(this._config[this._currentWorkingIndex] instanceof BonusTargetOrb){
+                    this._config[this._currentWorkingIndex].turnOnLightning();
+                }
             }
         }
         

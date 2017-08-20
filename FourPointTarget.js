@@ -68,23 +68,27 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
     }
     
     
-    FourPointTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseX, mouseY, callback){
-        var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
-        if(possibleHitBox){
-            console.log("test!")
-            this._numGuardsActivated++;
-            if(this._numGuardsActivated === 4){
-                this._numGuardsActivated = 0;
-                this._guardPrefs = [0, 0, 0, 0];
+    FourPointTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+            var mouseX = mouseInputObj.x;
+            var mouseY = mouseInputObj.y;
+            
+            var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
+            if(possibleHitBox){
+                this._numGuardsActivated++;
+                if(this._numGuardsActivated === 4){
+                    this._numGuardsActivated = 0;
+                    this._guardPrefs = [0, 0, 0, 0];
+                    this._handler.setGuardPrefs(this._guardPrefs);
+                    this.destroyAndReset(callback);
+                    return true;   
+                }
+
+                this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
                 this._handler.setGuardPrefs(this._guardPrefs);
-                this.destroyAndReset(callback);
-                return true;   
+                this._handler.increaseLgGlowFactor(1.5);
+                possibleHitBox.activated = false;
             }
-    
-            this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
-            this._handler.setGuardPrefs(this._guardPrefs);
-            this._handler.increaseLgGlowFactor(1.5);
-            possibleHitBox.activated = false;
         }
         
         return false;
