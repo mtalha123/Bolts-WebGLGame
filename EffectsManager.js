@@ -1,4 +1,4 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler){
     var allHandlers = [];
     
     var ShaderLibrary;
@@ -90,49 +90,56 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     function requestLightningOrbEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new LightningOrbHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
         
-        addHandlers(handler);
+        addHandlers(handler.getAllHandlers());
         return handler;
     }
     
     function requestEnemySpikeEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new SpikeEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary);
         
-        addHandlers(handler);
+        addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestLightningOrbWithStreakEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new LightningOrbStreakHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
         
-        addHandlers(handler);
+        addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestBubblyOrbEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new BubblyOrbHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
         
-        addHandlers(handler);
+        addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestTriangularTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new TriangularTargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
         
-        addHandlers(handler);
+        addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestFourPointLightningEffect(shouldDraw, gl, zOrder, x, y, opts){
         var handler = new FourPointTargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
 
+        addHandlers(handler.getAllHandlers());
+        return handler;
+    }
+    
+    function requestBasicParticleEffect(shouldDraw, gl, numParticles, zOrder, x, y, opts){
+        var handler = new BasicParticlesHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary);
+
         addHandlers(handler);
         return handler;
     }
     
-    function requestBasicParticleEffect(shouldDraw, gl, numParticles, zOrder, x, y){
-        var handler = new BasicParticlesHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, ShaderLibrary);
+    function requestLinkHandler(shouldDraw, gl, zOrder, x1, y1, x2, y2, opts){
+        var handler = new LinkHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x1, y1, x2, y2, opts, ShaderLibrary);
 
-        addHandlers(handler);
+        addHandlers(handler.getAllHandlers());
         return handler;
     }
     
@@ -225,7 +232,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestTriangularTargetEffect: requestTriangularTargetEffect,
         requestFourPointLightningEffect: requestFourPointLightningEffect,
         requestEnemySpikeEffect: requestEnemySpikeEffect,
-        requestBasicParticleEffect: requestBasicParticleEffect
+        requestBasicParticleEffect: requestBasicParticleEffect,
+        requestLinkHandler: requestLinkHandler
     };
     
 });
