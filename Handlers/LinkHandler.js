@@ -1,10 +1,4 @@
-define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Handlers/BasicParticlesHandler'], function(EntityHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler){
-    
-    function getNormalized(vector){
-        var magnitude = Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
-        return [vector[0] / magnitude, vector[1] / magnitude];
-    }
-    
+define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Handlers/BasicParticlesHandler', 'Custom Utility/Vector'], function(EntityHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler, Vector){
     
     function LinkHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x1, y1, x2, y2, opts, ShaderLibrary){        
         this._uniforms = {
@@ -42,7 +36,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LINK); 
         
-        this._padding = canvasHeight * 0.02;
+        this._padding = canvasHeight * 0.01;
         this.setCoords(x1, y1, x2, y2);
     }
     
@@ -65,23 +59,21 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     }
 
     LinkHandler.prototype._generateVerticesFromCurrentState = function(){
-        var startCoord = this._uniforms.startCoord.value;
-        var endCoord = this._uniforms.endCoord.value;
-        var padding = this._padding;
+        var startCoord = new Vector(this._uniforms.startCoord.value[0], this._uniforms.startCoord.value[1]);
+        var endCoord = new Vector(this._uniforms.endCoord.value[0], this._uniforms.endCoord.value[1]);
         
-        var dirVec = getNormalized([endCoord[0] - startCoord[0], endCoord[1] - startCoord[1]]);
-        dirVec = [dirVec[0] * padding, dirVec[1] * padding];
-        var negDirVec = [dirVec[0] * -1, dirVec[1] * -1];
-        var perp1 = [-dirVec[1], dirVec[0]];
-        var perp2 = [dirVec[1], -dirVec[0]];
+        var dirVec = (endCoord.subtractFrom(startCoord)).multiplyWithScalar(this._padding);
+        var negDirVec = dirVec.multiplyWithScalar(-1);
+        var perp1 = new Vector(-dirVec.getY(), dirVec.getX());
+        var perp2 = new Vector(dirVec.getY(), -dirVec.getX());
         
-        var firstVertex = [startCoord[0] + negDirVec[0] + perp1[0], startCoord[1] + negDirVec[1] + perp1[1]];
-        var secondVertex = [startCoord[0] + negDirVec[0] + perp2[0], startCoord[1] + negDirVec[1] + perp2[1]];
-        var thirdVertex = [endCoord[0] + dirVec[0] + perp1[0], endCoord[1] + dirVec[1] + perp1[1]];
-        var fourthVertex = [endCoord[0] + dirVec[0] + perp2[0], endCoord[1] + dirVec[1] + perp2[1]];
-        
-        var vertices = [firstVertex[0], firstVertex[1], secondVertex[0], secondVertex[1], thirdVertex[0], thirdVertex[1], thirdVertex[0], thirdVertex[1], secondVertex[0], secondVertex[1], fourthVertex[0], fourthVertex[1]];
+        var firstVertex = (startCoord.addTo(negDirVec)).addTo(perp1);
+        var secondVertex = (startCoord.addTo(negDirVec)).addTo(perp2);
+        var thirdVertex = (endCoord.addTo(dirVec)).addTo(perp1);
+        var fourthVertex = (endCoord.addTo(dirVec)).addTo(perp2);
 
+        var vertices = [firstVertex.getX(), firstVertex.getY(), secondVertex.getX(), secondVertex.getY(), thirdVertex.getX(), thirdVertex.getY(), thirdVertex.getX(), thirdVertex.getY(), secondVertex.getX(), secondVertex.getY(), fourthVertex.getX(), fourthVertex.getY()]; 
+        
         //normalize
         for(var i = 0; i < vertices.length-1; i+=2){
             vertices[i] /= this._canvasWidth; 
