@@ -1,10 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getGLTextureToPassInfoFromRGBData', 'Custom Utility/coordsToRGB'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, getGLTextureToPassInfoFromRGBData, coordsToRGB){
     
     function LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, coords, ShaderLibrary, noiseTextureData, coordsSamplerVal){
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
-        
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIGHTNING);
-
         var widthOfCoordsTexture = coordsToRGB(coords, canvasWidth, canvasHeight).length / 3;
         this._uniforms = { 
             iResolution: { 
@@ -55,14 +51,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };
         
-        for(var option in opts){
-            for(var uniform in this._uniforms){
-                if(option === uniform){
-                    this._uniforms[uniform].value = opts[option];
-                }
-            }
-        }
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts); 
         
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIGHTNING);
+       
         //CHANGE AFTER
         this._padding = 0.06 * this._canvasHeight;
         this.setLightningCoords(coords, gl);        
@@ -98,26 +90,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._addToPath( [width - this._padding, this._padding * 3, width - this._padding, height - this._padding] );
         this._addToPath( [this._padding, height - this._padding, width - (this._padding * 3), height - this._padding] );
         this._addToPath( [this._padding, this._padding * 3, this._padding, height - (this._padding * 3)] );
-    }
-    
-    LightningHandler.prototype.setFluctuation = function(newFluctutation){
-        this._uniforms.fluctuation.value = [newFluctuation];
-    }
-    
-    LightningHandler.prototype.setGlow = function(newGlowFactor){
-        this._uniforms.glowFactor.value = [newGlowFactor];
-    }
-    
-    LightningHandler.prototype.setLineWidth = function(newLineWidth){
-        this._uniforms.lineWidth.value = [newLineWidth];
-    }
-    
-    LightningHandler.prototype.setGlowColor = function(newGlowColor){
-        this._uniforms.glowColor.value = newGlowColor;
-    }
-    
-    LightningHandler.prototype.setBoltColor = function(newBoltColor){
-        this._uniforms.boltColor.value = newBoltColor;
     }
 
     LightningHandler.prototype.setLightningCoords = function(coords, gl){

@@ -1,9 +1,7 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
     function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
-        
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
+       this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
         
         var comboTextInfo = getTextInfo(comboText);
         var firstCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[0]], fontTextureData.width, fontTextureData.height);
@@ -72,14 +70,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 value: [-1, -1, -1, -1]
             },
         };
-        
-        for(var option in opts){
-            for(var uniform in this._uniforms){
-                if(option === uniform){
-                    this._uniforms[uniform].value = opts[option];
-                }
-            }
-        }
+
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);
         
         this._fontTextureWidth = fontTextureData.width;
         this._fontTextureHeight = fontTextureData.height;
@@ -102,11 +94,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         
         //make sure text appears in right spot
         this._setPositionOfChars();
-    }
-    
-    ComboHandler.prototype.update = function(){
-        this._time+=0.1;
-        this._uniforms.iGlobalTime.value[0] = this._time;
     }
     
     ComboHandler.prototype.setCompletion = function(completionVal){
@@ -154,10 +141,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
             this._uniforms.firstCharCoords.value = [firstCharStart[0], firstCharStart[1], firstCharEnd[0], firstCharEnd[1]];
             this._uniforms.secondCharCoords.value = [secondCharStart[0], secondCharStart[1], secondCharEnd[0], secondCharEnd[1]];
         }
-    }
-    
-    ComboHandler.prototype.setTime = function(timeVal){
-        this._uniforms.time.value = [timeVal];
     }
     
     ComboHandler.prototype._getCharCoordsFromTextInfo = function(textInfoForSingleChar, fontTextureWidth, fontTextureHeight){

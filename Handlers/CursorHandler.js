@@ -1,11 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getVerticesNormalized'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, getVerticesNormalized){
     
     function CursorHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, x, y){
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
-        
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.CURSOR);
-        this._padding = 0.03 * canvasHeight;
-        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -29,16 +24,13 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };
         
-        for(var option in opts){
-            for(var uniform in this._uniforms){
-                if(option === uniform){
-                    this._uniforms[uniform].value = opts[option];
-                }
-            }
-        }
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);   
+        
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.CURSOR);
+        this._padding = 0.03 * canvasHeight;
         
         this.setPosition(x, y);
-        this.setRadius(this._uniforms.radius.value[0]);
+        this._setVerticesFromCurrState();   
     }
     
     //inherit from Handler
@@ -58,11 +50,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         }else{
             this._uniforms.clicked.value[0] = 0.0;
         }
-    }
-    
-    CursorHandler.prototype.setRadius = function(newRadius){
-        this._uniforms.radius.value[0] = newRadius;
-        this._setVerticesFromCurrState();              
     }
     
     CursorHandler.prototype._setVerticesFromCurrState = function(){

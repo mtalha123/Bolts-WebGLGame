@@ -1,12 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer){
     
-    function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary){
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);
-        
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);
-        this._numParticles = numParticles;
-        this._time = 1;
-        
+    function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -46,13 +40,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };  
         
-        for(var option in opts){
-            for(var uniform in this._uniforms){
-                if(option === uniform){
-                    this._uniforms[uniform].value = opts[option];
-                }
-            }
-        }
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);
+        
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);
+        this._numParticles = numParticles;
         
         var randVals = [];
         for(var i = 0; i < numParticles; i++){

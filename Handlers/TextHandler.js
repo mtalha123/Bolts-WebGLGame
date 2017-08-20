@@ -1,10 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
     function TextHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, fontTextureData, x, y, text){
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight);   
-        
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TEXT);
-
         this._uniforms = {
             fontTexture: {
                 type: "sampler2D",
@@ -17,13 +13,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };
         
-        for(var option in opts){
-            for(var uniform in this._uniforms){
-                if(option === uniform){
-                    this._uniforms[uniform].value = opts[option];
-                }
-            }
-        }
+        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);   
+        
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TEXT);
         
         this._attributes.texCoord = [];
         this._width = 0, this._x = x, this._y = y;
@@ -118,10 +110,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             textCursorX += xAdvance;
             this._width += (xAdvance * this._canvasWidth);
         }
-    }
-    
-    TextHandler.prototype.setTextColor = function(r, g, b){
-        this._uniforms.textColor.value = [r, g, b];
     }
     
     TextHandler.prototype.getWidth = function(){

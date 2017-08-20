@@ -112,7 +112,7 @@ void main()
     
     if(distToCenter > (radiusFromTextUV)){
         if(!(uvAngle <= (PI / 2.0) && uvAngle >= angleOfCompletion)){
-            if(anotherApproach(uv, centerUV, radiusFromTextUV, radiusOfEdgeEffectUV, spreadOfEdgeEffectUV, iGlobalTime, effectTexture) == 0.0){
+            if(anotherApproach(uv, centerUV, radiusFromTextUV, radiusOfEdgeEffectUV, spreadOfEdgeEffectUV, iGlobalTime / 10.0, effectTexture) == 0.0){
     	       color = vec4(1.0, 0.0, 0.4, 1.0); 
             }   
         }

@@ -1,20 +1,26 @@
 define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords'], function(getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords){ 
-    function Handler(shouldDraw, x, y, zOrder, canvasWidth, canvasHeight){
+    function Handler(shouldDraw, x, y, zOrder, canvasWidth, canvasHeight, opts){
         this._shouldDraw = shouldDraw;
         this._x = x;
         this._y = y;
         this._width = 300;
         this._height = 300;
-        this._uniforms = {};
         this._attributes = {
             vertexPosition: []
         };
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
-        this._shaderProgram = null;
         this._zOrder = zOrder;
         this._handlers = [this];
-        this._time = 1;
+        this._time = 1;      
+        
+        for(var option in opts){
+            for(var uniform in this._uniforms){
+                if(option === uniform){
+                    this._uniforms[uniform].value = opts[option];
+                }
+            }
+        }
     }
     
     Handler.prototype.shouldDraw = function(shouldDrawOrNot){
