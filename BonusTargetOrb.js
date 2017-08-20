@@ -39,11 +39,6 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions'], fu
         
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, x, y, {radius: [p_radius]});
         
-        this._currentMovementAngleInDeg = null;
-        this._speed = null;
-        this._xUnits = null;
-        this._yUnits = null;
-        
         this._normalState = new BonusTargetOrbNormalState(this);
         this._destructionState = new BonusTargetOrbDestructionState(this._handler);
         this._currentState = this._normalState;
