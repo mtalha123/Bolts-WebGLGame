@@ -1,4 +1,4 @@
-define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Link'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, Link){
+define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Link'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, Link){
     
     function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
         EntityController.call(this, 0, maxEntitiesToSpawn, 0); 

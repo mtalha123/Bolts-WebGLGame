@@ -1,22 +1,21 @@
-define(['TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(TriangularTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
+define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController){
     
-    function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+    function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
         EntityController.call(this, 0, maxEntitiesToSpawn, 10); 
-        this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
-        this._spawnAttemptDelay = 5000;
+        this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new TriangularTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
+            this._entitiesPool[i] = new FourPointTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
         }
         
         this._spawnTimer.start();
     }
     
     //inherit from EntityController
-    TriangularTargetController.prototype = Object.create(EntityController.prototype);
-    TriangularTargetController.prototype.constructor = TriangularTargetController;
+    FourPointTargetController.prototype = Object.create(EntityController.prototype);
+    FourPointTargetController.prototype.constructor = FourPointTargetController;
     
-    TriangularTargetController.prototype._spawn = function(){
+    FourPointTargetController.prototype._spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         var movementAngle;
@@ -60,30 +59,23 @@ define(['TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Rand
         EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
-    TriangularTargetController.prototype.receiveEvent = function(eventInfo){
+    FourPointTargetController.prototype.receiveEvent = function(eventInfo){
         EntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 4:
-                    this._chanceOfSpawning = 20;
-                    break;
-                case 5:
-                    this._chanceOfSpawning = 40;
-                    break;
                 case 6:
-                    this._chanceOfSpawning = 50;
+                    this._chanceOfSpawning = 10;
                     break;
                 case 7:
-                    this._chanceOfSpawning = 70;
+                    this._chanceOfSpawning = 20;
                     break;
                 case 8:
                     this._chanceOfSpawning = 50;
                     break;
-                
             }
         }
     }
     
-    return TriangularTargetController;
+    return FourPointTargetController;
 });

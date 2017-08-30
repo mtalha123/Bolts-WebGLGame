@@ -1,84 +1,80 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance){
+define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance){
 
-    function BasicTargetDestructionState(targetHandler){
+    function BonusTargetBubblyOrbDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
     }
     
     //inherit from EntityDestructionState
-    BasicTargetDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
-    BasicTargetDestructionState.prototype.constructor = BasicTargetDestructionState; 
+    BonusTargetBubblyOrbDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
+    BonusTargetBubblyOrbDestructionState.prototype.constructor = BonusTargetBubblyOrbDestructionState; 
     
     
-    function BasicTargetNormalState(target){
+    function BonusTargetBubblyOrbNormalState(target){
         Entity.EntityNormalState.call(this, target);
     }
     
     //inherit from EntityNormalState
-    BasicTargetNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
-    BasicTargetNormalState.prototype.constructor = BasicTargetNormalState;
+    BonusTargetBubblyOrbNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
+    BonusTargetBubblyOrbNormalState.prototype.constructor = BonusTargetBubblyOrbNormalState;
     
     
-    function BasicTarget(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
+    function BonusTargetBubblyOrb(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
         Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(x, y);
         this._hitBoxRegions.addRegion(x, y, p_radius);
         
         this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
-        this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  
+        this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, x, y, {});
         
-        this._normalState = new BasicTargetNormalState(this);
-        this._destructionState = new BasicTargetDestructionState(this._handler);
+        this._normalState = new BonusTargetBubblyOrbNormalState(this);
+        this._destructionState = new BonusTargetBubblyOrbDestructionState(this._handler);
         this._currentState = this._normalState;
         
         this._targetDistCovered = 0;
         this._startXInTarget = undefined;
         this._startYInTargetInTarget = undefined;
         this._targetAreaToAchieve = 228;
+        
+        this._charge = 0;
     }
     
     //inherit from Entity
-    BasicTarget.prototype = Object.create(Entity.Entity.prototype);
-    BasicTarget.prototype.constructor = BasicTarget;
+    BonusTargetBubblyOrb.prototype = Object.create(Entity.Entity.prototype);
+    BonusTargetBubblyOrb.prototype.constructor = BonusTargetBubblyOrb;
     
-    BasicTarget.prototype.getRadius = function(){
+    BonusTargetBubblyOrb.prototype.getRadius = function(){
         return this._radius;
     }
     
-    BasicTarget.prototype.setPosition = function(newX, newY){
+    BonusTargetBubblyOrb.prototype.setPosition = function(newX, newY){
         Entity.Entity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
-    BasicTarget.prototype._setPositionWithInterpolation = function(newX, newY){
+    BonusTargetBubblyOrb.prototype._setPositionWithInterpolation = function(newX, newY){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
-    BasicTarget.prototype.reset = function(){
+    BonusTargetBubblyOrb.prototype.setAchievementPercentage = function(percent){
+        this._handler.increaseGlow(percent / 3.0);
+    }
+    
+    BonusTargetBubblyOrb.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
         this._targetDistCovered = 0;
         this._startXInTarget = undefined;
         this._startYInTarget = undefined;
     }
     
-    BasicTarget.prototype.setAchievementPercentage = function(percent){
-        if(percent >= 0.75){
-            this._handler.setNumBolts(7);
-        }else if(percent >= 0.50){
-            this._handler.setNumBolts(6);
-        }
-    
-        this._handler.increaseLgGlowFactor(percent / 2.0);
-    }
-    
-    BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(mouseInputObj.type === "moquse_down" || mouseInputObj.type === "mouse_held_down"){
+    BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
+        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
             var mouseX = mouseInputObj.x;
             var mouseY = mouseInputObj.y;
-            
+        
             if(this.areCoordsInHitRegions(mouseX, mouseY)){
                 if(!(this._startXInTarget && this._startYInTarget)){
                     this._startXInTarget = mouseX - this._x;;
@@ -95,6 +91,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
                 this._startYInTarget = mouseYRelativeToTarget;
 
                 if(this._targetDistCovered >= this._targetAreaToAchieve){
+                   // this._targetDistCovered = 0;
                     Entity.Entity.prototype.destroyAndReset.call(this, callback);
                     return true;
                 }
@@ -107,10 +104,10 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         return false;
     }
     
-    BasicTarget.prototype.setAchievementParameters = function(targetAreaToAchieve){
+    BonusTargetBubblyOrb.prototype.setAchievementParameters = function(targetAreaToAchieve){
         this._targetAreaToAchieve = targetAreaToAchieve;
     }
     
-    return BasicTarget;
+    return BonusTargetBubblyOrb;
     
 });

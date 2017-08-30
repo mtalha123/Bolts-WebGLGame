@@ -1,4 +1,4 @@
-define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Custom Utility/distance'], function(SpikeEnemy, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
+define(['Entities/SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/distance'], function(SpikeEnemy, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
     
     function SpikeEnemyController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
         EntityController.call(this, 100, maxEntitiesToSpawn, 10); 

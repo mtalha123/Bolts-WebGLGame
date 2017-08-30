@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions'], function(SynchronizedTimers, Entity, CircularHitRegions){
+define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions'], function(SynchronizedTimers, Entity, CircularHitRegions){
 
     function BonusTargetOrbDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);

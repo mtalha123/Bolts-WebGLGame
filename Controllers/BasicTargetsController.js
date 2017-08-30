@@ -1,4 +1,4 @@
-define(['BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
+define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
         EntityController.call(this, 100, maxEntitesToSpawn, 10); 

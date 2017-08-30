@@ -1,4 +1,4 @@
-define(['EntityController'], function(EntityController){
+define([], function(){
 
     function EntityDestructionState(handler){
         this._handler = handler;

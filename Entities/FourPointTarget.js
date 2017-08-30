@@ -1,23 +1,23 @@
-define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsEntity'], function(SynchronizedTimers, Entity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsEntity){
+define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsEntity'], function(SynchronizedTimers, Entity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsEntity){
 
-    function TriangularTargetDestructionState(targetHandler){
+    function FourPointTargetDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
     }
     
     //inherit from EntityDestructionState
-    TriangularTargetDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
-    TriangularTargetDestructionState.prototype.constructor = TriangularTargetDestructionState; 
+    FourPointTargetDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
+    FourPointTargetDestructionState.prototype.constructor = FourPointTargetDestructionState; 
     
     
-    function TriangularTargetNormalState(target){
+    function FourPointTargetNormalState(target){
         Entity.EntityNormalState.call(this, target);
     }
     
     //inherit from EntityNormalState
-    TriangularTargetNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
-    TriangularTargetNormalState.prototype.constructor = TriangularTargetNormalState;
+    FourPointTargetNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
+    FourPointTargetNormalState.prototype.constructor = FourPointTargetNormalState;
     
-    TriangularTargetNormalState.prototype.update = function(){
+    FourPointTargetNormalState.prototype.update = function(){
         Entity.EntityNormalState.prototype.update.call(this);
         
         this._entity._rotationAngle+=0.05;
@@ -26,7 +26,7 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
     }
     
     
-    function TriangularTarget(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
+    function FourPointTarget(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
         Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._id = id;       
         this._x = this._prevX = x; 
@@ -34,48 +34,47 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
         
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(x, y);
-        var firstRegion = new Vector(x + p_radius, y);
-        var secondRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI - (Math.PI/3), new Vector(x, y));
-        var thirdRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI + (Math.PI/3), new Vector(x, y));
-        this._hitBoxRegions.addRegion(firstRegion.getX(), firstRegion.getY(), p_radius / 3);
-        this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3);
-        this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3);
+        this._hitBoxRegions.addRegion(x + p_radius, y, p_radius / 2.5);
+        this._hitBoxRegions.addRegion(x, y + p_radius, p_radius / 2.5);
+        this._hitBoxRegions.addRegion(x - p_radius, y, p_radius / 2.5);
+        this._hitBoxRegions.addRegion(x, y - p_radius, p_radius / 2.5);
         
         this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
-        this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, x, y, {radius: [p_radius]});
+        this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, x, y, {radius: [p_radius]});
         
-        this._normalState = new TriangularTargetNormalState(this);
-        this._destructionState = new TriangularTargetDestructionState(this._handler);
+        this._normalState = new FourPointTargetNormalState(this);
+        this._destructionState = new FourPointTargetDestructionState(this._handler);
         this._currentState = this._normalState;
         
         this._rotationAngle = 0;
         this._numGuardsActivated = 0;
-        this._guardPrefs = [0, 0, 0];
+        this._guardPrefs = [0, 0, 0, 0];
     }
     
     //inherit from Entity
-    TriangularTarget.prototype = Object.create(Entity.Entity.prototype);
-    TriangularTarget.prototype.constructor = TriangularTarget;
+    FourPointTarget.prototype = Object.create(Entity.Entity.prototype);
+    FourPointTarget.prototype.constructor = FourPointTarget;
     
-    TriangularTarget.prototype.setPosition = function(newX, newY){
+    FourPointTarget.prototype.setPosition = function(newX, newY){
         Entity.Entity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
-    TriangularTarget.prototype._setPositionWithInterpolation = function(newX, newY){
+    FourPointTarget.prototype._setPositionWithInterpolation = function(newX, newY){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
-    TriangularTarget.prototype.reset = function(){
+    FourPointTarget.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
     }
     
-    TriangularTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
+    
+    FourPointTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
             var mouseX = mouseInputObj.x;
             var mouseY = mouseInputObj.y;
@@ -83,9 +82,9 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
             var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
             if(possibleHitBox){
                 this._numGuardsActivated++;
-                if(this._numGuardsActivated === 3){
+                if(this._numGuardsActivated === 4){
                     this._numGuardsActivated = 0;
-                    this._guardPrefs = [0, 0, 0];
+                    this._guardPrefs = [0, 0, 0, 0];
                     this._handler.setGuardPrefs(this._guardPrefs);
                     this.destroyAndReset(callback);
                     return true;   
@@ -101,11 +100,11 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
         return false;
     }
     
-    TriangularTarget.prototype.spawn = function(callback){
+    FourPointTarget.prototype.spawn = function(callback){
         Entity.Entity.prototype.spawn.call(this, callback);
         this._hitBoxRegions.activateAllRegions();
     }
     
-    return TriangularTarget;
+    return FourPointTarget;
     
 });
