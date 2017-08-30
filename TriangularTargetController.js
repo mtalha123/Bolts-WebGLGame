@@ -1,10 +1,11 @@
 define(['TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(TriangularTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
-    function TriangularTargetController(gl, appMetaData, EffectsManager){
-        EntityController.EntityController.call(this); 
+    function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+        EntityController.call(this, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
+        this._spawnAttemptDelay = 5000;
 
-        for(var i = 0; i < 2; i++){
+        for(var i = 0; i < maxEntitiesToSpawn; i++){
             this._entitiesPool[i] = new TriangularTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
         }
         
@@ -12,7 +13,7 @@ define(['TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Rand
     }
     
     //inherit from EntityController
-    TriangularTargetController.prototype = Object.create(EntityController.EntityController.prototype);
+    TriangularTargetController.prototype = Object.create(EntityController.prototype);
     TriangularTargetController.prototype.constructor = TriangularTargetController;
     
     TriangularTargetController.prototype._spawn = function(){
@@ -52,12 +53,36 @@ define(['TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Rand
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
+            newlyActivatedTarget.setSpeed(this._speed);
             newlyActivatedTarget.setMovementAngle(movementAngle);
-        });
+        }.bind(this));
+        
+        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
-    TriangularTargetController.prototype.recieveEvent = function(eventInfo){
-        EntityController.EntityController.prototype.recieveEvent.call(this, eventInfo);
+    TriangularTargetController.prototype.receiveEvent = function(eventInfo){
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 4:
+                    this._chanceOfSpawning = 20;
+                    break;
+                case 5:
+                    this._chanceOfSpawning = 40;
+                    break;
+                case 6:
+                    this._chanceOfSpawning = 50;
+                    break;
+                case 7:
+                    this._chanceOfSpawning = 70;
+                    break;
+                case 8:
+                    this._chanceOfSpawning = 50;
+                    break;
+                
+            }
+        }
     }
     
     return TriangularTargetController;

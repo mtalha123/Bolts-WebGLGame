@@ -54,6 +54,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         }        
         this._attributes.randVals = randVals;
         
+        this.additiveBlending = true;
+        
+        this._callback = undefined;
+        
         this.setPosition(x, y);
     }   
     
@@ -63,17 +67,29 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     
     
     BasicParticlesHandler.prototype.update = function(){
-        if(this._time <= this._uniforms.maxLifetime.value[0]){
+        if((this._time <= this._uniforms.maxLifetime.value[0])){
             this._time++;
             this._uniforms.iGlobalTime.value[0] = this._time;
         }else{
             this._shouldDraw = false;
+//            this._time = 1;
+            if(this._callback){
+                this._callback();
+                this._callback = undefined;
+            }
         }   
     }
     
-    BasicParticlesHandler.prototype.doEffect = function(){
+    BasicParticlesHandler.prototype.doEffect = function(optCallback){
+        this._callback = optCallback;
         this._time = 1;
         this._shouldDraw = true;
+    }
+    
+    BasicParticlesHandler.prototype.reset = function(){
+        this._callback = undefined;
+        this._time = 1;
+        this._shouldDraw = false;
     }
     
     

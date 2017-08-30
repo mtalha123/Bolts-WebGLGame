@@ -30,10 +30,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "vec3",
                 value: [1.0, 1.0, 0.0]
             },
-            glowColor: {
-                type: "vec3",
-                value: [1.0, 1.0, 0.7]
-            },
             center: {
                 type: "vec2",
                 value: [960.0, 475.0]
@@ -53,6 +49,14 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             completion: {
                 type: "float",
                 value: [1.0]
+            },
+            rotationBool: {
+                type: "float",
+                value: [0.0]
+            },
+            spaceInCenterBool: {
+                type: "float",
+                value: [0.0]
             },
             noise: {
                 type: "sampler2D",

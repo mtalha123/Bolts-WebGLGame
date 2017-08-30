@@ -1,10 +1,10 @@
 define(['FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController){
     
-    function FourPointTargetController(gl, appMetaData, EffectsManager){
-        EntityController.EntityController.call(this); 
+    function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+        EntityController.call(this, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
 
-        for(var i = 0; i < 2; i++){
+        for(var i = 0; i < maxEntitiesToSpawn; i++){
             this._entitiesPool[i] = new FourPointTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
         }
         
@@ -12,7 +12,7 @@ define(['FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Rando
     }
     
     //inherit from EntityController
-    FourPointTargetController.prototype = Object.create(EntityController.EntityController.prototype);
+    FourPointTargetController.prototype = Object.create(EntityController.prototype);
     FourPointTargetController.prototype.constructor = FourPointTargetController;
     
     FourPointTargetController.prototype._spawn = function(){
@@ -52,12 +52,29 @@ define(['FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Rando
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
+            newlyActivatedTarget.setSpeed(this._speed);
             newlyActivatedTarget.setMovementAngle(movementAngle);
-        });
+        }.bind(this));
+        
+        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
-    FourPointTargetController.prototype.recieveEvent = function(eventInfo){
-        EntityController.EntityController.prototype.recieveEvent.call(this, eventInfo);
+    FourPointTargetController.prototype.receiveEvent = function(eventInfo){
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 6:
+                    this._chanceOfSpawning = 10;
+                    break;
+                case 7:
+                    this._chanceOfSpawning = 20;
+                    break;
+                case 8:
+                    this._chanceOfSpawning = 50;
+                    break;
+            }
+        }
     }
     
     return FourPointTargetController;

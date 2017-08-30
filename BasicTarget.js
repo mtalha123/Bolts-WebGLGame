@@ -57,6 +57,13 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
+    BasicTarget.prototype.reset = function(){
+        Entity.Entity.prototype.reset.call(this);
+        this._targetDistCovered = 0;
+        this._startXInTarget = undefined;
+        this._startYInTarget = undefined;
+    }
+    
     BasicTarget.prototype.setAchievementPercentage = function(percent){
         if(percent >= 0.75){
             this._handler.setNumBolts(7);
@@ -88,7 +95,6 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
                 this._startYInTarget = mouseYRelativeToTarget;
 
                 if(this._targetDistCovered >= this._targetAreaToAchieve){
-                    this._targetDistCovered = 0;
                     Entity.Entity.prototype.destroyAndReset.call(this, callback);
                     return true;
                 }

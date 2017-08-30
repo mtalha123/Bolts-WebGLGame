@@ -3,18 +3,18 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     var x = 0, y = 0; 
     var mouseHeldDown = false;  
     var radius = 20;
-    EventSystem.register(recieveEvent, "combo_level_increased");
-    EventSystem.register(recieveEvent, "combo_level_reset");
+    EventSystem.register(receiveEvent, "combo_level_increased");
+    EventSystem.register(receiveEvent, "combo_level_reset");
     var handler = null;
     var appMetaData;
     
     function initialize(gl, p_appMetaData, EffectsManager){
         appMetaData = p_appMetaData;
-        handler = EffectsManager.requestCursorEffect(true, 100, {}, gl, 100, 100);
-        handler.shouldDraw(true);
+        handler = EffectsManager.requestCursorEffect(false, 100, {}, gl, 100, 100);
     }
     
     function draw(interpolation){
+        handler.shouldDraw(true);
         if(mouseHeldDown){
             handler.setClicked(true);
         }else{
@@ -49,7 +49,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
         mouseHeldDown = false;
     }
     
-    function recieveEvent(eventInfo){
+    function receiveEvent(eventInfo){
         switch(eventInfo.eventData.comboLevel){
             case 0:
                 radius = 20;

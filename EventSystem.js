@@ -18,10 +18,15 @@ define([], function(){
         S_game_update: [],
         border_collision: [],  
         entity_collision: [],    
+        entity_spawned: [],
         entity_destroyed: [],
         score_achieved: [],
         combo_level_increased: [],
-        combo_level_reset: []
+        combo_level_reset: [],
+        game_lost: [],
+        game_restart: [],
+        game_level_up: [],
+        lightning_stolen: []
     };
     
     
@@ -46,8 +51,7 @@ define([], function(){
         currentEventsQueue.push({eventType: eventType, eventData: eventData});
     }
     
-    function update(){
-        
+    function update(){        
         var eventBeingProcessed = currentEventsQueue.shift();
 
         while(eventBeingProcessed){

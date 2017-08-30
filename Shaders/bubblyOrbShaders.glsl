@@ -86,6 +86,7 @@ uniform vec2 center;
 uniform float radius;
 uniform float particleGlowFactor;
 uniform float circleGlowFactor;
+uniform float particlesBool;
 uniform sampler2D noise;
 
 void main()
@@ -125,9 +126,11 @@ void main()
     
     color += vec4(0.0, 0.1, 0.7, 1.0) * (1.0 - smoothstep(distance(center, lightningPoint) - 0.001, distance(center, lightningPoint), distance(uv, center))); 
     
-    float distFromParticle = getDistToParticle(uv, center, radius / 2.0, iGlobalTime);    
-    float particleMult = (1.0 / distFromParticle) * particleGlowFactor;
-    color += vec4( (particleMult * vec3(1.0, 1.0, 0.0)) * 0.8, particleMult);
+    if(particlesBool == 1.0){
+        float distFromParticle = getDistToParticle(uv, center, radius / 2.0, iGlobalTime);    
+        float particleMult = (1.0 / distFromParticle) * particleGlowFactor;
+        color += vec4( (particleMult * vec3(1.0, 1.0, 0.0)) * 0.8, particleMult);
+    }
     
 	gl_FragColor = color;
 }

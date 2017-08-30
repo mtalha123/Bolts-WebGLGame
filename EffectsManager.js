@@ -1,4 +1,4 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler){
     var allHandlers = [];
     
     var ShaderLibrary;
@@ -143,6 +143,20 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
     
+    function requestFullScreenColorHandler(shouldDraw, zOrder){
+        var handler = new FullScreenColorHandler(shouldDraw, zOrder, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), ShaderLibrary);
+
+        addHandlers(handler);
+        return handler;
+    }
+    
+    function requestLifebarHandler(shouldDraw, gl, zOrder, x1, y1, x2, y2, opts){
+        var handler = new LifebarHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x1, y1, x2, y2, opts, ShaderLibrary);
+
+        addHandlers(handler.getAllHandlers());
+        return handler;
+    }
+    
     function getHandlers(){
         var handlersToReturn = [];
         
@@ -233,7 +247,9 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestFourPointLightningEffect: requestFourPointLightningEffect,
         requestEnemySpikeEffect: requestEnemySpikeEffect,
         requestBasicParticleEffect: requestBasicParticleEffect,
-        requestLinkHandler: requestLinkHandler
+        requestLinkHandler: requestLinkHandler,
+        requestFullScreenColorHandler: requestFullScreenColorHandler,
+        requestLifebarHandler: requestLifebarHandler,
     };
     
 });

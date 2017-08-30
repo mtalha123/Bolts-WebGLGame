@@ -42,6 +42,8 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions'], fu
         this._normalState = new BonusTargetOrbNormalState(this);
         this._destructionState = new BonusTargetOrbDestructionState(this._handler);
         this._currentState = this._normalState;
+        
+        this._charge = 0;
     }
     
     //inherit from Entity

@@ -35,6 +35,8 @@ uniform float radius;
 uniform float angle;
 uniform vec3 guardPref;
 uniform float lgGlowFactor;
+uniform float lgBool;
+uniform float autoRotationBool;
 uniform sampler2D noise;
 
 void main()
@@ -52,6 +54,10 @@ void main()
     uv.x *= aspectRatio;
     center.x *= aspectRatio;
     
+    float angle = angle;
+    if(autoRotationBool == 1.0){
+        angle = iGlobalTime * -0.05;
+    }
     uv = rotateCoord(uv, -angle, center);
     
     float angleMultipleDeg = 360.0 / 3.0;
@@ -77,7 +83,7 @@ void main()
     color.a = m;
     
     //handle lightning
-    if(distance(uv, center) <= radius){
+    if(distance(uv, center) <= radius && lgBool == 1.0){
 //        float distToLg = genLightningAndGetDist(uv, center, rotatedCoord, 0.0002, 0.008, 2.0, noise, iGlobalTime, iResolution);
 //        float m2 = (1.0 / distToLg) * 0.003;
 //        m2 = pow(m2, 1.3);

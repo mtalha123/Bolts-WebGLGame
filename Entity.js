@@ -1,25 +1,17 @@
-define(['EntityController', 'SynchronizedTimers'], function(EntityController, SynchronizedTimers){
+define(['EntityController'], function(EntityController){
 
     function EntityDestructionState(handler){
         this._handler = handler;
-        this._timer = SynchronizedTimers.getTimer();
-        this._callback = null;
     }
     
     EntityDestructionState.prototype.prepareForDrawing = function(){
-        if(this._timer.getTime() >= 2000){
-            this._timer.reset();
-            this._callback();
-        }
         this._handler.update();
     }
 
     EntityDestructionState.prototype.update = function(){ }
     
     EntityDestructionState.prototype.startDestruction = function(callback, x, y){
-        this._timer.start();
-        this._handler.doDestroyEffect(x, y);
-        this._callback = callback;
+        this._handler.doDestroyEffect(x, y, callback);
     }
     
     
@@ -45,6 +37,7 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         this._hitBoxRegions = null;
+        this._charge = 1;
         
         this._physicsEntity = null;//new CircleEntity("dynamic", x, y, canvasHeight, p_radius + (0.02 * canvasHeight), 1, 0, 1);
         
@@ -110,6 +103,12 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         callback();
     }
     
+    Entity.prototype.reset = function(){
+        this._handler.resetProperties();
+        this._handler.shouldDraw(false);
+        this._currentState = this._normalState;
+    }
+    
     Entity.prototype.setAchievementPercentage = function(percent){
         //override
     }
@@ -118,8 +117,7 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
         this._currentState = this._destructionState;
         
         this._currentState.startDestruction(function(){
-            this._handler.resetProperties();
-            this._currentState = this._normalState;
+            this.reset();
             callback();
         }.bind(this), this._x, this._y);
     }
@@ -130,6 +128,14 @@ define(['EntityController', 'SynchronizedTimers'], function(EntityController, Sy
     
     Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(){
         //override
+    }
+    
+    Entity.prototype.getCharge = function(){
+        return this._charge;
+    }
+    
+    Entity.prototype.setSpeed = function(newSpeed){
+        this._speed = newSpeed;
     }
     
     return {

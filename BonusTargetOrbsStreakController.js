@@ -1,12 +1,13 @@
 define(['BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
-    function BonusTargetOrbsStreakController(gl, appMetaData, EffectsManager){
-        EntityController.EntityController.call(this); 
+    function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+        EntityController.call(this, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
+        this._spawnAttemptDelay = 5000;
         
-        for(var i = 0; i < 2; i++){
+        for(var i = 0; i < maxEntitiesToSpawn; i++){
             this._entitiesPool[i] = new BonusTargetOrbStreak(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 30, 10, EffectsManager);
         }
         
@@ -14,7 +15,7 @@ define(['BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/
     }
     
     //inherit from EntityController
-    BonusTargetOrbsStreakController.prototype = Object.create(EntityController.EntityController.prototype);
+    BonusTargetOrbsStreakController.prototype = Object.create(EntityController.prototype);
     BonusTargetOrbsStreakController.prototype.constructor = BonusTargetOrbsStreakController;
     
     BonusTargetOrbsStreakController.prototype._spawn = function(){
@@ -30,12 +31,15 @@ define(['BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
+            newlyActivatedTarget.setSpeed(this._speed);
             newlyActivatedTarget.setMovementAngle(movementAngle);
-        });
+        }.bind(this));
+        
+        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
-    BonusTargetOrbsStreakController.prototype.recieveEvent = function(eventInfo){
-        EntityController.EntityController.prototype.recieveEvent.call(this, eventInfo);
+    BonusTargetOrbsStreakController.prototype.receiveEvent = function(eventInfo){
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "combo_level_increased"){
             this._targetAreaToAchieve -= this._areaToAchieveReductionAmount;
@@ -43,6 +47,18 @@ define(['BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/
         }else if(eventInfo.eventType === "combo_level_reset"){
             this._targetAreaToAchieve = this._targetRadius * 4;
             this._setAchievementParamtersForAllActiveTargets();
+        }else if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 4:
+                    this._chanceOfSpawning = 20;
+                    break;
+                case 5:
+                    this._chanceOfSpawning = 35;
+                    break;
+                case 6:
+                    this._chanceOfSpawning = 45;
+                    break;
+            }
         }
     }
     

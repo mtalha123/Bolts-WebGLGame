@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.14:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.18:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -23,7 +23,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor', 'BasicTargetsController', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ComboSystem', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'Background', 'Handlers/BasicParticlesHandler', 'BonusTargetOrbsController', 'BonusTargetOrbsStreakController', 'BonusTargetBubblyOrbsController', 'TriangularTargetController', 'FourPointTargetController', 'SpikeEnemyController'], function(Timer, FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ComboSystem, ShaderLibrary, EffectsManager, appMetaData, AssetManager, Background, BasicParticlesHandler, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -35,8 +35,8 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor'
     var canvas = document.getElementById("canvas");
     
     //innerWidth and innerHeight are the width and height of the window without toolbars/scrollbars (i.e. content on page)
-    var canvasWidth = canvas.width = window.innerWidth;
-    var canvasHeight = canvas.height = window.innerHeight;
+    var canvasWidth = canvas.width = 1920;//window.innerWidth;
+    var canvasHeight = canvas.height = 950;//window.innerHeight;
     
     //get context of main canvas and store in variable "context"
     //var context = canvas.getContext("2d");
@@ -44,9 +44,12 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor'
     if(!gl){
         alert("No WebGL enabled.");
     }
+    
+    var context = (document.getElementById("2dCanvas")).getContext("2d");
+    context.canvas.width = canvasWidth;
+    context.canvas.height = canvasHeight;
 //-------------------------------------------------------------------------------------
     
-    var fpsCounter = Object.create(FPSCounter);
     var tickTimer = new Timer();
     
     //although there are 25 ticks that are supposed to happen, this variable ROUGHLY monitors those updates in case they were ever to drop
@@ -74,78 +77,65 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor'
     
     var updateCounter = 0;
     
-    var fpsHandler = null;
-    
     var initializationDone = false;
     
-    //testing shaderprocessor module
-    var handler = null
+    LoadingState.initialize(context);
+    var currentState = LoadingState;
+    currentState.draw();
     
-    var basicTargetsController;
-    var bonusTargetOrbsController;
-    var bonusTargetOrbsStreakController;
-    var bonusTargetOrbsStreakController;
-    var bonusTargetBubblyOrbsController;
-    var triangularTargetController;
-    var fourPointTargetController;
-    var spikeEnemyController;
+    var windowFocused = true;
     
     function gameLoop(){
-        if(NetworkManager.connectedToServer() && initializationDone){
-            //set to 0 each time game loop runs so that it can be utilized for the next set of updates
-            loops = 0;
-            
-            tickTimer.start();
-
-            //variable to hold currentTime so references to it in multiple places gives same value as opposed to using Date.now()
-            var currentTime = Date.now();
-            
-            //update loop
-            while(currentTime > nextTick && loops < maxFrameSkip){
-                tickCounter+=1;
-                var currentTickTime = nextTick;
-                update(currentTickTime);
-                nextTick += tickTimeMillis;
-                loops++;
-                updateCounter++;
-                
-                var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
-                
-                if(loops > 1){
-                    console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
-                }
-            }
-
-            interpolation = ( (Date.now() + tickTimeMillis) - nextTick ) / ( tickTimeMillis );
-
-            if(interpolation < 0){
-                interpolation = 0;
-            }
+//        if(!initializationDone){
+//            LoadingState.draw();
+//        }
         
-            //the time in the previous second's calculation of the TPS that went over into this second is accounted for
-            //in the condition below
-            if(tickTimer.getTime() >= (1000 - offsetTime)){
-                testTicksPerSecond = tickCounter;
-                tickCounter = 0;
+        if(NetworkManager.connectedToServer() && windowFocused){                
+                //set to 0 each time game loop runs so that it can be utilized for the next set of updates
+                loops = 0;
 
-                if(offsetTime == 0){
-                    offsetTime = tickTimer.getTime() - 1000;
+                tickTimer.start();
+
+                //variable to hold currentTime so references to it in multiple places gives same value as opposed to using Date.now()
+                var currentTime = Date.now();
+
+                //update loop
+                while(currentTime > nextTick && loops < maxFrameSkip){
+                    tickCounter+=1;
+                    var currentTickTime = nextTick;
+                    update();
+                    nextTick += tickTimeMillis;
+                    loops++;
+                    updateCounter++;
+
+                    var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
+
+                    if(loops > 1){
+                        console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
+                    }
                 }
 
-                tickTimer.reset();
-                tickTimer.start();
-            }
+                interpolation = ( (Date.now() + tickTimeMillis) - nextTick ) / ( tickTimeMillis );
 
-            fpsCounter.start();
+                if(interpolation < 0){
+                    interpolation = 0;
+                }
 
-            draw(interpolation);
-            
-            if(!fpsHandler){
-                fpsHandler = EffectsManager.requestTextEffect(true, gl, 1, {}, canvasWidth * 0.9, canvasHeight * 0.88, fpsCounter.getFPS().toString());
-            }
-            fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
+                //the time in the previous second's calculation of the TPS that went over into this second is accounted for
+                //in the condition below
+                if(tickTimer.getTime() >= (1000 - offsetTime)){
+                    testTicksPerSecond = tickCounter;
+                    tickCounter = 0;
 
-            fpsCounter.end();
+                    if(offsetTime == 0){
+                        offsetTime = tickTimer.getTime() - 1000;
+                    }
+
+                    tickTimer.reset();
+                    tickTimer.start();
+                }
+
+                draw(interpolation);
         }
         
         window.requestAnimationFrame(gameLoop);
@@ -156,81 +146,25 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor'
     gameLoop();
     
 
-    function draw(interpolation){
-        Border.draw(interpolation);
-        
-        basicTargetsController.prepareForDrawing(interpolation);
-        bonusTargetOrbsController.prepareForDrawing(interpolation);
-        bonusTargetOrbsStreakController.prepareForDrawing(interpolation);
-        bonusTargetBubblyOrbsController.prepareForDrawing(interpolation);
-        triangularTargetController.prepareForDrawing(interpolation);
-        fourPointTargetController.prepareForDrawing(interpolation);
-        spikeEnemyController.prepareForDrawing(interpolation);
-        Cursor.draw(interpolation);
-
-        ComboSystem.draw();
-        Background.draw();
-        
-        gl.viewport(0, 0, canvasWidth, canvasHeight);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.clearColor(0.65, 0.65, 0.65, 1.0);
-        gl.enable(gl.BLEND);
-        //normal blending
-        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-       // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        
-        var handlers = EffectsManager.getHandlers();
-        var numVerticesDone = 0;
-        for(var i = 0; i < handlers.length; i++){
-            if(handlers[i] instanceof BasicParticlesHandler){
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-            }
-            gl.useProgram(handlers[i]._shaderProgram);
-            EffectsManager.setUpAttributesAndUniforms(gl, handlers[i]);
-            gl.drawArrays(gl.TRIANGLES, 0, handlers[i].getNumVertices());
-           // console.log("num vertices: " + handlers[i].getNumVertices());
-            numVerticesDone += handlers[i].getNumVertices();
-        }       
+    function draw(interpolation){        
+        currentState.draw(gl, interpolation);
     }
     
-    function update(currentTick){        
-        SynchronizedTimers.updateAllTimers(tickTimeMillis);
-        
-        var inputInfo = InputEventsManager.notifyOfCurrentStateAndConsume();
-        
-        if(inputInfo != undefined){
-            inputInfo.updateCounter = updateCounter;
-            NetworkManager.sendToServer("input", inputInfo);
-        }else{
-            NetworkManager.sendToServer("input", "none");
-        }
-        
-        ComboSystem.update();
-        Border.update();
-        basicTargetsController.update();
-        bonusTargetOrbsController.update();
-        bonusTargetOrbsStreakController.update();
-        bonusTargetBubblyOrbsController.update();
-        triangularTargetController.update();
-        fourPointTargetController.update();
-        spikeEnemyController.update();
-        EventSystem.update();
-        
-        
-        //TESTING SHADERPROCESSOR MODULE
-        if(!handler){
-            //handler = EffectsManager.requestComboEffect(gl, 300, 700, 80, 0.1, 3, "2x");
-        }
+    function update(){        
+        SynchronizedTimers.updateAllTimers(tickTimeMillis);        
+        currentState.update();
     }
     
     function networkEventListener(eventType, eventData){
         if(eventType === "S_initialize"){
-            AssetManager.loadAllAssets(gl, function(){
-                //function for each asset loaded. DO LOADING GRAPHICS HERE~~~~
+            AssetManager.loadAllAssets(gl, function(completion){
+                LoadingState.setCompletion(completion);
             }, function(){
                 console.log("All assets loaded.");
                 initializationDone = true;
-                initialize();    
+                initialize();
+                LoadingState.clear();
+                currentState = StartingState;
             });
         }
     }
@@ -239,21 +173,32 @@ require(['Custom Utility/Timer', 'Custom Utility/FPSCounter', 'Border', 'Cursor'
         appMetaData.initialize(canvasWidth, canvasHeight);
         ShaderLibrary.initialize(gl);
         EffectsManager.initialize(ShaderLibrary, appMetaData, AssetManager);
-        Background.initialize(gl, EffectsManager);
         Cursor.initialize(gl, appMetaData, EffectsManager);
-        Border.initialize(gl, appMetaData, AssetManager, EffectsManager);
-        ComboSystem.initialize(gl, EffectsManager, Border);
-        basicTargetsController = new BasicTargetsController(gl, appMetaData, EffectsManager); 
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, EffectsManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, EffectsManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, EffectsManager);
-        triangularTargetController = new TriangularTargetController(gl, appMetaData, EffectsManager);
-        fourPointTargetController = new FourPointTargetController(gl, appMetaData, EffectsManager);
-        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, EffectsManager);
         
         InputEventsManager.initialize(canvas, appMetaData);
+       
+        RestartState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, function(state){
+            currentState = state;
+        });
+        
+        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, Cursor, RestartState, function(state){
+            currentState = state;
+        });
+        
+        StartingState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, function(state){
+            currentState = state;
+        });
         
         nextTick = Date.now();
+    }
+    
+    window.onfocus = function(){
+        windowFocused = true;
+        nextTick = Date.now();
+    }
+    
+    window.onblur = function(){
+        windowFocused = false;
     }
     
 });

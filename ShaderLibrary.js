@@ -13,35 +13,15 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var ENEMY_SPIKE = "ENEMY_SPIKE";
     var PARTICLE = "PARTICLE";
     var LINK = "LINK";
+    var FULL_SCREEN_COLOR = "FULL_SCREEN_COLOR";
+    var LIFEBAR = "LIFEBAR";
     
-    var vertexShaderSources = [], fragmentShadersInfo = [];
     var allPrograms = {};    
-    
-    function vertexShaderLoaded(error, text, index){
-        vertexShaderSources[index] = text;
-    }
-    
-    function fragmentShaderLoaded(error, text, info){
-        var obj = {
-            vertexShaderId: info.vertexShaderId,
-            effect: info.effect,
-            text: text
-        };
-        fragmentShadersInfo.push(obj);
-    }
     
     function initialize(gl){
         var allShaderSources = AssetManager.getShaderAsset(null, true);
         var commonFunctionsSource = allShaderSources["commonFunctions"];
-        delete allShaderSources["commonFunctions"];
-        
-       // var commonFunctionsCompiled = gl.createShader(gl.FRAGMENT_SHADER);
-       // gl.shaderSource(commonFunctionsCompiled, commonFunctionsSource);
-       // gl.compileShader(commonFunctionsCompiled);
-//        if (!gl.getShaderParameter(commonFunctionsCompiled, gl.COMPILE_STATUS)) {
-//            alert("Could not compile fragment shader: " + gl.getShaderInfoLog(commonFunctionsCompiled));
-//        }
-        
+        delete allShaderSources["commonFunctions"];        
         
         for(var shaderSource in allShaderSources){      
             var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -104,6 +84,8 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         FOUR_POINT_TARGET: FOUR_POINT_TARGET,
         ENEMY_SPIKE: ENEMY_SPIKE,
         PARTICLE: PARTICLE,
-        LINK: LINK
+        LINK: LINK,
+        FULL_SCREEN_COLOR: FULL_SCREEN_COLOR,
+        LIFEBAR: LIFEBAR
     };
 });

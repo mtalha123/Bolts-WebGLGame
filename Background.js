@@ -1,16 +1,17 @@
 define(['EventSystem'], function(EventSystem){
     var handler;
-    EventSystem.register(recieveEvent, "entity_destroyed");
+    EventSystem.register(receiveEvent, "entity_destroyed");
     
     function initialize(gl, EffectsManager){
-        handler = EffectsManager.requestBackgroundFieldEffect(true, gl, -10, {});
+        handler = EffectsManager.requestBackgroundFieldEffect(false, gl, -10, {});
     }
     
     function draw(){
+        handler.shouldDraw(true);
         handler.update();
     }
     
-    function recieveEvent(eventInfo){
+    function receiveEvent(eventInfo){
         handler.doEffect();
     }
     

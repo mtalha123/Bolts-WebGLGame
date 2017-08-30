@@ -38,8 +38,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._time+=0.01;
         this._uniforms.iGlobalTime.value[0] = this._time;
         
-        this._uniforms.completion.value[0] = this._effectTimer.getTime() / 1000;
-        if(this._effectTimer.getTime() >= 1000){
+        this._uniforms.completion.value[0] = this._effectTimer.getTime() / 500;
+        if(this._effectTimer.getTime() >= 500){
             this._effectTimer.reset();
         }
     }

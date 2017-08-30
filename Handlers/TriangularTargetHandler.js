@@ -30,6 +30,14 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "vec3",
                 value: [0.0, 0.0, 0.0]
             },
+            lgBool: {
+                type: "float",
+                value: [1.0]
+            },       
+            autoRotationBool: {
+                type: "float",
+                value: [0.0]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,

@@ -26,6 +26,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "float",
                 value: [3.0] 
             },
+            particlesBool: {
+                type: "float",
+                value: [1.0] 
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,

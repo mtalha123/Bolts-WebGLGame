@@ -67,6 +67,12 @@ define(['SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Cu
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
+    FourPointTarget.prototype.reset = function(){
+        Entity.Entity.prototype.reset.call(this);
+        this._numGuardsActivated = 0;
+        this._guardPrefs = [0, 0, 0, 0];
+    }
+    
     
     FourPointTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){

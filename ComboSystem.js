@@ -9,7 +9,8 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     var maxComboLevel = 8;
     var numTargetsAchievedSinceLastCombo = 0;
     var comboHandler;
-    EventSystem.register(recieveEvent, "entity_destroyed");
+    EventSystem.register(receiveEvent, "entity_destroyed");
+    EventSystem.register(receiveEvent, "game_restart");
     
     function initialize(gl, EffectsManager, Border){
         comboHandler = EffectsManager.requestComboEffect(false, gl, 0, Border.getLeftX(), Border.getTopY(), {}, "1x");
@@ -112,13 +113,17 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
         return numTargetsNeededHigherCombo;
     }
     
-    function recieveEvent(eventInfo){
-        EventSystem.publishEventImmediately("score_achieved", chargeMultiplier * baseTargetCharge); 
-        
-        numTargetsAchievedSinceLastCombo++;
-        if(numTargetsAchievedSinceLastCombo >= numTargetsNeededHigherCombo){
-            increaseComboLevel();
-            numTargetsAchievedSinceLastCombo = 0;
+    function receiveEvent(eventInfo){
+        if(eventInfo.eventType === "entity_destroyed"){
+            EventSystem.publishEventImmediately("score_achieved", chargeMultiplier * eventInfo.eventData.charge); 
+
+            numTargetsAchievedSinceLastCombo++;
+            if(numTargetsAchievedSinceLastCombo >= numTargetsNeededHigherCombo){
+                increaseComboLevel();
+                numTargetsAchievedSinceLastCombo = 0;
+            }
+        }else{
+            resetCombo();
         }
     }
     

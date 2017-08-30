@@ -35,6 +35,8 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._startXInTarget = undefined;
         this._startYInTargetInTarget = undefined;
         this._targetAreaToAchieve = 228;
+        
+        this._charge = 0;
     }
     
     //inherit from Entity
@@ -61,6 +63,13 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._handler.increaseGlow(percent / 3.0);
     }
     
+    BonusTargetBubblyOrb.prototype.reset = function(){
+        Entity.Entity.prototype.reset.call(this);
+        this._targetDistCovered = 0;
+        this._startXInTarget = undefined;
+        this._startYInTarget = undefined;
+    }
+    
     BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
             var mouseX = mouseInputObj.x;
@@ -82,7 +91,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
                 this._startYInTarget = mouseYRelativeToTarget;
 
                 if(this._targetDistCovered >= this._targetAreaToAchieve){
-                    this._targetDistCovered = 0;
+                   // this._targetDistCovered = 0;
                     Entity.Entity.prototype.destroyAndReset.call(this, callback);
                     return true;
                 }

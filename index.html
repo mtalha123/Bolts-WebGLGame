@@ -9,16 +9,46 @@
                 margin: 0;
                 padding: 0;
             }
-            #canvas{
+            
+/*
+            .container{
+                position: relative;
+            }
+            
+            .container #canvas{
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                z-index: 0;
+            }
+
+            .container #2dCanvas {
+                position: absolute; 
+                left: 0; 
+                top: 0;
+                z-index: 1;
+            }
+*/
+            
+            canvas{
                 cursor: none;
             }
         </style>
 	</head>
 	
 	
-	<body>        
-        <canvas id="canvas" style="display: block;"></canvas>
-        
+	<body>  
+<!--
+        <div class="container">
+            <canvas id="canvas"></canvas>
+            <canvas id="2dCanvas"></canvas>
+        </div>
+-->
+            
+        <div style="position: relative;">
+         <canvas id="canvas" style="position: absolute; left: 0; top: 0; z-index: 0; cursor:none; width: 1920px; height: 950px;" ></canvas>
+         <canvas id="2dCanvas" style="position: absolute; left: 0; top: 0; z-index: 1; pointer-events:none;"></canvas>
+        </div>
         <script data-main="main.js" src="Third Party/require.js"></script>
     </body>
 

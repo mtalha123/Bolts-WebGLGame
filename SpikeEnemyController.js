@@ -1,12 +1,13 @@
 define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Custom Utility/distance'], function(SpikeEnemy, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
     
-    function SpikeEnemyController(gl, appMetaData, EffectsManager){
-        EntityController.EntityController.call(this); 
+    function SpikeEnemyController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+        EntityController.call(this, 100, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._canvasWidth = appMetaData.getCanvasWidth();
         this._canvasHeight = appMetaData.getCanvasHeight();
+        this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < 2; i++){
             this._entitiesPool[i] = new SpikeEnemy(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 5, EffectsManager);
@@ -16,7 +17,7 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
     }
     
     //inherit from EntityController
-    SpikeEnemyController.prototype = Object.create(EntityController.EntityController.prototype);
+    SpikeEnemyController.prototype = Object.create(EntityController.prototype);
     SpikeEnemyController.prototype.constructor = SpikeEnemyController;
     
     SpikeEnemyController.prototype._spawn = function(){
@@ -40,7 +41,8 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
             }
         });
         
-        newlyActivatedTarget.setPosition(spawnX, spawnY);     
+        newlyActivatedTarget.setPosition(spawnX, spawnY);  
+        newlyActivatedTarget.setSpeed(this._speed);
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
@@ -56,10 +58,12 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
                     break;
             }
         });
+        
+//        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
-    SpikeEnemyController.prototype.recieveEvent = function(eventInfo){
-        EntityController.EntityController.prototype.recieveEvent.call(this, eventInfo);
+    SpikeEnemyController.prototype.receiveEvent = function(eventInfo){
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "combo_level_increased"){
             this._targetAreaToAchieve -= this._areaToAchieveReductionAmount;
@@ -67,6 +71,28 @@ define(['SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', '
         }else if(eventInfo.eventType === "combo_level_reset"){
             this._targetAreaToAchieve = this._targetRadius * 4;
       //      this._setAchievementParamtersForAllActiveTargets();
+        }else if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 3:
+                    this._chanceOfSpawning = 20;
+                    break;
+                case 4:
+                    this._chanceOfSpawning = 25;
+                    break;
+                case 5:
+                    this._chanceOfSpawning = 35;
+                    break;
+                case 6:
+                    this._chanceOfSpawning = 50;
+                    break;
+                case 7:
+                    this._chanceOfSpawning = 60;
+                    break;
+                case 8:
+                    this._chanceOfSpawning = 70;
+                    break;
+                
+            }
         }
     }
     

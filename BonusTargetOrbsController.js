@@ -1,8 +1,9 @@
 define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'EntityController', 'Link'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, Link){
     
-    function BonusTargetOrbsController(gl, appMetaData, EffectsManager){
-        EntityController.EntityController.call(this); 
+    function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+        EntityController.call(this, 0, maxEntitiesToSpawn, 0); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
+        this._spawnAttemptDelay = 2000;
         
         this._entitiesPool.push(new BonusTargetOrbConfig(gl, appMetaData, EffectsManager, this._targetRadius, 400, 400));
         
@@ -10,7 +11,7 @@ define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random
     }
     
     //inherit from EntityController
-    BonusTargetOrbsController.prototype = Object.create(EntityController.EntityController.prototype);
+    BonusTargetOrbsController.prototype = Object.create(EntityController.prototype);
     BonusTargetOrbsController.prototype.constructor = BonusTargetOrbsController;
     
     BonusTargetOrbsController.prototype._spawn = function(){
@@ -23,14 +24,33 @@ define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn();
+        
+        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
-    BonusTargetOrbsController.prototype.recieveEvent = function(eventInfo){
-        EntityController.EntityController.prototype.recieveEvent.call(this, eventInfo);
+    BonusTargetOrbsController.prototype.receiveEvent = function(eventInfo){
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 2:
+                    this._chanceOfSpawning = 10;
+                    break;
+                case 3:
+                    this._chanceOfSpawning = 20;
+                    break;
+                case 5:
+                    this._chanceOfSpawning = 45;
+                    break;
+                case 6:
+                    this._chanceOfSpawning = 50;
+                    break;                
+            }
+        }
     }
     
     BonusTargetOrbsController.prototype.prepareForDrawing = function(eventInfo){
-        EntityController.EntityController.prototype.prepareForDrawing.call(this, eventInfo);
+        EntityController.prototype.prepareForDrawing.call(this, eventInfo);
     }
     
     
@@ -93,11 +113,21 @@ define(['BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random
     BonusTargetOrbConfig.prototype.update = function(){ 
     }
     
+    BonusTargetOrbConfig.prototype.getCharge = function(){ 
+        return 0;
+    }
+    
     BonusTargetOrbConfig.prototype.spawn = function(){
         for(var i = 0; i < this._config.length; i++){
             this._config[i].spawn(function(){});
         }
         this._config[0].turnOnLightning();
+    }
+    
+    BonusTargetOrbConfig.prototype.reset = function(){
+        for(var i = 0; i < this._config.length; i++){
+            this._config[i].reset();
+        }
     }
     
     BonusTargetOrbConfig.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){

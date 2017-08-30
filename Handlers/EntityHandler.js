@@ -17,6 +17,8 @@ define(['Handlers/Handler', 'Handlers/BasicParticlesHandler'], function(Handler,
                 this._uniformsDefault[uniform].value[i] = this._uniforms[uniform].value[i];
             }
         }
+        
+        this.additiveBlending = true;
     }
     
     //inherit from Handler
@@ -36,14 +38,15 @@ define(['Handlers/Handler', 'Handlers/BasicParticlesHandler'], function(Handler,
         this._shouldDraw = true;
     }
     
-    EntityHandler.prototype.doDestroyEffect = function(x, y){
+    EntityHandler.prototype.doDestroyEffect = function(x, y, optCallback){
         this._particlesHandler.setPosition(x, y);
-        this._particlesHandler.doEffect();
+        this._particlesHandler.doEffect(optCallback);
         this._particlesHandler.setParticlesColor(1.0, 1.0, 0.5);
         this._shouldDraw = false;
     }
     
     EntityHandler.prototype.resetProperties = function(opts){
+        this._particlesHandler.reset();
         this._setToDefaultUniforms(opts);
     }
     

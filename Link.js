@@ -55,6 +55,12 @@ define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSy
         this._handler.shouldDraw(true);
     }
     
+    Link.prototype.reset = function(){
+        this._hitBoxRegions.setPosition(this._startPosition.getX(), this._startPosition.getY());
+        this._handler.setCompletion(0);
+        this._handler.shouldDraw(false);
+    }
+    
     Link.prototype.prepareForDrawing = function(){
         this._handler.update();
     }

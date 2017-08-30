@@ -3,8 +3,8 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
     var inputObj = {
         mouseState: {
             type: undefined,
-            xPos: undefined,
-            yPos: undefined
+            x: undefined,
+            y: undefined
         }
     };
     var mouseDown = false;
@@ -35,13 +35,13 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
         var returnObject = inputObj;
 
         if(inputObj.mouseState.type){
-            EventSystem.publishEventImmediately(inputObj.mouseState.type, {x: inputObj.mouseState.xPos, y: inputObj.mouseState.yPos});
+            EventSystem.publishEventImmediately(inputObj.mouseState.type, {x: inputObj.mouseState.x, y: inputObj.mouseState.y});
     
             inputObj = {
                 mouseState: {
                     type: undefined,
-                    xPos: undefined,
-                    yPos: undefined
+                    x: undefined,
+                    y: undefined
                 }
             };  
             
@@ -71,8 +71,8 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
                 }
                 break;
         }
-        inputObj.mouseState.xPos = eventData.clientX;
-        inputObj.mouseState.yPos = appMetaData.getCanvasHeight() - eventData.clientY;
+        inputObj.mouseState.x = eventData.clientX;
+        inputObj.mouseState.y = appMetaData.getCanvasHeight() - eventData.clientY;
         
         Cursor.changePosition(eventData.clientX, appMetaData.getCanvasHeight() - eventData.clientY);
     }
@@ -97,10 +97,15 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
 //        }
 //    }
     
+    function getCurrentInputObj(){
+        return inputObj;
+    }
+    
     
     return {
         initialize: initialize,
-        notifyOfCurrentStateAndConsume: notifyOfCurrentStateAndConsume
+        notifyOfCurrentStateAndConsume: notifyOfCurrentStateAndConsume,
+        getCurrentInputObj: getCurrentInputObj
     }
     
 });

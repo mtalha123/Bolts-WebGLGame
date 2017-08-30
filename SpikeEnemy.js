@@ -1,4 +1,4 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance, Vector){
+define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance, Vector, EventSystem){
 
     function SpikeEnemyDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
@@ -25,6 +25,13 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         }else{
             this._entity._prevX = this._entity._x;
             this._entity._prevY = this._entity._y;
+            
+            if(this._entity._lightningStealTimer.getTime() >= 2000){
+                this._entity._charge++;
+                EventSystem.publishEventImmediately("lightning_stolen", {amount: 1})
+                this._entity._lightningStealTimer.reset();
+                this._entity._lightningStealTimer.start();
+            }
         }
     }
     
@@ -46,6 +53,10 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
         this._velocity = ((new Vector(-x, -y)).getNormalized()).multiplyWithScalar(speed);
         
         this._inputArray = [];
+        
+        this._charge = 0;
+        
+        this._lightningStealTimer = SynchronizedTimers.getTimer();
     }
     
     //inherit from Entity
@@ -83,6 +94,18 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entity', 'Custom Utility/C
 //    
 //        this._handler.increaseLgGlowFactor(percent / 2.0);
     }
+    
+    SpikeEnemy.prototype.reset = function(){
+        Entity.Entity.prototype.reset.call(this);
+        this._lightningStealTimer.reset();
+        this._charge = 0;
+        this._inputArray = [];
+    } 
+    
+    SpikeEnemy.prototype.spawn = function(callback){
+        Entity.Entity.prototype.spawn.call(this, callback);
+        this._lightningStealTimer.start();
+    } 
     
     SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
