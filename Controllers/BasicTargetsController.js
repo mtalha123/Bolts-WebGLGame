@@ -1,7 +1,7 @@
 define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController, ){
     
     function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
-        MovingEntityController.call(this, 100, maxEntitesToSpawn, 10); 
+        MovingEntityController.call(this, appMetaData, 100, maxEntitesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;

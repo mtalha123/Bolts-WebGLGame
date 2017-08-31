@@ -9,7 +9,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         return false;
     }
     
-    function EntityController(spawnChance, maxEntitiesToSpawn){
+    function EntityController(appMetaData, spawnChance, maxEntitiesToSpawn){
         this._entitiesPool = [];
         this._entitiesActivated = [];
         this._entitiesInTransition = [];
@@ -17,6 +17,8 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         this._chanceOfSpawning = spawnChance;
         this._spawnTimer = SynchronizedTimers.getTimer();  
         this._maxEntitiesToSpawn = this._totalPoolSize = maxEntitiesToSpawn;
+        this._canvasWidth = appMetaData.getCanvasWidth();
+        this._canvasHeight = appMetaData.getCanvasHeight();
         
         EventSystem.register(this.receiveEvent, "mouse_move", this);
         EventSystem.register(this.receiveEvent, "mouse_down", this);

@@ -1,7 +1,7 @@
 define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController){
     
     function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        MovingEntityController.call(this, 0, maxEntitiesToSpawn, 10); 
+        MovingEntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){

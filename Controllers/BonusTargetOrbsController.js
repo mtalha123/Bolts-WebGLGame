@@ -1,7 +1,7 @@
 define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Link'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, Link){
     
     function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, 0, maxEntitiesToSpawn, 0); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 0); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
         this._spawnAttemptDelay = 2000;
         
@@ -15,8 +15,8 @@ define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utili
     BonusTargetOrbsController.prototype.constructor = BonusTargetOrbsController;
     
     BonusTargetOrbsController.prototype._spawn = function(){
-        var spawnX = Random.getRandomInt(200, 600);
-        var spawnY = Random.getRandomInt(300, 400);
+        var spawnX = Random.getRandomInt(this._canvasWidth * 0.3, this._canvasWidth * 0.7);
+        var spawnY = Random.getRandomInt(this._canvasHeight * 0.3, this._canvasHeight * 0.5);
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
         
@@ -34,7 +34,7 @@ define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utili
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 2:
-                    this._chanceOfSpawning = 70;
+                    this._chanceOfSpawning = 10;
                     break;
                 case 3:
                     this._chanceOfSpawning = 20;

@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Custom Utility/distance', 'Controllers/EntityController'], function(SynchronizedTimers, Border, Random, EventSystem, distance, EntityController){ 
     
-    function MovingEntityController(spawnChance, maxEntitiesToSpawn, speed){
-        EntityController.call(this, spawnChance, maxEntitiesToSpawn);
+    function MovingEntityController(appMetaData, spawnChance, maxEntitiesToSpawn, speed){
+        EntityController.call(this, appMetaData, spawnChance, maxEntitiesToSpawn);
         this._speed = speed;
     }
     

@@ -1,12 +1,10 @@
 define(['Entities/SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController', 'Custom Utility/distance'], function(SpikeEnemy, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController, distance){
     
     function SpikeEnemyController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        MovingEntityController.call(this, 100, maxEntitiesToSpawn, 10); 
+        MovingEntityController.call(this, appMetaData, 100, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
-        this._canvasWidth = appMetaData.getCanvasWidth();
-        this._canvasHeight = appMetaData.getCanvasHeight();
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < 2; i++){

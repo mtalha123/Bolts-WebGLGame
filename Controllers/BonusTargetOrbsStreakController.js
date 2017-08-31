@@ -1,7 +1,7 @@
 define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, 0, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
@@ -20,8 +20,8 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
     
     BonusTargetOrbsStreakController.prototype._spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
-        var spawnX = Random.getRandomInt(200, 600);
-        var spawnY = Random.getRandomInt(300, 400);
+        var spawnX = Random.getRandomInt(this._canvasWidth * 0.3, this._canvasWidth * 0.7);
+        var spawnY = Random.getRandomInt(this._canvasHeight * 0.3, this._canvasHeight * 0.7);
         var movementAngle = Random.getRandomIntInclusive(0, 360);;
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
@@ -46,9 +46,6 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
             this._setAchievementParamtersForAllActiveTargets();
         }else if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 2:
-                    this._chanceOfSpawning = 100;
-                    break;
                 case 4:
                     this._chanceOfSpawning = 20;
                     break;
