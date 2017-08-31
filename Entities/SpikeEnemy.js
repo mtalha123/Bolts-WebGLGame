@@ -1,4 +1,4 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem'], function(CirclePhysicsEntity, SynchronizedTimers, MovingEntity, CircularHitRegions, distance, Vector, EventSystem){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitRegions, distance, Vector, EventSystem){
 
     function SpikeEnemyDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);

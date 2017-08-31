@@ -1,18 +1,18 @@
 define(['Border'], function(Border){
     
-    function CircleEntity(x, y, canvasHeight, radius, velocity){
+    function CirclePhysicsBody(x, y, canvasHeight, radius, velocity){
         this._radius = radius;
         this._velocity = velocity;
         this.setPosition(x, y);
         this._isInSimulation = false;
     }
     
-    CircleEntity.prototype.setPosition = function(newX, newY){
+    CirclePhysicsBody.prototype.setPosition = function(newX, newY){
         this._x = newX;
         this._y = newY;
     }
     
-    CircleEntity.prototype.update = function(){          
+    CirclePhysicsBody.prototype.update = function(){          
         if( (this._x - this._radius) <= Border.getLeftX()){
             this._x += 5;
             this._velocity[0] *= -1;
@@ -37,17 +37,17 @@ define(['Border'], function(Border){
         this._y += this._velocity[1];
     }
     
-    CircleEntity.prototype.setLinearVelocity = function(velX, velY){
+    CirclePhysicsBody.prototype.setLinearVelocity = function(velX, velY){
         this._velocity = [velX, velY];
     }
     
-    CircleEntity.prototype.getX = function(){
+    CirclePhysicsBody.prototype.getX = function(){
         return this._x;
     }
     
-    CircleEntity.prototype.getY = function(){
+    CirclePhysicsBody.prototype.getY = function(){
         return this._y;
     }
     
-    return CircleEntity;
+    return CirclePhysicsBody;
 });

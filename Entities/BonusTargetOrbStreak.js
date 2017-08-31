@@ -1,4 +1,4 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitRegions, distance){
 
     function BonusTargetOrbStreakDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);

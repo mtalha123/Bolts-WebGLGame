@@ -1,4 +1,4 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, MovingEntity, CircularHitRegions, distance){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitRegions, distance){
 
     function BasicTargetDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -24,7 +24,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/MovingEntity', 'C
         this._hitBoxRegions = new CircularHitRegions(x, y);
         this._hitBoxRegions.addRegion(x, y, p_radius);
         
-        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  
         
         this._normalState = new BasicTargetNormalState(this);
