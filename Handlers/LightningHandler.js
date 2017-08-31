@@ -51,9 +51,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts); 
-        
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIGHTNING);
+        
+        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts); 
        
         //CHANGE AFTER
         this._padding = 0.06 * this._canvasHeight;
@@ -135,7 +135,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             vertices = vertices.concat( getGLCoordsFromNormalizedShaderCoords(getVerticesNormalized(startX - this._padding, startY - this._padding, width, height, this._canvasWidth, this._canvasHeight)) );
         }
         
-         this._attributes.vertexPosition = vertices;
+        //testing
+        this._attributes.vertexPosition = vertices;
     }
     
     return LightningHandler;

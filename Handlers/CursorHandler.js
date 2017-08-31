@@ -23,10 +23,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 value: [0.0]
             }
         };
-        
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);   
-        
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.CURSOR);
+        
+        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);   
+        
         this._padding = 0.03 * canvasHeight;
         
         this.setPosition(x, y);

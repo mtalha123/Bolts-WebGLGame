@@ -143,8 +143,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
     
-    function requestFullScreenColorHandler(shouldDraw, zOrder){
-        var handler = new FullScreenColorHandler(shouldDraw, zOrder, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), ShaderLibrary);
+    function requestFullScreenColorHandler(shouldDraw, zOrder, gl){
+        var handler = new FullScreenColorHandler(shouldDraw, zOrder, gl, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), ShaderLibrary);
 
         addHandlers(handler);
         return handler;
@@ -168,72 +168,9 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handlersToReturn;
     }
     
-    function setUpUniforms(gl, handler){
-        var uniforms = handler.getUniforms();
-        
-        for(var uniformVar in uniforms){
-            var uniformLocation = gl.getUniformLocation(handler.getShaderProgram(), uniformVar);
-            switch(uniforms[uniformVar].type){
-                case "int":
-                    gl.uniform1iv(uniformLocation, uniforms[uniformVar].value);
-                    break;
-                case "float":
-                    gl.uniform1fv(uniformLocation, uniforms[uniformVar].value);
-                    break;
-                case "vec2":
-                    gl.uniform2fv(uniformLocation, uniforms[uniformVar].value);
-                    break;
-                case "vec3":
-                    gl.uniform3fv(uniformLocation, uniforms[uniformVar].value);
-                    break;
-                case "vec4":
-                    gl.uniform4fv(uniformLocation, uniforms[uniformVar].value);
-                    break;
-                case "sampler2D":
-                    if(uniforms[uniformVar].value === 0){
-                        gl.activeTexture(gl.TEXTURE0);
-                    }else if(uniforms[uniformVar].value === 1){
-                        gl.activeTexture(gl.TEXTURE1);
-                    }else if(uniforms[uniformVar].value === 2){
-                        gl.activeTexture(gl.TEXTURE2);
-                    }else if(uniforms[uniformVar].value === 3){
-                        gl.activeTexture(gl.TEXTURE3);
-                    }else if(uniforms[uniformVar].value === 4){
-                        gl.activeTexture(gl.TEXTURE4);
-                    }else if(uniforms[uniformVar].value === 5){
-                        gl.activeTexture(gl.TEXTURE5);
-                    }
-                    
-                    gl.bindTexture(gl.TEXTURE_2D, uniforms[uniformVar].texture);
-                    gl.uniform1i(uniformLocation, uniforms[uniformVar].value);
-                    break;
-            }
-        }
-    }
-    
-    function setUpAttributesAndUniforms(gl, handler){
-        var attributes = handler.getAttributes();
-        
-        for(var attribute in attributes){
-            var vertexBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(attributes[attribute]), gl.STATIC_DRAW);
-            var attribLocation = gl.getAttribLocation(handler.getShaderProgram(), attribute);
-            gl.enableVertexAttribArray(attribLocation);
-            if(attribute === "randVals"){
-                gl.vertexAttribPointer(attribLocation, 4, gl.FLOAT, false, 0, 0);
-            }else{
-                gl.vertexAttribPointer(attribLocation, 2, gl.FLOAT, false, 0, 0);
-            }
-        }
-        
-        setUpUniforms(gl, handler);
-    }
-    
     return {
         initialize: initialize,
         getHandlers: getHandlers,
-        setUpAttributesAndUniforms: setUpAttributesAndUniforms,
         requestLightningEffect: requestLightningEffect,
         requestBasicTargetEffect: requestBasicTargetEffect,
         requestTextEffect: requestTextEffect,

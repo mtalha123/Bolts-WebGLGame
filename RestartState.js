@@ -60,7 +60,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 70, 0, 0, {radius: [radiusOfIndicators], numBolts: [0.0]});
         scoreBody = new SimpleMovingBody( scoreHandler, cWidth, cHeight, new Vector(cWidth / 1.3, cHeight + (cHeight / 2)), new Vector(cWidth / 1.3, (cHeight / 2)) );
         
-        darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 60);
+        darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 60, gl);
         callbackToSwitchState = callback;
         hitRegions = new CircularHitRegions(cWidth / 2, cHeight / 3.3);
         hitRegions.addRegion(cWidth / 2, cHeight / 3.3, radiusOfIndicators);

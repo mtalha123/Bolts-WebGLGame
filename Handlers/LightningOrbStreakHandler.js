@@ -36,10 +36,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 texture: noiseTextureData.noiseTexture
             }
         };
-           
-        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);   
         
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.ORB_LIGHTNING_STREAK); 
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.ORB_LIGHTNING_STREAK);
+        
+        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);    
         
         this.setPosition(x, y);
     }

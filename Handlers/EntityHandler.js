@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Handlers/BasicParticlesHandler'], function(Handler, BasicParticlesHandler){
     function EntityHandler(shouldDraw, gl, x, y, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts){
-        Handler.call(this, shouldDraw, x, y, zOrder, canvasWidth, canvasHeight, opts);
+        Handler.call(this, shouldDraw, x, y, zOrder, gl, canvasWidth, canvasHeight, opts);
         
         this._particlesHandler = new BasicParticlesHandler(false, 50, canvasWidth, canvasHeight, gl, zOrder-1, x, y, {}, ShaderLibrary);
         this._handlers.push(this._particlesHandler);

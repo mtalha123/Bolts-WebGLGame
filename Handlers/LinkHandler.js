@@ -32,9 +32,9 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             },
         };
         
-        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);   
-        
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LINK); 
+        
+        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);   
         
         this._padding = canvasHeight * 0.01;
         this.setCoords(x1, y1, x2, y2);

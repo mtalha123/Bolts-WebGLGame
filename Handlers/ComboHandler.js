@@ -1,8 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
-    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){
-       this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
-        
+    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){        
         var comboTextInfo = getTextInfo(comboText);
         var firstCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[0]], fontTextureData.width, fontTextureData.height);
         var secondCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[1]], fontTextureData.width, fontTextureData.height);
@@ -70,8 +68,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 value: [-1, -1, -1, -1]
             },
         };
+        
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
 
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);
+        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);
         
         this._fontTextureWidth = fontTextureData.width;
         this._fontTextureHeight = fontTextureData.height;

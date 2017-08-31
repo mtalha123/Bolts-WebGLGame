@@ -10,7 +10,8 @@ define([''], function(){
                 gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             }
             gl.useProgram(handlers[i]._shaderProgram);
-            EffectsManager.setUpAttributesAndUniforms(gl, handlers[i]);
+            handlers[i].setUpAttributes(gl);
+            handlers[i].setUpUniforms(gl);
             gl.drawArrays(gl.TRIANGLES, 0, handlers[i].getNumVertices());
             numVerticesDone += handlers[i].getNumVertices();
         }

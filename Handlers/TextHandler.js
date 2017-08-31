@@ -13,9 +13,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);   
-        
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TEXT);
+        
+        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
         this._attributes.texCoord = [];
         this._width = 0, this._x = x, this._y = y;

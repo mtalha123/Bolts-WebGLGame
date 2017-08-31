@@ -31,10 +31,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 value: [1.0]
             },
         };
-
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, opts);   
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIFEBAR); 
+        
+        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
         this._padding = canvasHeight * 0.01;
         this.setCoords(x1, y1, x2, y2);

@@ -1,5 +1,5 @@
 define(['Handlers/Handler', 'SynchronizedTimers', 'Custom Utility/getVerticesUnNormalized'], function(Handler, SynchronizedTimers, getVerticesUnNormalized){
-    function FullScreenColorHandler(shouldDraw, zOrder, canvasWidth, canvasHeight, ShaderLibrary){
+    function FullScreenColorHandler(shouldDraw, zOrder, gl, canvasWidth, canvasHeight, ShaderLibrary){
         this._uniforms = {
             color: {
                 type: "vec4",
@@ -7,9 +7,9 @@ define(['Handlers/Handler', 'SynchronizedTimers', 'Custom Utility/getVerticesUnN
             }
         };
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, canvasWidth, canvasHeight, {});   
-        
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.FULL_SCREEN_COLOR); 
+        
+        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, {});   
         
         this._timer = SynchronizedTimers.getTimer();
         this._duration = 1000;
