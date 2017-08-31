@@ -8,7 +8,7 @@ define(['Entities/BonusTargetBubblyOrb', 'SynchronizedTimers', 'Border', 'Custom
         this._spawnAttemptDelay = 5000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){              
-            this._entitiesPool[i] = new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 30, 10, EffectsManager);
+            this._entitiesPool[i] = new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -30,10 +30,7 @@ define(['Entities/BonusTargetBubblyOrb', 'SynchronizedTimers', 'Border', 'Custom
         newlyActivatedTarget.setAchievementParameters(this._targetAreaToAchieve);
         this._entitiesActivated.push(newlyActivatedTarget);
 
-        newlyActivatedTarget.spawn(function(){
-            newlyActivatedTarget.setSpeed(this._speed);
-            newlyActivatedTarget.setMovementAngle(movementAngle);
-        }.bind(this));
+        newlyActivatedTarget.spawn(function(){ });
         
         EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
@@ -49,6 +46,9 @@ define(['Entities/BonusTargetBubblyOrb', 'SynchronizedTimers', 'Border', 'Custom
             this._setAchievementParamtersForAllActiveTargets();
         }else if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
+                case 2:
+                    this._chanceOfSpawning = 100;
+                    break;
                 case 5:
                     this._chanceOfSpawning = 20;
                     break;

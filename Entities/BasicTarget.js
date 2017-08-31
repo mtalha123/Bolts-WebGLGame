@@ -1,25 +1,25 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance){
+define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsEntity, SynchronizedTimers, MovingEntity, CircularHitRegions, distance){
 
     function BasicTargetDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
+        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
     }
     
-    //inherit from EntityDestructionState
-    BasicTargetDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
+    //inherit from MovingEntityDestructionState
+    BasicTargetDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
     BasicTargetDestructionState.prototype.constructor = BasicTargetDestructionState; 
     
     
     function BasicTargetNormalState(target){
-        Entity.EntityNormalState.call(this, target);
+        MovingEntity.MovingEntityNormalState.call(this, target);
     }
     
-    //inherit from EntityNormalState
-    BasicTargetNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
+    //inherit from MovingEntityNormalState
+    BasicTargetNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
     BasicTargetNormalState.prototype.constructor = BasicTargetNormalState;
     
     
     function BasicTarget(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(x, y);
         this._hitBoxRegions.addRegion(x, y, p_radius);
@@ -37,8 +37,8 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
         this._targetAreaToAchieve = 228;
     }
     
-    //inherit from Entity
-    BasicTarget.prototype = Object.create(Entity.Entity.prototype);
+    //inherit from MovingEntity
+    BasicTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     BasicTarget.prototype.constructor = BasicTarget;
     
     BasicTarget.prototype.getRadius = function(){
@@ -46,19 +46,19 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
     }
     
     BasicTarget.prototype.setPosition = function(newX, newY){
-        Entity.Entity.prototype.setPosition.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
     BasicTarget.prototype._setPositionWithInterpolation = function(newX, newY){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
     BasicTarget.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        MovingEntity.MovingEntity.prototype.reset.call(this);
         this._targetDistCovered = 0;
         this._startXInTarget = undefined;
         this._startYInTarget = undefined;
@@ -95,7 +95,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
                 this._startYInTarget = mouseYRelativeToTarget;
 
                 if(this._targetDistCovered >= this._targetAreaToAchieve){
-                    Entity.Entity.prototype.destroyAndReset.call(this, callback);
+                    MovingEntity.MovingEntity.prototype.destroyAndReset.call(this, callback);
                     return true;
                 }
             }else{

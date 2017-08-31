@@ -1,20 +1,20 @@
-define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem'], function(CirclePhysicsEntity, SynchronizedTimers, Entity, CircularHitRegions, distance, Vector, EventSystem){
+define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem'], function(CirclePhysicsEntity, SynchronizedTimers, MovingEntity, CircularHitRegions, distance, Vector, EventSystem){
 
     function SpikeEnemyDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
+        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
     }
     
-    //inherit from EntityDestructionState
-    SpikeEnemyDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
+    //inherit from MovingEntityDestructionState
+    SpikeEnemyDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
     SpikeEnemyDestructionState.prototype.constructor = SpikeEnemyDestructionState; 
     
     
     function SpikeEnemyNormalState(target){
-        Entity.EntityNormalState.call(this, target);
+        MovingEntity.MovingEntityNormalState.call(this, target);
     }
     
-    //inherit from EntityNormalState
-    SpikeEnemyNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
+    //inherit from MovingEntityNormalState
+    SpikeEnemyNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
     SpikeEnemyNormalState.prototype.constructor = SpikeEnemyNormalState;
     
     SpikeEnemyNormalState.prototype.update = function(){ 
@@ -37,7 +37,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
     
     
     function SpikeEnemy(id, canvasWidth, canvasHeight, gl, p_radius, x, y, speed, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, 0, speed);
+        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, 0, speed);
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
         this._hitBoxRegions = new CircularHitRegions(x, y);
@@ -59,8 +59,8 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
         this._lightningStealTimer = SynchronizedTimers.getTimer();
     }
     
-    //inherit from Entity
-    SpikeEnemy.prototype = Object.create(Entity.Entity.prototype);
+    //inherit from MovingEntity
+    SpikeEnemy.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     SpikeEnemy.prototype.constructor = SpikeEnemy;
     
     SpikeEnemy.prototype.getRadius = function(){
@@ -80,7 +80,7 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
             return currValue;
         });
         
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
@@ -96,14 +96,14 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
     }
     
     SpikeEnemy.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        MovingEntity.MovingEntity.prototype.reset.call(this);
         this._lightningStealTimer.reset();
         this._charge = 0;
         this._inputArray = [];
     } 
     
     SpikeEnemy.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._lightningStealTimer.start();
     } 
     
@@ -114,13 +114,13 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
             
             if(this.areCoordsInHitRegions(mouseX, mouseY)){
                 this._inputArray.push(new Vector(mouseX, mouseY));
-                if(this._inputArray.length > 8){
+                if(this._inputArray.length > 7){
                     this._inputArray.shift();
                 }
 
 
                 var lastIndex = this._inputArray.length - 1;
-                if(distance(this._inputArray[0].getX(), this._inputArray[0].getY(), this._inputArray[lastIndex].getX(), this._inputArray[lastIndex].getY()) >= this._radius * 2){
+                if(distance(this._inputArray[0].getX(), this._inputArray[0].getY(), this._inputArray[lastIndex].getX(), this._inputArray[lastIndex].getY()) >= this._radius * 3){
                     var achieved = true;
                     this._inputArray.map(function(val, index, array){
                         var startToCurr = array[0].subtractFrom(val);

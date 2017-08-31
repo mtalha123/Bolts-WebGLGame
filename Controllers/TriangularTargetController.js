@@ -1,7 +1,7 @@
-define(['Entities/TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(TriangularTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
+define(['Entities/TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController'], function(TriangularTarget, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController, ){
     
     function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, 0, maxEntitiesToSpawn, 10); 
+        MovingEntityController.call(this, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
         this._spawnAttemptDelay = 5000;
 
@@ -12,8 +12,8 @@ define(['Entities/TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Uti
         this._spawnTimer.start();
     }
     
-    //inherit from EntityController
-    TriangularTargetController.prototype = Object.create(EntityController.prototype);
+    //inherit from MovingEntityController
+    TriangularTargetController.prototype = Object.create(MovingEntityController.prototype);
     TriangularTargetController.prototype.constructor = TriangularTargetController;
     
     TriangularTargetController.prototype._spawn = function(){
@@ -57,11 +57,11 @@ define(['Entities/TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Uti
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
         
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
+        MovingEntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     TriangularTargetController.prototype.receiveEvent = function(eventInfo){
-        EntityController.prototype.receiveEvent.call(this, eventInfo);
+        MovingEntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){

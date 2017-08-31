@@ -1,24 +1,24 @@
-define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsEntity'], function(SynchronizedTimers, Entity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsEntity){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsEntity'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsEntity){
 
     function FourPointTargetDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
+        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
     }
     
-    //inherit from EntityDestructionState
-    FourPointTargetDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
+    //inherit from MovingEntityDestructionState
+    FourPointTargetDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
     FourPointTargetDestructionState.prototype.constructor = FourPointTargetDestructionState; 
     
     
     function FourPointTargetNormalState(target){
-        Entity.EntityNormalState.call(this, target);
+        MovingEntity.MovingEntityNormalState.call(this, target);
     }
     
-    //inherit from EntityNormalState
-    FourPointTargetNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
+    //inherit from MovingEntityNormalState
+    FourPointTargetNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
     FourPointTargetNormalState.prototype.constructor = FourPointTargetNormalState;
     
     FourPointTargetNormalState.prototype.update = function(){
-        Entity.EntityNormalState.prototype.update.call(this);
+        MovingEntity.MovingEntityNormalState.prototype.update.call(this);
         
         this._entity._rotationAngle+=0.05;
         this._handler.setAngle(this._entity._rotationAngle);
@@ -27,7 +27,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
     
     
     function FourPointTarget(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._id = id;       
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
@@ -51,24 +51,24 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
         this._guardPrefs = [0, 0, 0, 0];
     }
     
-    //inherit from Entity
-    FourPointTarget.prototype = Object.create(Entity.Entity.prototype);
+    //inherit from MovingEntity
+    FourPointTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     FourPointTarget.prototype.constructor = FourPointTarget;
     
     FourPointTarget.prototype.setPosition = function(newX, newY){
-        Entity.Entity.prototype.setPosition.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
     FourPointTarget.prototype._setPositionWithInterpolation = function(newX, newY){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
     FourPointTarget.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        MovingEntity.MovingEntity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
     }
@@ -101,7 +101,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
     }
     
     FourPointTarget.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._hitBoxRegions.activateAllRegions();
     }
     

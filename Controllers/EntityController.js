@@ -9,14 +9,13 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         return false;
     }
     
-    function EntityController(spawnChance, maxEntitiesToSpawn, speed){
+    function EntityController(spawnChance, maxEntitiesToSpawn){
         this._entitiesPool = [];
         this._entitiesActivated = [];
         this._entitiesInTransition = [];
         this._spawnAttemptDelay = 1000;
         this._chanceOfSpawning = spawnChance;
         this._spawnTimer = SynchronizedTimers.getTimer();  
-        this._speed = speed;
         this._maxEntitiesToSpawn = this._totalPoolSize = maxEntitiesToSpawn;
         
         EventSystem.register(this.receiveEvent, "mouse_move", this);
@@ -115,13 +114,8 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         }
         
         this._spawnTimer.reset();
-        this._speed = 10;
         this._spawnAttemptDelay = 5000;
         this._chanceOfSpawning = 0;
-    }
-    
-    EntityController.prototype.setSpeed = function(newSpeed){
-        this._speed = newSpeed;
     }
     
     return EntityController;

@@ -18,33 +18,21 @@ define([], function(){
     function EntityNormalState(entity){
         this._entity = entity;
         this._handler = entity._handler;
-        this._physicsEntity = entity._physicsEntity;
     }
     
-    EntityNormalState.prototype.prepareForDrawing = function(interpolation){
-        this._handler.setPosition( this._entity._prevX + (interpolation * (this._entity._x - this._entity._prevX)), this._entity._prevY + (interpolation * (this._entity._y - this._entity._prevY)) );
+    EntityNormalState.prototype.prepareForDrawing = function(){
         this._handler.update();        
     }
 
-    EntityNormalState.prototype.update = function(){
-        this._physicsEntity.update();        
-        this._entity._setPositionWithInterpolation(this._physicsEntity.getX(), this._physicsEntity.getY());      
-    }
+    EntityNormalState.prototype.update = function(){ }
     
     
-    function Entity(id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed){
+    function Entity(id, canvasWidth, canvasHeight, gl, x, y){
         this._id = id;       
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         this._hitBoxRegions = null;
         this._charge = 1;
-        
-        this._physicsEntity = null;//new CircleEntity("dynamic", x, y, canvasHeight, p_radius + (0.02 * canvasHeight), 1, 0, 1);
-        
-        this._currentMovementAngleInDeg = movementangle;
-        this._speed = speed;
-        this._xUnits = Math.cos(movementangle * (Math.PI / 180)) * speed;
-        this._yUnits = Math.sin(movementangle * (Math.PI / 180)) * speed; 
         
         this._handler = null;
         
@@ -64,7 +52,7 @@ define([], function(){
     Entity.prototype.setPosition = function(newX, newY){
         this._x = this._prevX = newX;  
         this._y = this._prevY = newY;
-        this._physicsEntity.setPosition(newX, newY);
+        this._handler.setPosition(newX, newY);
     }
     
     Entity.prototype._setPositionWithInterpolation = function(newX, newY){
@@ -73,6 +61,8 @@ define([], function(){
         
         this._prevY = this._y;
         this._y = newY;
+        
+        this._handler.setPosition(newX, newY);
     }
     
     Entity.prototype.getX = function(){
@@ -81,17 +71,6 @@ define([], function(){
     
     Entity.prototype.getY = function(){
         return this._y;
-    }
-    
-    Entity.prototype.setMovementAngle = function(newAngle){
-        this._currentMovementAngleInDeg = newAngle;
-        this._xUnits = Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
-        this._yUnits = Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
-        this._physicsEntity.setLinearVelocity(this._xUnits, this._yUnits);
-    }
-    
-    Entity.prototype.getMovementAngle = function(){
-        return this._currentMovementAngleInDeg;
     }
     
     Entity.prototype.getId = function(){
@@ -132,10 +111,6 @@ define([], function(){
     
     Entity.prototype.getCharge = function(){
         return this._charge;
-    }
-    
-    Entity.prototype.setSpeed = function(newSpeed){
-        this._speed = newSpeed;
     }
     
     return {

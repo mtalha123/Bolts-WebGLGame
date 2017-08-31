@@ -18,13 +18,12 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
     BonusTargetBubblyOrbNormalState.prototype.constructor = BonusTargetBubblyOrbNormalState;
     
     
-    function BonusTargetBubblyOrb(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+    function BonusTargetBubblyOrb(id, canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
+        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y);
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(x, y);
         this._hitBoxRegions.addRegion(x, y, p_radius);
         
-        this._physicsEntity = new CirclePhysicsEntity(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, x, y, {});
         
         this._normalState = new BonusTargetBubblyOrbNormalState(this);
@@ -91,7 +90,6 @@ define(['CirclePhysicsEntity', 'SynchronizedTimers', 'Entities/Entity', 'Custom 
                 this._startYInTarget = mouseYRelativeToTarget;
 
                 if(this._targetDistCovered >= this._targetAreaToAchieve){
-                   // this._targetDistCovered = 0;
                     Entity.Entity.prototype.destroyAndReset.call(this, callback);
                     return true;
                 }

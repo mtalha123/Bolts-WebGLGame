@@ -34,7 +34,7 @@ define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utili
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 2:
-                    this._chanceOfSpawning = 10;
+                    this._chanceOfSpawning = 70;
                     break;
                 case 3:
                     this._chanceOfSpawning = 20;

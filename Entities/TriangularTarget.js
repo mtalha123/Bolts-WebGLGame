@@ -1,24 +1,24 @@
-define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsEntity'], function(SynchronizedTimers, Entity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsEntity){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsEntity'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsEntity){
 
     function TriangularTargetDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
+        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
     }
     
-    //inherit from EntityDestructionState
-    TriangularTargetDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
+    //inherit from MovingEntityDestructionState
+    TriangularTargetDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
     TriangularTargetDestructionState.prototype.constructor = TriangularTargetDestructionState; 
     
     
     function TriangularTargetNormalState(target){
-        Entity.EntityNormalState.call(this, target);
+        MovingEntity.MovingEntityNormalState.call(this, target);
     }
     
-    //inherit from EntityNormalState
-    TriangularTargetNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
+    //inherit from MovingEntityNormalState
+    TriangularTargetNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
     TriangularTargetNormalState.prototype.constructor = TriangularTargetNormalState;
     
     TriangularTargetNormalState.prototype.update = function(){
-        Entity.EntityNormalState.prototype.update.call(this);
+        MovingEntity.MovingEntityNormalState.prototype.update.call(this);
         
         this._entity._rotationAngle+=0.05;
         this._handler.setAngle(this._entity._rotationAngle);
@@ -27,7 +27,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
     
     
     function TriangularTarget(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._id = id;       
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
@@ -53,24 +53,24 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
         this._guardPrefs = [0, 0, 0];
     }
     
-    //inherit from Entity
-    TriangularTarget.prototype = Object.create(Entity.Entity.prototype);
+    //inherit from MovingEntity
+    TriangularTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     TriangularTarget.prototype.constructor = TriangularTarget;
     
     TriangularTarget.prototype.setPosition = function(newX, newY){
-        Entity.Entity.prototype.setPosition.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
     TriangularTarget.prototype._setPositionWithInterpolation = function(newX, newY){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
     }
     
     TriangularTarget.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        MovingEntity.MovingEntity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
     }
@@ -102,7 +102,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
     }
     
     TriangularTarget.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._hitBoxRegions.activateAllRegions();
     }
     

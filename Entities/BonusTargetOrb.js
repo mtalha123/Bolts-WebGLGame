@@ -28,7 +28,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
     
     
     function BonusTargetOrb(id, canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
-//        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y);
         this._id = id;       
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
