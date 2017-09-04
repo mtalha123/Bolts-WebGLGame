@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitRegions, distance){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/distance', 'SliceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, distance, SliceAlgorithm){
 
     function BonusTargetOrbStreakDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
@@ -21,19 +21,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     function BonusTargetOrbStreak(id, canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
         Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y);
         this._radius = p_radius;
-        this._hitBoxRegions = new CircularHitRegions(x, y);
-        this._hitBoxRegions.addRegion(x, y, p_radius);
+        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius));
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, x, y, {});
         
         this._normalState = new BonusTargetOrbStreakNormalState(this);
         this._destructionState = new BonusTargetOrbStreakDestructionState(this._handler);
         this._currentState = this._normalState;
-        
-        this._targetDistCovered = 0;
-        this._startXInTarget = undefined;
-        this._startYInTargetInTarget = undefined;
-        this._targetAreaToAchieve = 0.3 * canvasHeight;
         
         this._charge = 0;
     }
@@ -49,61 +43,26 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreak.prototype.setPosition = function(newX, newY){
         Entity.Entity.prototype.setPosition.call(this, newX, newY);
         
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBox.setPosition(newX, newY);
     }
     
     BonusTargetOrbStreak.prototype._setPositionWithInterpolation = function(newX, newY){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBox.setPosition(newX, newY);
     }
     
     BonusTargetOrbStreak.prototype.setAchievementPercentage = function(percent){
         this._handler.increaseGlow(percent / 3.0);
     }
-
-    BonusTargetOrbStreak.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
-        this._targetDistCovered = 0;
-        this._startXInTarget = undefined;
-        this._startYInTarget = undefined;
-    }
     
     BonusTargetOrbStreak.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
-            var mouseX = mouseInputObj.x;
-            var mouseY = mouseInputObj.y;
-            
-            if(this.areCoordsInHitRegions(mouseX, mouseY)){
-                if(!(this._startXInTarget && this._startYInTarget)){
-                    this._startXInTarget = mouseX - this._x;;
-                    this._startYInTarget = mouseY - this._y;;
-                }
-
-                var mouseXRelativeToTarget = mouseX - this._x;
-                var mouseYRelativeToTarget = mouseY - this._y;
-                this._targetDistCovered += distance(this._startXInTarget, this._startYInTarget, mouseXRelativeToTarget, mouseYRelativeToTarget);
-
-                this.setAchievementPercentage(this._targetDistCovered / this._targetAreaToAchieve);
-
-                this._startXInTarget = mouseXRelativeToTarget;
-                this._startYInTarget = mouseYRelativeToTarget;
-
-                if(this._targetDistCovered >= this._targetAreaToAchieve){
-                    Entity.Entity.prototype.destroyAndReset.call(this, callback);
-                    return true;
-                }
-            }else{
-                this._startXInTarget = undefined;
-                this._startYInTarget = undefined;
-            }
-        }
+        if(this._hitBox.processInput(mouseInputObj)){
+            this.destroyAndReset(callback);
+            return true;
+        };
         
         return false;
-    }
-    
-    BonusTargetOrbStreak.prototype.setAchievementParameters = function(targetAreaToAchieve){
-        this._targetAreaToAchieve = targetAreaToAchieve;
     }
     
     return BonusTargetOrbStreak;

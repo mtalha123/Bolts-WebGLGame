@@ -1,35 +1,4 @@
-define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector'], function(distance, rotateCoord, Vector){
-    function CircularHitBox(centerX, centerY, radius, label){
-        this._centerX = centerX;
-        this._centerY = centerY;
-        this._radius = radius;
-        this._label = label;
-        this.activated = true;
-    }
-    
-    CircularHitBox.prototype.isInRegion = function(checkX, checkY){
-        if( distance(checkX, checkY, this._centerX, this._centerY) <= this._radius ){
-            return true;
-        }
-        
-        return false;
-    }
-    
-    CircularHitBox.prototype.setPosition = function(newX, newY){
-        this._centerX = newX;
-        this._centerY = newY;
-    }
-    
-    CircularHitBox.prototype.getPosition = function(){
-        var x = this._centerX;
-        var y = this._centerY;
-        return [x, y];
-    }
-    
-    CircularHitBox.prototype.getLabel = function(){
-        return this._label;
-    }
-    
+define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/CircularHitBoxWithAlgorithm'], function(distance, rotateCoord, Vector, CircularHitBoxWithAlgorithm){    
     function CircularHitRegions(centerXOfAllRegions, centerYOfAllRegions){
         this._centerX = centerXOfAllRegions;
         this._centerY = centerYOfAllRegions;
@@ -37,8 +6,8 @@ define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility
         this._labelCounter = 1;
     }
     
-    CircularHitRegions.prototype.addRegion = function(centerX, centerY, radius){
-        var hitbox = new CircularHitBox(centerX, centerY, radius, this._labelCounter);
+    CircularHitRegions.prototype.addRegion = function(centerX, centerY, radius, algorithm){
+        var hitbox = new CircularHitBoxWithAlgorithm(centerX, centerY, radius, algorithm, this._labelCounter);
         this._regions.push(hitbox);
         
         this._labelCounter++;
@@ -49,6 +18,16 @@ define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility
             if(this._regions[i].activated && this._regions[i].isInRegion(checkX, checkY)){
                 return this._regions[i];
             }
+        }
+        
+        return false;
+    }
+    
+    CircularHitRegions.prototype.processInput = function(mouseInputObj){
+        for(var i = 0; i < this._regions.length; i++){
+            if(this._regions[i].processInput(mouseInputObj)){
+                return this._regions[i];
+            }            
         }
         
         return false;
@@ -87,6 +66,7 @@ define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility
     CircularHitRegions.prototype.activateAllRegions = function(){
         this._regions = this._regions.map(function(currValue){
             currValue.activated = true;
+            currValue.resetAlgorithm();
             return currValue;
         });
     }

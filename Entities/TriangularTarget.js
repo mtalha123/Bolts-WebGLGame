@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm){
 
     function TriangularTargetDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -37,9 +37,9 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         var firstRegion = new Vector(x + p_radius, y);
         var secondRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI - (Math.PI/3), new Vector(x, y));
         var thirdRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI + (Math.PI/3), new Vector(x, y));
-        this._hitBoxRegions.addRegion(firstRegion.getX(), firstRegion.getY(), p_radius / 3);
-        this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3);
-        this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3);
+        this._hitBoxRegions.addRegion(firstRegion.getX(), firstRegion.getY(), p_radius / 3, new SliceAlgorithm(firstRegion.getX(), firstRegion.getY(), p_radius / 3));
+        this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3, new SliceAlgorithm(secondRegion.getX(), secondRegion.getY(), p_radius / 3));
+        this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3, new SliceAlgorithm(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3));
         
         this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, x, y, {radius: [p_radius]});
@@ -72,30 +72,26 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     TriangularTarget.prototype.reset = function(){
         MovingEntity.MovingEntity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
-        this._guardPrefs = [0, 0, 0, 0];
+        this._guardPrefs = [0, 0, 0];
     }
     
     TriangularTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
-            var mouseX = mouseInputObj.x;
-            var mouseY = mouseInputObj.y;
-            
-            var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
-            if(possibleHitBox){
-                this._numGuardsActivated++;
-                if(this._numGuardsActivated === 3){
-                    this._numGuardsActivated = 0;
-                    this._guardPrefs = [0, 0, 0];
-                    this._handler.setGuardPrefs(this._guardPrefs);
-                    this.destroyAndReset(callback);
-                    return true;   
-                }
-
-                this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
+        var possibleHitBox = this._hitBoxRegions.processInput(mouseInputObj);
+        if(possibleHitBox){
+            this._numGuardsActivated++;
+            if(this._numGuardsActivated === 3){
+                this._numGuardsActivated = 0;
+                this._guardPrefs = [0, 0, 0];
                 this._handler.setGuardPrefs(this._guardPrefs);
-                this._handler.increaseLgGlowFactor(1.5);
-                possibleHitBox.activated = false;
+                this.destroyAndReset(callback);
+                return true;   
             }
+
+            this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
+            this._handler.setGuardPrefs(this._guardPrefs);
+            console.log("guardprefs: " + this._guardPrefs);
+            this._handler.increaseLgGlowFactor(1.5);
+            possibleHitBox.activated = false;
         }
         
         return false;

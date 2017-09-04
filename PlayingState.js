@@ -35,7 +35,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 2, EffectsManager); 
         bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 2, EffectsManager);
         triangularTargetController = new TriangularTargetController(gl, appMetaData, 5, EffectsManager);
-        fourPointTargetController = new FourPointTargetController(gl, appMetaData, 5, EffectsManager);
+        fourPointTargetController = new FourPointTargetController(gl, appMetaData, 2, EffectsManager);
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 3, EffectsManager);
         
         fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88, fpsCounter.getFPS().toString());

@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegions'], function(SynchronizedTimers, Entity, CircularHitRegions){
+define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'], function(SynchronizedTimers, Entity, CircularHitBox){
 
     function BonusTargetOrbDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
@@ -34,8 +34,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
         this._y = this._prevY = y;
         
         this._radius = p_radius;
-        this._hitBoxRegions = new CircularHitRegions(x, y);
-        this._hitBoxRegions.addRegion(x, y, p_radius * 3.0);
+        this._hitBox = new CircularHitBox(x, y, p_radius);
         
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, x, y, {radius: [p_radius]});
         
@@ -53,14 +52,14 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
     BonusTargetOrb.prototype.setPosition = function(newX, newY){
         this._x = this._prevX = newX;  
         this._y = this._prevY = newY;
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBox.setPosition(newX, newY);
         this._handler.setPosition(newX, newY);
     }
     
     BonusTargetOrb.prototype._setPositionWithInterpolation = function(newX, newY){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBox.setPosition(newX, newY);
     }
     
     BonusTargetOrb.prototype.turnOnLightning = function(){ 
@@ -82,7 +81,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitRegi
             var mouseX = mouseInputObj.x;
             var mouseY = mouseInputObj.y;
             
-            if(this.areCoordsInHitRegions(mouseX, mouseY)){
+            if(this._hitBox.isInRegion(mouseX, mouseY)){
                 return true;
             }
         }

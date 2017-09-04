@@ -3,8 +3,6 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
     function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
         MovingEntityController.call(this, appMetaData, 100, maxEntitesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
-        this._targetAreaToAchieve = this._targetRadius * 4;
-        this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < maxEntitesToSpawn; i++){
@@ -52,7 +50,6 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         }
         
         newlyActivatedTarget.setPosition(spawnX, spawnY);     
-        newlyActivatedTarget.setAchievementParameters(this._targetAreaToAchieve);
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
@@ -67,11 +64,7 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         MovingEntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "combo_level_increased"){
-            this._targetAreaToAchieve -= this._areaToAchieveReductionAmount;
-            this._setAchievementParamtersForAllActiveTargets();
         }else if(eventInfo.eventType === "combo_level_reset"){
-            this._targetAreaToAchieve = this._targetRadius * 4;
-            this._setAchievementParamtersForAllActiveTargets();
         }else if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 2:
@@ -105,12 +98,6 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         MovingEntityController.prototype.reset.call(this);
         this._spawnAttemptDelay = 2000;
         this._chanceOfSpawning = 100;
-    }
-    
-    BasicTargetsController.prototype._setAchievementParamtersForAllActiveTargets = function(){
-        for(var i = 0; i < this._entitiesActivated.length; i++){
-            this._entitiesActivated[i].setAchievementParameters(this._targetAreaToAchieve);
-        }
     }
     
     return BasicTargetsController;

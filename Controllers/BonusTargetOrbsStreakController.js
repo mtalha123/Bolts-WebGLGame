@@ -1,9 +1,8 @@
 define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
-        this._targetAreaToAchieve = this._targetRadius * 4;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;
         
@@ -27,7 +26,6 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
         var newlyActivatedTarget = this._entitiesPool.shift();   
         
         newlyActivatedTarget.setPosition(spawnX, spawnY);     
-        newlyActivatedTarget.setAchievementParameters(this._targetAreaToAchieve);
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){ });
@@ -39,11 +37,7 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
         EntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "combo_level_increased"){
-            this._targetAreaToAchieve -= this._areaToAchieveReductionAmount;
-            this._setAchievementParamtersForAllActiveTargets();
         }else if(eventInfo.eventType === "combo_level_reset"){
-            this._targetAreaToAchieve = this._targetRadius * 4;
-            this._setAchievementParamtersForAllActiveTargets();
         }else if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 4:
@@ -56,12 +50,6 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
                     this._chanceOfSpawning = 45;
                     break;
             }
-        }
-    }
-    
-    BonusTargetOrbsStreakController.prototype._setAchievementParamtersForAllActiveTargets = function(){
-        for(var i = 0; i < this._entitiesActivated.length; i++){
-            this._entitiesActivated[i].setAchievementParameters(this._targetAreaToAchieve);
         }
     }
     

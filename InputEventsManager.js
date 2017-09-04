@@ -109,3 +109,136 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Curso
     }
     
 });
+
+
+/*
+define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty'], function(Cursor, EventSystem, isObjectEmpty){
+    
+    var allInputObjs = [];
+    
+    var inputObj = {
+        mouseState: {
+            type: undefined,
+            x: undefined,
+            y: undefined
+        }
+    };
+    var mouseDown = false;
+    
+    var appMetaData;
+    
+    function initialize(canvas, p_appMetaData){
+        canvas.addEventListener("mousemove", function(event){
+            handleMouseEvent("mousemove", event);
+        }, false);    
+        canvas.addEventListener("mousedown", function(event){
+           handleMouseEvent("mousedown", event);
+        }, false);    
+        canvas.addEventListener("mouseup", function(event){
+           handleMouseEvent("mouseup", event);
+        }, false);
+//        document.addEventListener("keypress", function(event){
+//            handleKeyboardEvent("keypress", event);
+//        });
+//        document.addEventListener("keyup", function(event){
+//            handleKeyboardEvent("keyup", event);
+//        });
+        
+        appMetaData = p_appMetaData;
+    }
+    
+    function notifyOfCurrentStateAndConsume(){
+        var returnObject = inputObj;
+
+        if(allInputObjs.length > 0){
+            var len = allInputObjs.length;
+            console.log("LENGTH: " + len);
+            for(var i = 0; i < len; i++){
+                var tempInputObj = allInputObjs.shift();
+                EventSystem.publishEventImmediately(tempInputObj.mouseState.type, {x: tempInputObj.mouseState.x, y: tempInputObj.mouseState.y});
+            }
+//            EventSystem.publishEventImmediately(inputObj.mouseState.type, {x: inputObj.mouseState.x, y: inputObj.mouseState.y});
+    
+            inputObj = {
+                mouseState: {
+                    type: undefined,
+                    x: undefined,
+                    y: undefined
+                }
+            };  
+            
+            return returnObject;
+        }else{
+            return undefined;
+        }
+    }
+    
+    function handleMouseEvent(eventType, eventData){  
+        var inputObj = {
+            mouseState: {
+                type: undefined,
+                x: undefined,
+                y: undefined
+            }
+        };
+        switch(eventType){
+            case "mousedown":
+                Cursor.press();
+                mouseDown = true;
+                inputObj.mouseState.type = "mouse_down";
+                break;
+            case "mouseup":
+                Cursor.release();
+                mouseDown = false;
+                inputObj.mouseState.type = "mouse_up";
+                break;
+            case "mousemove":
+                if(mouseDown){
+                    inputObj.mouseState.type = "mouse_held_down"; 
+                }else{
+                    inputObj.mouseState.type = "mouse_move";
+                }
+                break;
+        }
+        inputObj.mouseState.x = eventData.clientX;
+        inputObj.mouseState.y = appMetaData.getCanvasHeight() - eventData.clientY;
+        
+        allInputObjs.push(inputObj);
+        
+        Cursor.changePosition(eventData.clientX, appMetaData.getCanvasHeight() - eventData.clientY);
+    }
+    
+//    function handleKeyboardEvent(eventType, eventData){
+//        switch(eventType){
+//            case "keypress":
+//                mostRecentKeyPressed = String.fromCharCode(eventData.charCode);
+//                
+//                if(mostRecentKeyPressed === " "){
+//                    keyboardStateChangedSinceLastConsume = true;
+//                    mostRecentInput.keyboardState.type = "key_press";
+//                }
+//                break;
+//            case "keyup":
+//                if(mostRecentKeyPressed === " "){
+//                    keyboardStateChangedSinceLastConsume = true;
+//                    mostRecentInput.keyboardState.type = "key_up";
+//                }
+//                mostRecentKeyPressed = undefined;
+//                break;
+//        }
+//    }
+    
+    function getCurrentInputObj(){
+        return allInputObjs[allInputObjs.length-1];
+    }
+    
+    
+    return {
+        initialize: initialize,
+        notifyOfCurrentStateAndConsume: notifyOfCurrentStateAndConsume,
+        getCurrentInputObj: getCurrentInputObj
+    }
+    
+});
+
+*/

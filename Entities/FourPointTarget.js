@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm){
 
     function FourPointTargetDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -34,10 +34,10 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(x, y);
-        this._hitBoxRegions.addRegion(x + p_radius, y, p_radius / 2.5);
-        this._hitBoxRegions.addRegion(x, y + p_radius, p_radius / 2.5);
-        this._hitBoxRegions.addRegion(x - p_radius, y, p_radius / 2.5);
-        this._hitBoxRegions.addRegion(x, y - p_radius, p_radius / 2.5);
+        this._hitBoxRegions.addRegion(x + p_radius, y, p_radius / 2.5, new SliceAlgorithm(x + p_radius, y, p_radius / 2.5));
+        this._hitBoxRegions.addRegion(x, y + p_radius, p_radius / 2.5, new SliceAlgorithm(x, y + p_radius, p_radius / 2.5));
+        this._hitBoxRegions.addRegion(x - p_radius, y, p_radius / 2.5, new SliceAlgorithm(x - p_radius, y, p_radius / 2.5));
+        this._hitBoxRegions.addRegion(x, y - p_radius, p_radius / 2.5, new SliceAlgorithm(x, y - p_radius, p_radius / 2.5));
         
         this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, x, y, {radius: [p_radius]});
@@ -75,28 +75,24 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     
     
     FourPointTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
-            var mouseX = mouseInputObj.x;
-            var mouseY = mouseInputObj.y;
-            
-            var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
-            if(possibleHitBox){
-                this._numGuardsActivated++;
-                if(this._numGuardsActivated === 4){
-                    this._numGuardsActivated = 0;
-                    this._guardPrefs = [0, 0, 0, 0];
-                    this._handler.setGuardPrefs(this._guardPrefs);
-                    this.destroyAndReset(callback);
-                    return true;   
-                }
-
-                this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
+        var possibleHitBox = this._hitBoxRegions.processInput(mouseInputObj);
+        if(possibleHitBox){
+            this._numGuardsActivated++;
+            if(this._numGuardsActivated === 4){
+                this._numGuardsActivated = 0;
+                this._guardPrefs = [0, 0, 0, 0];
                 this._handler.setGuardPrefs(this._guardPrefs);
-                this._handler.increaseLgGlowFactor(1.5);
-                possibleHitBox.activated = false;
+                this.destroyAndReset(callback);
+                return true;   
             }
-        }
+
+            this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
+            this._handler.setGuardPrefs(this._guardPrefs);
+            this._handler.increaseLgGlowFactor(1.5);
+            possibleHitBox.activated = false;
+         }
         
+
         return false;
     }
     

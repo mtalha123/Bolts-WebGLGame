@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitRegions, distance, Vector, EventSystem){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem', 'CoverDistanceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, distance, Vector, EventSystem, CoverDistanceAlgorithm){
 
     function SpikeEnemyDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -40,8 +40,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, 0, speed);
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
-        this._hitBoxRegions = new CircularHitRegions(x, y);
-        this._hitBoxRegions.addRegion(x, y, p_radius * 2.8);
+        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new CoverDistanceAlgorithm(x, y, p_radius, canvasHeight * 0.25));
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, x, y, {});
         
@@ -51,8 +50,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         
         this._destination = new Vector(0, 0);
         this._velocity = ((new Vector(-x, -y)).getNormalized()).multiplyWithScalar(speed);
-        
-        this._inputArray = [];
         
         this._charge = 0;
         
@@ -70,19 +67,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     SpikeEnemy.prototype.setPosition = function(newX, newY){
         this._x = this._prevX = newX;  
         this._y = this._prevY = newY;
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBox.setPosition(newX, newY);
     }
     
     SpikeEnemy.prototype._setPositionWithInterpolation = function(newX, newY){
-        var posDiff = new Vector(newX - this._x, newY - this._y);        
-        this._inputArray = this._inputArray.map(function(currValue){
-            currValue.addTo(posDiff);
-            return currValue;
-        });
-        
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBox.setPosition(newX, newY);
     }
     
     SpikeEnemy.prototype.setAchievementPercentage = function(percent){
@@ -99,7 +90,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.reset.call(this);
         this._lightningStealTimer.reset();
         this._charge = 0;
-        this._inputArray = [];
+        this._hitBox.resetAlgorithm();
     } 
     
     SpikeEnemy.prototype.spawn = function(callback){
@@ -107,43 +98,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._lightningStealTimer.start();
     } 
     
-    SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
-            var mouseX = mouseInputObj.x;
-            var mouseY = mouseInputObj.y;
-            
-            if(this.areCoordsInHitRegions(mouseX, mouseY)){
-                this._inputArray.push(new Vector(mouseX, mouseY));
-                if(this._inputArray.length > 7){
-                    this._inputArray.shift();
-                }
-
-
-                var lastIndex = this._inputArray.length - 1;
-                if(distance(this._inputArray[0].getX(), this._inputArray[0].getY(), this._inputArray[lastIndex].getX(), this._inputArray[lastIndex].getY()) >= this._radius * 3){
-                    var achieved = true;
-                    this._inputArray.map(function(val, index, array){
-                        var startToCurr = array[0].subtractFrom(val);
-                        var startToLast = array[0].subtractFrom(array[array.length-1]);
-                        var projection = startToCurr.projectOnto(startToLast);
-                        var pointOnLine = array[0].addTo(projection);
-                        var dist = distance(val.getX(), val.getY(), pointOnLine.getX(), pointOnLine.getY());
-
-                        if(dist >= 15){
-                            achieved = false;
-                        }
-                    });
-                    if(achieved){
-                        this.destroyAndReset(callback);
-                        return true;   
-                    }
-                }
-            }else{
-                this._inputArray = [];
-            }
-        }else{
-            this._inputArray = [];
-        }
+    SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
+        if(this._hitBox.processInput(mouseInputObj)){
+            this.destroyAndReset(callback);
+            return true;
+        };
         
         return false;
     }
