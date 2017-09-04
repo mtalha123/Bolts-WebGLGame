@@ -60,5 +60,9 @@ define(['Custom Utility/distance'], function(distance){
         return false;
     }
     
+    Vector.prototype.getAngleBetweenThisAnd = function(vec){
+        return Math.acos(dot(this, vec) / (this.getMagnitude() * vec.getMagnitude()));
+    }
+    
     return Vector;
 });
