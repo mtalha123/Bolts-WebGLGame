@@ -9,11 +9,10 @@ void main(){
 //FRAGMENT SHADER
 precision mediump float;
 
-const int MAX_ITERATIONS = 10;
+const int NUM_COORDS = 5;
 
 uniform float iGlobalTime;
 uniform vec2 iResolution;
-uniform int numCoords;
 uniform float widthOfCoordsTexture;
 uniform float glowFactor;
 uniform float fluctuation;
@@ -42,11 +41,7 @@ void main(){
     float xClamped, yNoiseVal;
     vec2 pointOnLightning;
        
-    for(int i = 0; i < MAX_ITERATIONS; i++){
-        if(i == (numCoords - 1)){
-            break;
-        }
-        
+    for(int i = 0; i < NUM_COORDS; i++){
         lightningStart = texture2D(coords, vec2(float(i) * (1.0/widthOfCoordsTexture), 0.5) ).xy;
         lightningEnd = texture2D(coords, vec2((float(i)+1.0) * (1.0/widthOfCoordsTexture), 0.5) ).xy;
         
