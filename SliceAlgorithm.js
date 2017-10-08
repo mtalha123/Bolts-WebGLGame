@@ -14,11 +14,11 @@ define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, di
             if(this._inputArray.length > 4){
                 this._inputArray.shift();
             }
-
+        
             var lastIndex = this._inputArray.length - 1;
             var vec1 = this._position.subtractFrom(this._inputArray[0]);
             var vec2 = this._position.subtractFrom(this._inputArray[lastIndex]);
-            if( (Math.PI - vec1.getAngleBetweenThisAnd(vec2)) <= (25 * (Math.PI / 180)) ){
+            if( (Math.PI - vec1.getAngleBetweenThisAnd(vec2)) <= (10 * (Math.PI / 180)) ){
                 if(distance(this._inputArray[0].getX(), this._inputArray[0].getY(), this._inputArray[lastIndex].getX(), this._inputArray[lastIndex].getY()) >= this._radius * 2){
                     return true;    
                 }
