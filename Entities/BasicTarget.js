@@ -18,8 +18,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     BasicTargetNormalState.prototype.constructor = BasicTargetNormalState;
     
     
-    function BasicTarget(id, canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius));
         

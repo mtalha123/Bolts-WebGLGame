@@ -1,12 +1,12 @@
 define(['Entities/TriangularTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController'], function(TriangularTarget, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController, ){
     
     function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        MovingEntityController.call(this, appMetaData, 100, maxEntitiesToSpawn, 10); 
+        MovingEntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
         this._spawnAttemptDelay = 5000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new TriangularTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
+            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
         }
         
         this._spawnTimer.start();

@@ -6,7 +6,7 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < maxEntitesToSpawn; i++){
-            this._entitiesPool[i] = new BasicTarget(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, 0, 0, 30, 10, EffectsManager);
+            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, 0, 0, 30, 10, EffectsManager);
         }
         
         this._spawnTimer.start();

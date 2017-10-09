@@ -1,7 +1,7 @@
 define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;

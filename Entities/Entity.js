@@ -27,8 +27,7 @@ define([], function(){
     EntityNormalState.prototype.update = function(){ }
     
     
-    function Entity(id, canvasWidth, canvasHeight, gl, x, y){
-        this._id = id;       
+    function Entity(canvasWidth, canvasHeight, gl, x, y){       
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         this._hitBoxRegions = null;
@@ -71,10 +70,6 @@ define([], function(){
     
     Entity.prototype.getY = function(){
         return this._y;
-    }
-    
-    Entity.prototype.getId = function(){
-        return this._id;
     }
     
     Entity.prototype.spawn = function(callback){

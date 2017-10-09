@@ -1,13 +1,14 @@
-define(['Entities/BonusTargetBubblyOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetBubblyOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
+define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetBubblyOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityController){
     
     function BonusTargetBubblyOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn, 10); 
-        this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
+        this._targetRadius = appMetaData.getCanvasHeight() * 0.07;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){              
-            this._entitiesPool[i] = new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
+//            this._entitiesPool[i] = new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
+            this._entitiesPool[i] = new BonusTargetBubblyOrbCompound(gl, appMetaData, this._targetRadius, 100, 100, EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -48,6 +49,11 @@ define(['Entities/BonusTargetBubblyOrb', 'SynchronizedTimers', 'Border', 'Custom
                     break;
             }
         }
+    }
+    
+    BonusTargetBubblyOrbsController.prototype.update = function(){
+       // console.log("entites pool length: " + this._entitiesPool.length);
+        EntityController.prototype.update.call(this);
     }
     
     return BonusTargetBubblyOrbsController;

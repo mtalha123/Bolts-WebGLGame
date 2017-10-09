@@ -26,9 +26,8 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     
-    function TriangularTarget(id, canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
-        this._id = id;       
+    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);    
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         

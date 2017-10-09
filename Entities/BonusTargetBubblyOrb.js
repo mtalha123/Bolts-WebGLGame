@@ -23,7 +23,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius));
         
-        this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, x, y, {});
+        this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, x, y, {radius: [p_radius]});
         
         this._normalState = new BonusTargetBubblyOrbNormalState(this);
         this._destructionState = new BonusTargetBubblyOrbDestructionState(this._handler);
