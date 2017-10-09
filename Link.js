@@ -1,4 +1,4 @@
-define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSystem', 'Custom Utility/Vector'], function(CircularHitRegions, distance, EventSystem, Vector){
+define(['Custom Utility/CircularHitBox', 'Custom Utility/distance', 'EventSystem', 'Custom Utility/Vector'], function(CircularHitBox, distance, EventSystem, Vector){
     
     function Link(gl, x1, y1, x2, y2, EffectsManager){
         this._handler = new EffectsManager.requestLinkHandler(false, gl, 10, x1, y1, x2, y2, EffectsManager);
@@ -10,9 +10,8 @@ define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSy
             var mouseX = mouseInputObj.x;
             var mouseY = mouseInputObj.y;
         
-            var possibleHitBox = this._hitBoxRegions.isInAnyRegion(mouseX, mouseY);
-            if(possibleHitBox){
-                var currHitBoxPosition = this._hitBoxRegions.getPosition();
+            if(this._hitBox.isInRegion(mouseX, mouseY)){
+                var currHitBoxPosition = this._hitBox.getPosition();
                 var currHitBoxPosToMouse = (new Vector(currHitBoxPosition[0], currHitBoxPosition[1])).subtractFrom(new Vector(mouseX, mouseY));
                 var projection = currHitBoxPosToMouse.projectOnto(this._dirVec);
 
@@ -23,7 +22,7 @@ define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSy
                         this.destroyAndReset();
                         return true;
                     }else{
-                        this._hitBoxRegions.setPosition(newHitBoxPosition.getX(), newHitBoxPosition.getY());
+                        this._hitBox.setPosition(newHitBoxPosition.getX(), newHitBoxPosition.getY());
 
                         var completion = distance(this._startPosition.getX(), this._startPosition.getY(), newHitBoxPosition.getX(), newHitBoxPosition.getY()) / this._lineLength;
                         this._handler.setCompletion(completion);   
@@ -40,14 +39,13 @@ define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSy
         this._lineLength = distance(x1, y1, x2, y2);
         this._startPosition = new Vector(x1, y1);
         this._endPosition = new Vector(x2, y2);
-        this._hitBoxRegions = new CircularHitRegions(x1, y1);
-        this._hitBoxRegions.addRegion(x1, y1, 150);
+        this._hitBox = new CircularHitBox(x1, y1, 200, 1);
         this._handler.setCoords(x1, y1, x2, y2);
     }
     
     Link.prototype.destroyAndReset = function(){
         this._handler.doDestroyEffect(this._endPosition.getX(), this._endPosition.getY());
-        this._hitBoxRegions.setPosition(this._startPosition.getX(), this._startPosition.getY());
+        this._hitBox.setPosition(this._startPosition.getX(), this._startPosition.getY());
         this._handler.setCompletion(0);
     }
     
@@ -56,7 +54,7 @@ define(['Custom Utility/CircularHitRegions', 'Custom Utility/distance', 'EventSy
     }
     
     Link.prototype.reset = function(){
-        this._hitBoxRegions.setPosition(this._startPosition.getX(), this._startPosition.getY());
+        this._hitBox.setPosition(this._startPosition.getX(), this._startPosition.getY());
         this._handler.setCompletion(0);
         this._handler.shouldDraw(false);
     }

@@ -27,14 +27,13 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     BonusTargetOrbNormalState.prototype.update = function(){ }
     
     
-    function BonusTargetOrb(id, canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y);
-        this._id = id;       
+    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, x, y);     
         this._x = this._prevX = x; 
         this._y = this._prevY = y;
         
         this._radius = p_radius;
-        this._hitBox = new CircularHitBox(x, y, p_radius);
+        this._hitBox = new CircularHitBox(x, y, p_radius * 1.5);
         
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, x, y, {radius: [p_radius]});
         
