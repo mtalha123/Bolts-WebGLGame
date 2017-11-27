@@ -35,7 +35,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/getSimplexN
                             (appMetaData.getCanvasWidth() - margin - (borderLength/2)) + (gapForScore/2), appMetaData.getCanvasHeight() - margin           
         ];
         
-        handler = EffectsManager.requestLightningEffect(false, gl, 3, {}, borderPath);
+        handler = EffectsManager.requestLightningEffect(false, gl, 3, {}, borderPath, true);
         scoreHandler = EffectsManager.requestTextEffect(false, gl, 4, {}, 100, 100, "0");
         healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, borderPath[0], borderPath[1] - 50, borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50);
         

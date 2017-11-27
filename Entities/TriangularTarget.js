@@ -36,9 +36,9 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         var firstRegion = new Vector(x + p_radius, y);
         var secondRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI - (Math.PI/3), new Vector(x, y));
         var thirdRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI + (Math.PI/3), new Vector(x, y));
-        this._hitBoxRegions.addRegion(firstRegion.getX(), firstRegion.getY(), p_radius / 3, new SliceAlgorithm(firstRegion.getX(), firstRegion.getY(), p_radius / 3));
-        this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3, new SliceAlgorithm(secondRegion.getX(), secondRegion.getY(), p_radius / 3));
-        this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3, new SliceAlgorithm(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3));
+        this._hitBoxRegions.addRegion(firstRegion.getX(), firstRegion.getY(), p_radius / 3, new SliceAlgorithm(firstRegion.getX(), firstRegion.getY(), p_radius / 3, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3, new SliceAlgorithm(secondRegion.getX(), secondRegion.getY(), p_radius / 3, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3, new SliceAlgorithm(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3, gl, EffectsManager));
         
         this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, x, y, {radius: [p_radius]});

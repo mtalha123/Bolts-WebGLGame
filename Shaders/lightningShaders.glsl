@@ -19,6 +19,8 @@ uniform float fluctuation;
 uniform float lineWidth;
 uniform vec3 boltColor;
 uniform vec3 glowColor;
+uniform float spikedLgBool;
+uniform float completion;
 uniform sampler2D noise;
 uniform sampler2D coords;
 
@@ -29,6 +31,7 @@ void main(){
     //normalize
     float lineWidthUV = lineWidth / iResolution.y; 
     float fluctuationUV = fluctuation / iResolution.y;
+    float glowFactor = glowFactor / iResolution.y;
     
     //take into account aspect ratio    
     uv.x *= aspectRatio;
@@ -48,24 +51,41 @@ void main(){
         lightningStart.x *= aspectRatio;
         lightningEnd.x *= aspectRatio;
 
-        testDistance = genLightningAndGetDist(uv, lightningStart, lightningEnd, lineWidthUV, fluctuationUV, 0.3, noise, iGlobalTime, iResolution);
+        testDistance = genLightningAndGetDist(uv, lightningStart, lightningEnd, lineWidthUV, fluctuationUV, 0.3, spikedLgBool, noise, iGlobalTime, iResolution);
         
         if(testDistance < distanceToPoint){
             distanceToPoint = testDistance;
         }
     }
     
-    float invertedDistance = smoothstep(0.0, 220.0, 1.0 / distanceToPoint);
-    float multiplier = invertedDistance;
-    
     float alpha = 1.0;
     
-    if(distanceToPoint <= lineWidthUV){
-        finalColor = boltColor;
-    }else{
-        finalColor = vec3(1.0, 1.0, 0.7);
-        alpha *= multiplier;
+    if(distanceToPoint == 0.0){
+        distanceToPoint = 0.0000001;
     }
+    
+    if(spikedLgBool == 1.0){
+        lineWidthUV *= (1.0 - completion);
+        glowFactor *= (1.0 - completion);
+        
+        float edgeBlurWidth = min(lineWidthUV, 0.005);
+        float smthVal = 1.0 - smoothstep(lineWidthUV - edgeBlurWidth, lineWidthUV, distanceToPoint);  
+        float invertedDist = 1.0 / (distanceToPoint - ((1.0 - smthVal) * (lineWidthUV - edgeBlurWidth)));
+        float glowMultiplier = invertedDist * glowFactor;
+
+        finalColor = (smthVal * boltColor) + ((1.0 - smthVal) * glowColor * glowMultiplier); 
+        alpha = glowMultiplier;
+    }else{
+        float invertedDistance = smoothstep(0.0, 220.0, 1.0 / distanceToPoint);
+        float multiplier = invertedDistance;
+        
+        if(distanceToPoint <= lineWidthUV){
+            finalColor = boltColor;
+        }else{
+            finalColor = glowColor;
+            alpha = multiplier;
+        }
+    }    
 
 	gl_FragColor = vec4(finalColor, alpha);
 }

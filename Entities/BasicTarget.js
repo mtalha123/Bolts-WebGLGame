@@ -21,7 +21,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius));
+        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius, gl, EffectsManager));
         
         this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  

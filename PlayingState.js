@@ -64,6 +64,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         fourPointTargetController.prepareForDrawing(interpolation);
         spikeEnemyController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
+        EffectsManager.prepareForDrawing();
 
         ComboSystem.draw();
         Background.draw();
@@ -122,7 +123,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
     }
     
     function handleGameLeveling(){
-        console.log("CURRENT TIME: " + gameLevelTimer.getTime());
+       // console.log("CURRENT TIME: " + gameLevelTimer.getTime());
         
         if(gameLevelTimer.getTime() >= 290000){
             EventSystem.publishEvent("game_level_up", {level: 8})

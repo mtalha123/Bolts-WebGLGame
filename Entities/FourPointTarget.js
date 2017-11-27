@@ -33,10 +33,10 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(x, y);
-        this._hitBoxRegions.addRegion(x + p_radius, y, p_radius / 2.5, new SliceAlgorithm(x + p_radius, y, p_radius / 2.5));
-        this._hitBoxRegions.addRegion(x, y + p_radius, p_radius / 2.5, new SliceAlgorithm(x, y + p_radius, p_radius / 2.5));
-        this._hitBoxRegions.addRegion(x - p_radius, y, p_radius / 2.5, new SliceAlgorithm(x - p_radius, y, p_radius / 2.5));
-        this._hitBoxRegions.addRegion(x, y - p_radius, p_radius / 2.5, new SliceAlgorithm(x, y - p_radius, p_radius / 2.5));
+        this._hitBoxRegions.addRegion(x + p_radius, y, p_radius / 2.5, new SliceAlgorithm(x + p_radius, y, p_radius / 2.5, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(x, y + p_radius, p_radius / 2.5, new SliceAlgorithm(x, y + p_radius, p_radius / 2.5, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(x - p_radius, y, p_radius / 2.5, new SliceAlgorithm(x - p_radius, y, p_radius / 2.5, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(x, y - p_radius, p_radius / 2.5, new SliceAlgorithm(x, y - p_radius, p_radius / 2.5, gl, EffectsManager));
         
         this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, x, y, {radius: [p_radius]});

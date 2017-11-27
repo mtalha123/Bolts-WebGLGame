@@ -94,7 +94,7 @@ void main()
     
     vec2 center = mousecoords;   
     vec4 color;
-    color = vec4(1.0, 1.0, 0.0, 1.0) * (1.0/distance(uv, mousecoords)) * 0.003;
+    color = vec4(1.0, 0.0, 0.4, 1.0) * (1.0/distance(uv, mousecoords)) * 0.003;
     
     if(clicked == 1.0){
         float noiseVal;
@@ -111,7 +111,7 @@ void main()
         vec2 closestPoint = center + (normalize(uv - center) * radius); 
         vec2 uvToCenterDirVec = normalize(center - uv);
         vec2 lightningPoint = closestPoint + (uvToCenterDirVec * noiseVal);
-        color += vec4(1.0, 1.0, 0.0, 1.0) * (1.0/distance(lightningPoint, uv)) * 0.002;
+        color += vec4(1.0, 0.0, 0.4, 1.0) * (1.0/distance(lightningPoint, uv)) * 0.002;
     }
     gl_FragColor = color;
 }

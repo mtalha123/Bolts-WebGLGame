@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.18:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.22:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -35,8 +35,8 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     var canvas = document.getElementById("canvas");
     
     //innerWidth and innerHeight are the width and height of the window without toolbars/scrollbars (i.e. content on page)
-    var canvasWidth = canvas.width = 1920;//window.innerWidth;
-    var canvasHeight = canvas.height = 950;//window.innerHeight;
+    var canvasWidth = canvas.width = window.innerWidth; //CHANGE TO LOWER RESOLUTION FOR PERFORMANCE
+    var canvasHeight = canvas.height = window.innerHeight; //CHANGE TO LOWER RESOLUTION FOR PERFORMANCE
     
     //get context of main canvas and store in variable "context"
     //var context = canvas.getContext("2d");
@@ -111,7 +111,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
                     var updatesDue = Math.floor((currentTime - currentTickTime) / 50) + 1;
 
                     if(loops > 1){
-                        console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
+                       // console.log("MORE UPDATE ITERATIONS!     LOOPS NUM: " + loops);
                     }
                 }
 
@@ -200,5 +200,9 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     window.onblur = function(){
         windowFocused = false;
     }
+    
+    
+    console.log("TEST SCREEN WIDTH: " + window.screen.availWidth);
+    console.log("TEST SCREEN HEIGHT: " + window.screen.availHeight);
     
 });

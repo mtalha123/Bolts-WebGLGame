@@ -60,7 +60,7 @@ void main()
 
     float completion = sinPositive(iGlobalTime / 20.0);   
     vec4 startAndEndPts = getStartAndEndPtsOnCirc(radius - 0.005, completion, center);
-    float dist = genLightningAndGetDist(uv, startAndEndPts.rg, startAndEndPts.ba, 0.0005, 0.02, 3.0, noise, iGlobalTime, iResolution);
+    float dist = genLightningAndGetDist(uv, startAndEndPts.rg, startAndEndPts.ba, 0.0005, 0.02, 3.0, 0.0, noise, iGlobalTime, iResolution);
     float m = pow((1.0 / dist) * lgGlowFactor, 1.5);
     color = vec4( vec3(1.0, 1.0, 0.0) * m, m);
     

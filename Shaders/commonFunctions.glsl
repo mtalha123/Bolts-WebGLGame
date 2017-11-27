@@ -64,7 +64,7 @@ vec2 getClosestAnglePointToUV(vec2 uv, vec2 center, float radius, float numPoint
 	return rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
 }
 
-float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float lineWidthUV, float fluctuationUV, float noiseXMultiplier, sampler2D noise, float iGlobalTime, vec2 iResolution){
+float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float lineWidthUV, float fluctuationUV, float noiseXMultiplier, float spikedLgBool, sampler2D noise, float iGlobalTime, vec2 iResolution){
     if(lgStartUV.x > lgEndUV.x){
         float temp = lgStartUV.x;
         lgStartUV.x = lgEndUV.x;
@@ -85,12 +85,17 @@ float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float
 
     float xClamped = clamp(currentUV_t.x, 0.0, lengthOfLightning);
     float yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(noiseXMultiplier * xClamped, iGlobalTime / 1024.0)).r) * (fluctuationUV * lightningCos(xClamped, lengthOfLightning));
-    vec2 pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV)); 
+    vec2 pointOnLightning;
+    if(spikedLgBool == 1.0){
+        pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0), yNoiseVal + (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0)));
+    }else{
+        pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV));    
+    }
     return distance(currentUV_t, pointOnLightning);
 }
 
 vec4 genLightningAndGetColor(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float lineWidthUV, float fluctuationUV, float noiseXMultiplier, sampler2D noise, float iGlobalTime, vec2 iResolution, vec3 solidColor, vec3 glowColor, float glowMultiplier){
-    float distToLg = genLightningAndGetDist(currentUV, lgStartUV, lgEndUV, lineWidthUV, fluctuationUV, noiseXMultiplier, noise, iGlobalTime, iResolution);
+    float distToLg = genLightningAndGetDist(currentUV, lgStartUV, lgEndUV, lineWidthUV, fluctuationUV, noiseXMultiplier, 0.0, noise, iGlobalTime, iResolution);
     
     vec4 color = vec4(0.0);
     if(distToLg <= lineWidthUV){

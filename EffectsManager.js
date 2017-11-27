@@ -1,11 +1,13 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'SynchronizedTimers'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, SynchronizedTimers){
     var allHandlers = [];
+    var automaticUpdatesHandlerObjs = [];
     
     var ShaderLibrary;
     var fontTexture;
     var spiderWebTexture;
     var simplexNoiseTexture, worleyNoiseTexture;
     var appMetaData;
+
     
     
     function initialize(p_ShaderLibrary, p_appMetaData, AssetManager){
@@ -45,8 +47,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         }   
     }
     
-    function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords){
-        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0}, 1);
+    function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords, shouldAnimateLg){
+        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0}, 1, addHandlerToAutomaticUpdates);
         
         addHandlers(handler.getAllHandlers());
         return handler;
@@ -168,6 +170,31 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handlersToReturn;
     }
     
+    function addHandlerToAutomaticUpdates(handler, timeToStopUpdates, callback){
+        var timer = SynchronizedTimers.getTimer();
+        timer.start();
+        
+        var handlerObj = {
+            handler: handler,
+            timeToStopUpdates: timeToStopUpdates,
+            timer: timer,
+            callback: callback
+        };
+        
+        automaticUpdatesHandlerObjs.push(handlerObj);
+    }
+    
+    function prepareForDrawing(){
+        for(var i = 0; i < automaticUpdatesHandlerObjs.length; i++){
+            if(automaticUpdatesHandlerObjs[i].timer.getTime() >= automaticUpdatesHandlerObjs[i].timeToStopUpdates){
+                automaticUpdatesHandlerObjs[i].callback();
+                automaticUpdatesHandlerObjs.splice(i, 1);
+            }else{
+                automaticUpdatesHandlerObjs[i].handler.update();   
+            }
+        }
+    }
+    
     return {
         initialize: initialize,
         getHandlers: getHandlers,
@@ -187,6 +214,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestLinkHandler: requestLinkHandler,
         requestFullScreenColorHandler: requestFullScreenColorHandler,
         requestLifebarHandler: requestLifebarHandler,
+        prepareForDrawing: prepareForDrawing
     };
     
 });

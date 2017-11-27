@@ -1,7 +1,7 @@
 define(['Entities/BonusTargetOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityController){
     
     function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn, 0); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 0); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
         this._spawnAttemptDelay = 2000;
         

@@ -122,7 +122,7 @@ void main()
             lgStartCoord = rotateCoord(vec2(centerUV.x + (radiusUV * 0.5), centerUV.y), closestAngleMultiple, centerUV);
         }
         
-        float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, lgLineWidthUV, fluctuationUV, 4.0, noise, iGlobalTime, iResolution);
+        float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, lgLineWidthUV, fluctuationUV, 4.0, 0.0, noise, iGlobalTime, iResolution);
         if(distToLg == 0.0){
             distToLg = 0.0000001;
         }
