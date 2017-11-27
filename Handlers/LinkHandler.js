@@ -62,7 +62,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         var startCoord = new Vector(this._uniforms.startCoord.value[0], this._uniforms.startCoord.value[1]);
         var endCoord = new Vector(this._uniforms.endCoord.value[0], this._uniforms.endCoord.value[1]);
         
-        var dirVec = (endCoord.subtractFrom(startCoord)).multiplyWithScalar(this._padding);
+        var dirVec = (endCoord.subtractFrom(startCoord)).getNormalized().multiplyWithScalar(this._padding);
         var negDirVec = dirVec.multiplyWithScalar(-1);
         var perp1 = new Vector(-dirVec.getY(), dirVec.getX());
         var perp2 = new Vector(dirVec.getY(), -dirVec.getX());
