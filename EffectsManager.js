@@ -97,7 +97,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestEnemySpikeEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new SpikeEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary);
+        var handler = new SpikeEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;

@@ -57,6 +57,8 @@ uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform vec2 center;
 uniform float radius;
+uniform float numBolts;
+uniform sampler2D noise;
 
 
 void main()
@@ -81,6 +83,30 @@ void main()
     vec2 closestPtToCircle = normalize(uv_t - center) * radius;
     uv_t -= closestPtToCircle;
     color = getSpikeColor(uv_t, center, PI/2.0, radius);
+    
+    
+    /* Dealing with lg bolts */
+    
+    uv = rotateCoord(uv, -0.04 * iGlobalTime * numBolts, center); // make lg spin faster, relative to how many bolts there are   
+    vec4 lgContribution;
+    float angleMultipleDeg = 360.0 / numBolts;
+    float UVAngleDeg = getUVAngleDeg(uv, center);
+    float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
+    vec2 rotatedCoord = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
+    vec2 lgStartCoord = center;
+
+    float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, 0.001, 0.002, 4.0, 0.0, noise, iGlobalTime, iResolution);
+    if(distToLg == 0.0){
+        distToLg = 0.0000001;
+    }
+
+    vec3 lgColor = vec3(1.0, 1.0, 0.7);
+    float glowMult = 0.003;
+
+    lgContribution.rgb = (1.0 / distToLg) * glowMult * lgColor;
+    lgContribution.a = pow((1.0 / distToLg) * glowMult, 1.5);
+    
+    color += lgContribution;
     
     gl_FragColor = color;
 }

@@ -27,7 +27,10 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             this._entity._prevY = this._entity._y;
             
             if(this._entity._lightningStealTimer.getTime() >= 2000){
-                this._entity._charge++;
+                if(this._entity._charge < this._entity._maxCharge){
+                    this._entity._charge++;
+                }
+                this._entity._handler.setNumBolts(this._entity._charge);
                 EventSystem.publishEventImmediately("lightning_stolen", {amount: 1})
                 this._entity._lightningStealTimer.reset();
                 this._entity._lightningStealTimer.start();
@@ -52,6 +55,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._velocity = ((new Vector(-x, -y)).getNormalized()).multiplyWithScalar(speed);
         
         this._charge = 0;
+        this._maxCharge = 5;
         
         this._lightningStealTimer = SynchronizedTimers.getTimer();
     }

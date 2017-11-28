@@ -1,6 +1,6 @@
 define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', "Handlers/BasicParticlesHandler"], function(EntityHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler){
     
-    function SpikeEnemyHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary){       
+    function SpikeEnemyHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, noiseTextureData){       
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -17,6 +17,15 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             radius: {
                 type: "float",
                 value: [30] 
+            },
+            numBolts: {
+                type: "float",
+                value: [1]
+            },
+            noise: {
+                type: "sampler2D",
+                value: noiseTextureData.sampler,
+                texture: noiseTextureData.noiseTexture
             }
         };
         
@@ -45,6 +54,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     SpikeEnemyHandler.prototype.doDestroyEffect = function(x, y){
         EntityHandler.prototype.doDestroyEffect.call(this, x, y);
         this._particlesHandler.setParticlesColor(1.0, 0.2, 0.2);
+    }
+    
+    SpikeEnemyHandler.prototype.setNumBolts = function(numBolts){
+        this._uniforms.numBolts.value = [numBolts];
     }
 
     SpikeEnemyHandler.prototype._generateVerticesFromCurrentState = function(){
