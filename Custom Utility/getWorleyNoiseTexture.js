@@ -1,5 +1,5 @@
-define(['Third Party/tooloud.min.js', 'Custom Utility/map'], function(tooloud, map){
-    function getWorleyNoiseTexture(width, height){            
+define(['Third Party/tooloud.min.js', 'Custom Utility/map', 'Custom Utility/getGlTextureForNoise'], function(tooloud, map, getGLTextureForNoise){
+    function getWorleyNoiseTexture(gl, width, height){            
         var textureData = [];
 
         var xVal = 0 , yVal = 0;
@@ -20,7 +20,7 @@ define(['Third Party/tooloud.min.js', 'Custom Utility/map'], function(tooloud, m
             }
         }
         
-        return textureData;
+        var noiseTexture = getGLTextureForNoise(gl, textureData, width, height); 
     }
     
     return getWorleyNoiseTexture;

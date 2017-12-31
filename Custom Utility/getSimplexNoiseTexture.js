@@ -1,4 +1,4 @@
-define(['Custom Utility/map'], function(map){
+define(['Custom Utility/map', 'Custom Utility/getGLTextureForNoise'], function(map, getGLTextureForNoise){
     var SimplexNoise = function(r) {
         if (r == undefined) r = Math;
         this.grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0], 
@@ -88,7 +88,7 @@ define(['Custom Utility/map'], function(map){
     };
     
     
-    function getSimplexNoiseTexture(width, height){
+    function getSimplexNoiseTexture(gl, width, height, xMultiplyFactor, yMultiplyFactor){
         var noise = new SimplexNoise();
             
         var textureData = [];
@@ -97,7 +97,7 @@ define(['Custom Utility/map'], function(map){
         var noiseValue, color;
         
         for(var i = 0; i < ((width * height) * 3); i+=3){
-            noiseValue = noise.noise(x * 0.01, y * 0.6);
+            noiseValue = noise.noise(x * xMultiplyFactor, y * yMultiplyFactor);
             color = map(-255, 255, 0, 255, noiseValue * 255);
             
             textureData.push(color);
@@ -111,7 +111,8 @@ define(['Custom Utility/map'], function(map){
             }
         }
         
-        return textureData;
+        var noiseTexture = getGLTextureForNoise(gl, textureData, width, height);        
+        return noiseTexture;
     }
     
     return getSimplexNoiseTexture;
