@@ -84,7 +84,7 @@ float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float
     vec2 currentUV_t = (currentUV - lgStartUV) * rotationMatrix;
 
     float xClamped = clamp(currentUV_t.x, 0.0, lengthOfLightning);
-    float yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(noiseXMultiplier * xClamped, iGlobalTime / 1024.0)).r) * (fluctuationUV * lightningCos(xClamped, lengthOfLightning));
+    float yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(noiseXMultiplier * xClamped, iGlobalTime / 2048.0)).r) * (fluctuationUV * lightningCos(xClamped, lengthOfLightning));
     vec2 pointOnLightning;
     if(spikedLgBool == 1.0){
         pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0), yNoiseVal + (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0)));
