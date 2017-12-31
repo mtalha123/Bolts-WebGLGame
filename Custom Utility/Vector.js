@@ -64,5 +64,9 @@ define(['Custom Utility/distance'], function(distance){
         return Math.acos(dot(this, vec) / (this.getMagnitude() * vec.getMagnitude()));
     }
     
+    Vector.prototype.distanceTo = function(vec){
+        return Math.sqrt(Math.pow(this._x - vec.getX(), 2) + Math.pow(this._y - vec.getY(), 2));
+    }
+    
     return Vector;
 });
