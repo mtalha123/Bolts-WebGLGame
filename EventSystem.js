@@ -1,6 +1,3 @@
-// EVENTS:  BorderCollisionEvent (Entity, coordinatesOfCollision), EntityCollisionEvent (entity1, entity2, coordinatesOfCollision), TargetClickedEvent(Target), TargetAchievedByUserEvent(Target), 
-//          TargetLostFocusEvent(Target), TargetDestroyedEvent(Target)
-
 define([], function(){
     
     var currentEventsQueue = [];
@@ -20,6 +17,8 @@ define([], function(){
         entity_collision: [],    
         entity_spawned: [],
         entity_destroyed: [],
+        captured_entity_destroyed: [],
+        entity_captured: [],
         score_achieved: [],
         combo_level_increased: [],
         combo_level_reset: [],

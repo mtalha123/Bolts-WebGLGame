@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.22:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.18:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -199,10 +199,5 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     
     window.onblur = function(){
         windowFocused = false;
-    }
-    
-    
-    console.log("TEST SCREEN WIDTH: " + window.screen.availWidth);
-    console.log("TEST SCREEN HEIGHT: " + window.screen.availHeight);
-    
+    }    
 });

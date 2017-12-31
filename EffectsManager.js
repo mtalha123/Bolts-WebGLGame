@@ -1,11 +1,11 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'SynchronizedTimers'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, SynchronizedTimers){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler){
     var allHandlers = [];
     var automaticUpdatesHandlerObjs = [];
     
     var ShaderLibrary;
     var fontTexture;
     var spiderWebTexture;
-    var simplexNoiseTexture, worleyNoiseTexture;
+    var simplexNoiseTextureFaster, simplexNoiseTextureSlower, worleyNoiseTexture;
     var appMetaData;
 
     
@@ -16,7 +16,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         
         fontTexture = AssetManager.getTextureAsset("arial");
         spiderWebTexture = AssetManager.getTextureAsset("spiderWeb");
-        simplexNoiseTexture = AssetManager.getTextureAsset("simplexNoise");
+        simplexNoiseTextureFaster = AssetManager.getTextureAsset("simplexNoiseFaster");
+        simplexNoiseTextureSlower = AssetManager.getTextureAsset("simplexNoiseSlower");
         worleyNoiseTexture = AssetManager.getTextureAsset("worleyNoise");
     }    
     
@@ -48,14 +49,14 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords, shouldAnimateLg){
-        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0}, 1, addHandlerToAutomaticUpdates);
+        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, width: 1024, height: 1024, sampler: 0}, 1, addHandlerToAutomaticUpdates);
         
         addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestBasicTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, width: 1024, height: 1024, sampler: 0});
+        var handler = new TargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, width: 1024, height: 1024, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;
@@ -90,42 +91,42 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestLightningOrbEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new LightningOrbHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
+        var handler = new LightningOrbHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;
     }
     
     function requestEnemySpikeEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new SpikeEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
+        var handler = new SpikeEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestLightningOrbWithStreakEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new LightningOrbStreakHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
+        var handler = new LightningOrbStreakHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestBubblyOrbEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new BubblyOrbHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
+        var handler = new BubblyOrbHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestTriangularTargetEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new TriangularTargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
+        var handler = new TriangularTargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
         
         addHandlers(handler.getAllHandlers());
         return handler;
     }
 
     function requestFourPointLightningEffect(shouldDraw, gl, zOrder, x, y, opts){
-        var handler = new FourPointTargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTexture, sampler: 0});
+        var handler = new FourPointTargetHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
 
         addHandlers(handler.getAllHandlers());
         return handler;
@@ -159,6 +160,13 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
     
+    function requestTentacleEnemyHandler(shouldDraw, gl, zOrder, x, y, opts){
+        var handler = new TentacleEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, x, y, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureSlower, sampler: 0}, addHandlerToAutomaticUpdates);
+
+        addHandlers(handler.getAllHandlers());
+        return handler;
+    }
+    
     function getHandlers(){
         var handlersToReturn = [];
         
@@ -170,14 +178,15 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handlersToReturn;
     }
     
-    function addHandlerToAutomaticUpdates(handler, timeToStopUpdates, callback){
-        var timer = SynchronizedTimers.getTimer();
+    function addHandlerToAutomaticUpdates(handler, timeToStopUpdates, updateFunc, callback){
+        var timer = new Timer();
         timer.start();
         
         var handlerObj = {
             handler: handler,
             timeToStopUpdates: timeToStopUpdates,
             timer: timer,
+            updateFunc: updateFunc,
             callback: callback
         };
         
@@ -186,11 +195,11 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     
     function prepareForDrawing(){
         for(var i = 0; i < automaticUpdatesHandlerObjs.length; i++){
-            if(automaticUpdatesHandlerObjs[i].timer.getTime() >= automaticUpdatesHandlerObjs[i].timeToStopUpdates){
-                automaticUpdatesHandlerObjs[i].callback();
+            if(automaticUpdatesHandlerObjs[i].timer.getTime() > automaticUpdatesHandlerObjs[i].timeToStopUpdates){
+                automaticUpdatesHandlerObjs[i].callback.call(automaticUpdatesHandlerObjs[i].handler);
                 automaticUpdatesHandlerObjs.splice(i, 1);
             }else{
-                automaticUpdatesHandlerObjs[i].handler.update();   
+                automaticUpdatesHandlerObjs[i].updateFunc.call(automaticUpdatesHandlerObjs[i].handler, automaticUpdatesHandlerObjs[i].timer.getTime());  
             }
         }
     }
@@ -214,6 +223,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestLinkHandler: requestLinkHandler,
         requestFullScreenColorHandler: requestFullScreenColorHandler,
         requestLifebarHandler: requestLifebarHandler,
+        requestTentacleEnemyHandler: requestTentacleEnemyHandler,
         prepareForDrawing: prepareForDrawing
     };
     

@@ -7,7 +7,7 @@ define(['EventSystem'], function(EventSystem){
     }
     
     function draw(){
-        handler.shouldDraw(true);
+        handler.shouldDraw(false);
         handler.update();
     }
     

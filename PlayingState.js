@@ -1,4 +1,4 @@
-define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'ComboSystem', 'Background', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers'], function(FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, ComboSystem, Background, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers){
+define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'ComboSystem', 'Background', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers'], function(FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, ComboSystem, Background, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers){
     var Cursor;
     var Background;
     var Border;
@@ -11,6 +11,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
     var triangularTargetController;
     var fourPointTargetController;
     var spikeEnemyController;
+    var tentacleEnemyController;
     
     var InputEventsManager;
     var EffectsManager;
@@ -37,6 +38,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         triangularTargetController = new TriangularTargetController(gl, appMetaData, 5, EffectsManager);
         fourPointTargetController = new FourPointTargetController(gl, appMetaData, 2, EffectsManager);
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 3, EffectsManager);
+        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 3, EffectsManager);
         
         fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88, fpsCounter.getFPS().toString());
         
@@ -63,6 +65,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         triangularTargetController.prepareForDrawing(interpolation);
         fourPointTargetController.prepareForDrawing(interpolation);
         spikeEnemyController.prepareForDrawing(interpolation);
+        tentacleEnemyController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
         EffectsManager.prepareForDrawing();
 
@@ -71,7 +74,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         
         gl.viewport(0, 0, canvasWidth, canvasHeight);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.clearColor(0.65, 0.65, 0.65, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.BLEND);
        // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         
@@ -109,6 +112,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         triangularTargetController.update();
         fourPointTargetController.update();
         spikeEnemyController.update();
+        tentacleEnemyController.update();
         EventSystem.update();
     }
     
@@ -126,25 +130,25 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
        // console.log("CURRENT TIME: " + gameLevelTimer.getTime());
         
         if(gameLevelTimer.getTime() >= 290000){
-            EventSystem.publishEvent("game_level_up", {level: 8})
+//            EventSystem.publishEvent("game_level_up", {level: 8})
             console.log("LEVEL 8");
         }else if(gameLevelTimer.getTime() >= 230000){
-            EventSystem.publishEvent("game_level_up", {level: 7})
+//            EventSystem.publishEvent("game_level_up", {level: 7})
             console.log("LEVEL 7");
         }else if(gameLevelTimer.getTime() >= 170000){
-            EventSystem.publishEvent("game_level_up", {level: 6})
+//            EventSystem.publishEvent("game_level_up", {level: 6})
             console.log("LEVEL 6");
         }else if(gameLevelTimer.getTime() >= 130000){
-            EventSystem.publishEvent("game_level_up", {level: 5})
+//            EventSystem.publishEvent("game_level_up", {level: 5})
             console.log("LEVEL 5");
         }else if(gameLevelTimer.getTime() >= 90000){
-            EventSystem.publishEvent("game_level_up", {level: 4})
+//            EventSystem.publishEvent("game_level_up", {level: 4})
             console.log("LEVEL 4");
         }else if(gameLevelTimer.getTime() >= 60000){
-            EventSystem.publishEvent("game_level_up", {level: 3})
+//            EventSystem.publishEvent("game_level_up", {level: 3})
             console.log("LEVEL 3");
         }else if(gameLevelTimer.getTime() >= 20000){
-            EventSystem.publishEvent("game_level_up", {level: 2})
+//            EventSystem.publishEvent("game_level_up", {level: 2})
             console.log("LEVEL 2");
         }
     }

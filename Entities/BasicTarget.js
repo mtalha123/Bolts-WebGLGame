@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/distance', 'Custom Utility/Vector', 'SliceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, distance, Vector, SliceAlgorithm){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/distance', 'Custom Utility/Vector', 'SliceAlgorithm', 'MainTargetsPositions'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, distance, Vector, SliceAlgorithm, MainTargetsPositions){
 
     function BasicTargetDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -43,19 +43,30 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBox.setPosition(newX, newY);
+        
+        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
     }
     
     BasicTarget.prototype._setPositionWithInterpolation = function(newX, newY){                
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBox.setPosition(newX, newY);
+        
+        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
     }
     
     BasicTarget.prototype.reset = function(){
         MovingEntity.MovingEntity.prototype.reset.call(this);
+        MainTargetsPositions.removeTargetObj(this);
+        this._hitBox.resetAlgorithm();
     }
     
-    BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
+    BasicTarget.prototype.spawn = function(callback){
+        MainTargetsPositions.addTargetObj(this, new Vector(this._x, this._y));
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+    }
+    
+    BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){       
         if(this._hitBox.processInput(mouseInputObj)){
             this.destroyAndReset(callback);
             return true;

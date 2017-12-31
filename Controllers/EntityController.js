@@ -13,6 +13,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         this._entitiesPool = [];
         this._entitiesActivated = [];
         this._entitiesInTransition = [];
+        this._entitiesCaptured = [];
         this._spawnAttemptDelay = 1000;
         this._chanceOfSpawning = spawnChance;
         this._spawnTimer = SynchronizedTimers.getTimer();  
@@ -24,10 +25,10 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
         EventSystem.register(this.receiveEvent, "mouse_down", this);
         EventSystem.register(this.receiveEvent, "mouse_up", this);
         EventSystem.register(this.receiveEvent, "mouse_held_down", this); 
-        EventSystem.register(this.receiveEvent, "combo_level_increased", this);
-        EventSystem.register(this.receiveEvent, "combo_level_reset", this);
         EventSystem.register(this.receiveEvent, "game_restart", this);
         EventSystem.register(this.receiveEvent, "game_level_up", this);
+        EventSystem.register(this.receiveEvent, "entity_captured", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
     }
     
     EntityController.prototype.prepareForDrawing = function(interpolation){
@@ -67,10 +68,27 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
     EntityController.prototype.receiveEvent = function(eventInfo){
         if(eventInfo.eventType === "game_restart"){
             this.reset();
-        }else if(eventInfo.eventType === "combo_level_increased"){
-        }else if(eventInfo.eventType === "combo_level_reset"){
+        }else if(eventInfo.eventType === "entity_captured"){
+            for(var i = 0; i < this._entitiesActivated.length; i++){
+                if(this._entitiesActivated[i] === eventInfo.eventData.entity){
+                    this._entitiesActivated[i].destroyAndReset(function(){
+                        var indexOfTarget = 0;     
+                        this._entitiesCaptured.push(this._entitiesInTransition.splice(indexOfTarget, 1)[0]); 
+                    }.bind(this));
+                    this._entitiesInTransition.push(this._entitiesActivated.splice(i, 1)[0]);
+                    break;
+                }
+            }
+        }else if(eventInfo.eventType === "captured_entity_destroyed"){
+            for(var i = 0; i < this._entitiesCaptured.length; i++){
+                if(this._entitiesCaptured[i] === eventInfo.eventData.entity){
+                    this._entitiesPool.push(this._entitiesCaptured.splice(i, 1)[0]);
+                    break;
+                }
+            }
         }else if(eventInfo.eventType === "game_level_up"){
-            //override
+            // override. IMPORTANT: THIS IF STATEMENT IS NEEDED HERE BECAUSE OF THE FOLLOWING ELSE CLAUSE. IF THIS 'IF' STATEMENT IS REMOVED,
+            // THEN THE FOLLOWING ELSE CLAUSE WILL INTERPRET "game_level_up" EVENT TO BE A INPUT EVENT (I.E. MOUSEDOWN, MOUSEUP, ETC.)
         }else{
             var inputToBeProcessed = {};
             inputToBeProcessed.mouseState = eventInfo.eventData;

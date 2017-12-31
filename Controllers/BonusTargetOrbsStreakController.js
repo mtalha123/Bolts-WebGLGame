@@ -1,13 +1,13 @@
 define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new BonusTargetOrbStreak(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
+            this._entitiesPool[i] = new BonusTargetOrbStreak(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -35,10 +35,8 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
     
     BonusTargetOrbsStreakController.prototype.receiveEvent = function(eventInfo){
         EntityController.prototype.receiveEvent.call(this, eventInfo);
-        
-        if(eventInfo.eventType === "combo_level_increased"){
-        }else if(eventInfo.eventType === "combo_level_reset"){
-        }else if(eventInfo.eventType === "game_level_up"){
+
+        if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 4:
                     this._chanceOfSpawning = 20;

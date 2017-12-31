@@ -1,7 +1,7 @@
-define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController){
+define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController){
     
     function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        MovingEntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
@@ -11,8 +11,8 @@ define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Util
         this._spawnTimer.start();
     }
     
-    //inherit from MovingEntityController
-    FourPointTargetController.prototype = Object.create(MovingEntityController.prototype);
+    //inherit from EntityController
+    FourPointTargetController.prototype = Object.create(EntityController.prototype);
     FourPointTargetController.prototype.constructor = FourPointTargetController;
     
     FourPointTargetController.prototype._spawn = function(){
@@ -52,15 +52,14 @@ define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Util
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
-            newlyActivatedTarget.setSpeed(this._speed);
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
         
-        MovingEntityController.prototype._spawn.call(this, newlyActivatedTarget);
+        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     FourPointTargetController.prototype.receiveEvent = function(eventInfo){
-        MovingEntityController.prototype.receiveEvent.call(this, eventInfo);
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){

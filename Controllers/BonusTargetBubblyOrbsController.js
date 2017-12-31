@@ -1,7 +1,7 @@
 define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetBubblyOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityController){
     
     function BonusTargetBubblyOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.07;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;
@@ -37,9 +37,7 @@ define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border',
     BonusTargetBubblyOrbsController.prototype.receiveEvent = function(eventInfo){
         EntityController.prototype.receiveEvent.call(this, eventInfo);
         
-        if(eventInfo.eventType === "combo_level_increased"){
-        }else if(eventInfo.eventType === "combo_level_reset"){
-        }else if(eventInfo.eventType === "game_level_up"){
+        if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 5:
                     this._chanceOfSpawning = 20;

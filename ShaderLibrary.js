@@ -15,6 +15,7 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var LINK = "LINK";
     var FULL_SCREEN_COLOR = "FULL_SCREEN_COLOR";
     var LIFEBAR = "LIFEBAR";
+    var TENTACLE_ENEMY = "TENTACLE_ENEMY";
     
     var allPrograms = {};    
     
@@ -86,6 +87,7 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         PARTICLE: PARTICLE,
         LINK: LINK,
         FULL_SCREEN_COLOR: FULL_SCREEN_COLOR,
-        LIFEBAR: LIFEBAR
+        LIFEBAR: LIFEBAR,
+        TENTACLE_ENEMY: TENTACLE_ENEMY
     };
 });

@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions){
 
     function TriangularTargetDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -60,18 +60,23 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
+        
+        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
     }
     
     TriangularTarget.prototype._setPositionWithInterpolation = function(newX, newY){
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
+        
+        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
     }
     
     TriangularTarget.prototype.reset = function(){
         MovingEntity.MovingEntity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0];
+        MainTargetsPositions.removeTargetObj(this);
     }
     
     TriangularTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
@@ -96,9 +101,10 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         return false;
     }
     
-    TriangularTarget.prototype.spawn = function(callback){
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+    TriangularTarget.prototype.spawn = function(callback){        
         this._hitBoxRegions.activateAllRegions();
+        MainTargetsPositions.addTargetObj(this, new Vector(this._x, this._y));
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
     
     return TriangularTarget;

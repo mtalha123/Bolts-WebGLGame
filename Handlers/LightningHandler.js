@@ -169,7 +169,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this.timerForDisappearEffect.start();
         this.isDisappearing = true;
         this._shouldDraw = true;
-        this.funcToCallForAutomaticUpdates(this, 1000, function(){this._shouldDraw = false; this.isDisappearing = false;}.bind(this));
+        this.funcToCallForAutomaticUpdates(this, 1000, this.update, function(){this._shouldDraw = false; this.isDisappearing = false;}.bind(this));
     }
     
     return LightningHandler;

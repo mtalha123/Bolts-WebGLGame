@@ -1,7 +1,7 @@
-define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController, ){
+define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
     
     function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
-        MovingEntityController.call(this, appMetaData, 100, maxEntitesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 100, maxEntitesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
 
@@ -12,8 +12,8 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         this._spawnTimer.start();
     }
     
-    //inherit from MovingEntityController
-    BasicTargetsController.prototype = Object.create(MovingEntityController.prototype);
+    //inherit from EntityController
+    BasicTargetsController.prototype = Object.create(EntityController.prototype);
     BasicTargetsController.prototype.constructor = BasicTargetsController;
     
     BasicTargetsController.prototype._spawn = function(){
@@ -53,26 +53,21 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
-            newlyActivatedTarget.setSpeed(this._speed);
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
         
-        MovingEntityController.prototype._spawn.call(this, newlyActivatedTarget);
+        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     BasicTargetsController.prototype.receiveEvent = function(eventInfo){
-        MovingEntityController.prototype.receiveEvent.call(this, eventInfo);
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
         
-        if(eventInfo.eventType === "combo_level_increased"){
-        }else if(eventInfo.eventType === "combo_level_reset"){
-        }else if(eventInfo.eventType === "game_level_up"){
+        if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 2:
-                    this._speed = 15;
                     this._spawnAttemptDelay = 1000;
                     break;
                 case 3:
-                    this._speed = 20;
                     break;
                 case 4:
                     this._chanceOfSpawning = 80;
@@ -95,7 +90,7 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
     }
     
     BasicTargetsController.prototype.reset = function(){
-        MovingEntityController.prototype.reset.call(this);
+        EntityController.prototype.reset.call(this);
         this._spawnAttemptDelay = 2000;
         this._chanceOfSpawning = 100;
     }

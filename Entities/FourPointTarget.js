@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions){
 
     function FourPointTargetDestructionState(targetHandler){
         MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
@@ -58,18 +58,23 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
+        
+        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
     }
     
     FourPointTarget.prototype._setPositionWithInterpolation = function(newX, newY){
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
         
         this._hitBoxRegions.setPosition(newX, newY);
+        
+        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
     }
     
     FourPointTarget.prototype.reset = function(){
         MovingEntity.MovingEntity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
+        MainTargetsPositions.removeTargetObj(this);
     }
     
     
@@ -96,8 +101,9 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     FourPointTarget.prototype.spawn = function(callback){
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        MainTargetsPositions.addTargetObj(this, new Vector(this._x, this._y));
         this._hitBoxRegions.activateAllRegions();
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
     
     return FourPointTarget;

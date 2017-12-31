@@ -1,4 +1,4 @@
-define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/getSimplexNoiseTexture'], function(EventSystem, coordsToRGB, getSimplexNoiseTexture){
+define(['EventSystem', 'Custom Utility/coordsToRGB'], function(EventSystem, coordsToRGB){
     
     var margin;    
     var borderLength;

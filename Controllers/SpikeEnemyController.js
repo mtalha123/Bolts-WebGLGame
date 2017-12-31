@@ -1,19 +1,19 @@
-define(['Entities/SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/MovingEntityController', 'Custom Utility/distance'], function(SpikeEnemy, SynchronizedTimers, Border, Random, EventSystem, MovingEntityController, distance){
+define(['Entities/SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/distance'], function(SpikeEnemy, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
     
     function SpikeEnemyController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        MovingEntityController.call(this, appMetaData, 0, maxEntitiesToSpawn, 10); 
+        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < 2; i++){
-            this._entitiesPool[i] = new SpikeEnemy(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 5, EffectsManager);
+            this._entitiesPool[i] = new SpikeEnemy(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 5, EffectsManager);
         }
         
         this._spawnTimer.start();
     }
     
-    //inherit from MovingEntityController
-    SpikeEnemyController.prototype = Object.create(MovingEntityController.prototype);
+    //inherit from EntityController
+    SpikeEnemyController.prototype = Object.create(EntityController.prototype);
     SpikeEnemyController.prototype.constructor = SpikeEnemyController;
     
     SpikeEnemyController.prototype._spawn = function(){
@@ -38,7 +38,6 @@ define(['Entities/SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/R
         });
         
         newlyActivatedTarget.setPosition(spawnX, spawnY);  
-        newlyActivatedTarget.setSpeed(this._speed);
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){
@@ -55,15 +54,13 @@ define(['Entities/SpikeEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/R
             }
         });
         
-//        MovingEntityController.prototype._spawn.call(this, newlyActivatedTarget);
+//        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     SpikeEnemyController.prototype.receiveEvent = function(eventInfo){
-        MovingEntityController.prototype.receiveEvent.call(this, eventInfo);
+        EntityController.prototype.receiveEvent.call(this, eventInfo);
         
-        if(eventInfo.eventType === "combo_level_increased"){
-        }else if(eventInfo.eventType === "combo_level_reset"){
-        }else if(eventInfo.eventType === "game_level_up"){
+        if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 3:
                     this._chanceOfSpawning = 20;
