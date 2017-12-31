@@ -39,8 +39,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     
-    function SpikeEnemy(id, canvasWidth, canvasHeight, gl, p_radius, x, y, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, id, canvasWidth, canvasHeight, gl, x, y, 0, speed);
+    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, x, y, speed, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, 0, speed);
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
         this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new CoverDistanceAlgorithm(x, y, p_radius, canvasHeight * 0.25));

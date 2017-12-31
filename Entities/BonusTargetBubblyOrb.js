@@ -18,8 +18,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetBubblyOrbNormalState.prototype.constructor = BonusTargetBubblyOrbNormalState;
     
     
-    function BonusTargetBubblyOrb(id, canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y);
+    function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, x, y);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius, gl, EffectsManager));
         

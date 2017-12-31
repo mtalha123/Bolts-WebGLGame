@@ -18,7 +18,7 @@
         this._transitioningTargetObjs = [];
 
         this._initialTargetObj = {
-            target: new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, x, y, EffectsManager),
+            target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, x, y, EffectsManager),
             stage: 1
         };
 
@@ -28,13 +28,13 @@
         for(var i = 0; i < 4; i++){
             if(i < 2){
                this._targetObjsSecondStage[i] = {
-                    target: new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 1.5, x, y, EffectsManager),
+                    target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 1.5, x, y, EffectsManager),
                     stage: 2
                 }; 
             }
 
             this._targetObjsThirdStage[i] = {
-                target: new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 2, x, y, EffectsManager),
+                target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 2, x, y, EffectsManager),
                 stage: 3
             };
         }

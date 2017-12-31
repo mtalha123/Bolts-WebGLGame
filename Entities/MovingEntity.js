@@ -27,8 +27,8 @@ define(['Entities/Entity'], function(Entity){
     }
     
     
-    function MovingEntity(id, canvasWidth, canvasHeight, gl, x, y, movementangle, speed){
-        Entity.Entity.call(this, id, canvasWidth, canvasHeight, gl, x, y);
+    function MovingEntity(canvasWidth, canvasHeight, gl, x, y, movementangle, speed){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, x, y);
         
         this._physicsBody = null;
         
