@@ -15,7 +15,5 @@ define([''], function(){
         return texture;
     }
     
-  //  FIX LONG WAITING TIME~~~~~
-    
     return getGLTextureForNoise;
 });
