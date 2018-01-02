@@ -11,9 +11,7 @@ define([], function(){
         key_held_down: [],
         key_up: [],
         
-        S_initialize: [],
-        S_game_update: [],
-        border_collision: [],  
+        S_initialize: [], 
         entity_collision: [],    
         entity_spawned: [],
         entity_destroyed: [],
