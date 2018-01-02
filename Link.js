@@ -11,12 +11,12 @@ define(['Custom Utility/CircularHitBox', 'EventSystem', 'Custom Utility/Vector']
             
             if(this._hitBox.isInRegion(mousePos)){
                 var currHitBoxPosition = this._hitBox.getPosition();
-                var currHitBoxPosToMouse = currHitBoxPosition.subtractFrom(mousePos);
+                var currHitBoxPosToMouse = mousePos.subtract(currHitBoxPosition);
                 var projection = currHitBoxPosToMouse.projectOnto(this._dirVec);
 
                 if(projection.hasSameDirection(this._dirVec)){
                     var newHitBoxPosition = currHitBoxPosition.addTo(projection);
-                    if( (this._startPosition.subtractFrom(newHitBoxPosition)).getMagnitude() >= this._lineLength){
+                    if( (newHitBoxPosition.subtract(this._startPosition)).getMagnitude() >= this._lineLength){
                         this._handler.setCompletion(1.5); 
                         this.destroyAndReset();
                         return true;
@@ -34,7 +34,7 @@ define(['Custom Utility/CircularHitBox', 'EventSystem', 'Custom Utility/Vector']
     }
     
     Link.prototype.setCoords = function(startPos, endPos){
-        this._dirVec = startPos.subtractFrom(endPos);
+        this._dirVec = endPos.subtract(startPos);
         this._lineLength = startPos.distanceTo(endPos);
         this._startPosition = startPos;
         this._endPosition = endPos;

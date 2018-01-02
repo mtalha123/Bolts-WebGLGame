@@ -115,7 +115,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     SpikeEnemy.prototype.setDestination = function(destPosition){
         this._destination = destPosition;
-        this._velocity = ((this._position.subtractFrom(destPosition)).getNormalized()).multiplyWithScalar(this._speed);
+        this._velocity = ((destPosition.subtract(this._position)).getNormalized()).multiplyWithScalar(this._speed);
     }
     
     return SpikeEnemy;

@@ -140,7 +140,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             var startCoord = new Vector(coords[i], coords[i+1]);
             var endCoord = new Vector(coords[i+2], coords[i+3]);
 
-            var dirVec = (startCoord.subtractFrom(endCoord)).getNormalized().multiplyWithScalar(this._padding);
+            var dirVec = (endCoord.subtract(startCoord)).getNormalized().multiplyWithScalar(this._padding);
             var negDirVec = dirVec.multiplyWithScalar(-1);
             var perp1 = new Vector(-dirVec.getY(), dirVec.getX());
             var perp2 = new Vector(dirVec.getY(), -dirVec.getX());

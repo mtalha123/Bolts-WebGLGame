@@ -19,7 +19,7 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
     MovingEntityNormalState.prototype.prepareForDrawing = function(interpolation){
         Entity.EntityNormalState.prototype.prepareForDrawing.call(this);
         
-        this._handler.setPosition( this._entity._prevPosition.addTo((this._entity._prevPosition.subtractFrom(this._entity._position)).multiplyWithScalar(interpolation)) )      
+        this._handler.setPosition( this._entity._prevPosition.addTo((this._entity._position.subtract(this._entity._prevPosition)).multiplyWithScalar(interpolation)) );      
     }
 
     MovingEntityNormalState.prototype.update = function(){

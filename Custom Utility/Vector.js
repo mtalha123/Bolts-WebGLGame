@@ -23,8 +23,8 @@ define(['Custom Utility/distance'], function(distance){
         return vec;
     }
     
-    Vector.prototype.subtractFrom = function(vector){
-        var vec = new Vector(vector.getX() - this._x, vector.getY() - this._y);
+    Vector.prototype.subtract = function(vector){
+        var vec = new Vector(this._x - vector.getX(), this._y - vector.getY());
         return vec;
     }
     

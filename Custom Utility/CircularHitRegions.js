@@ -33,7 +33,7 @@ define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility
     }
     
     CircularHitRegions.prototype.setPosition = function(newPosition){        
-        var positionDiff = this._centerPositionOfAllRegions.subtractFrom(newPosition);
+        var positionDiff = newPosition.subtract(this._centerPositionOfAllRegions);
         
         this._centerPositionOfAllRegions = this._centerPositionOfAllRegions.addTo(positionDiff);
         

@@ -13,10 +13,10 @@ define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, di
         
             if(this._position.distanceTo(mousePos) <= this._radius){
                 if(!this._startPos){
-                    this._startPos = this._position.subtractFrom(mousePos);
+                    this._startPos = mousePos.subtract(this._position);
                 }
 
-                var mousePosRelative = this._position.subtractFrom(mousePos);
+                var mousePosRelative = mousePos.subtract(this._position);
                 this._distCovered += this._startPos.distanceTo(mousePos);
 
                 this._startPos = this._startPos.addTo(mousePos);

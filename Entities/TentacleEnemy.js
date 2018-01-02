@@ -2,7 +2,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
 
     function getQuadrant(point, center){        
         var angle;
-        var point_t = center.subtractFrom(point);
+        var point_t = point.subtract(center);
     
         if(point_t.getX() == 0.0){
             if(point_t.getY() >= 0.0){

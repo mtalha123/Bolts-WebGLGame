@@ -16,8 +16,8 @@ define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, di
             }
         
             var lastIndex = this._inputArray.length - 1;
-            var vec1 = this._position.subtractFrom(this._inputArray[0]);
-            var vec2 = this._position.subtractFrom(this._inputArray[lastIndex]);
+            var vec1 = this._inputArray[0].subtract(this._position);
+            var vec2 = this._inputArray[lastIndex].subtract(this._position);
             if( (Math.PI - vec1.getAngleBetweenThisAnd(vec2)) <= (10 * (Math.PI / 180)) ){
                 if(this._inputArray[0].distanceTo(this._inputArray[lastIndex]) >= this._radius * 2){
                     var coordsForBolt = this._getCoordsForSliceBolt();
@@ -40,8 +40,8 @@ define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, di
     }
     
     SliceAlgorithm.prototype._getCoordsForSliceBolt = function(){
-        var coord1 = this._position.addTo(this._position.subtractFrom(this._inputArray[0]).getNormalized().multiplyWithScalar(this._radius * 2));
-        var coord2 = this._position.addTo(this._position.subtractFrom(this._inputArray[this._inputArray.length-1]).getNormalized().multiplyWithScalar(this._radius * 3));
+        var coord1 = this._position.addTo(this._inputArray[0].subtract(this._position).getNormalized().multiplyWithScalar(this._radius * 2));
+        var coord2 = this._position.addTo(this._inputArray[this._inputArray.length-1].subtract(this._position).getNormalized().multiplyWithScalar(this._radius * 3));
         
         return [coord1, coord2];
     }
