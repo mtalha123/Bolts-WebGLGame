@@ -1,4 +1,4 @@
-define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, distance){
+define(['Custom Utility/Vector'], function(Vector){
     function CoverDistanceAlgorithm(position, radius, areaToAchieve){
         this._position = position;
         this._radius = radius;

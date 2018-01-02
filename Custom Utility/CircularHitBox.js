@@ -1,4 +1,4 @@
-define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector'], function(distance, rotateCoord, Vector){
+define(['Custom Utility/rotateCoord', 'Custom Utility/Vector'], function(rotateCoord, Vector){
     function CircularHitBox(centerPosition, radius, label){
         this._centerPosition = centerPosition;
         this._radius = radius;

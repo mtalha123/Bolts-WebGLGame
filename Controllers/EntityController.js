@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Custom Utility/distance'], function(SynchronizedTimers, Border, Random, EventSystem, distance){ 
+define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'], function(SynchronizedTimers, Border, Random, EventSystem){ 
     
     function returnTrueWithChance(chance){
         var randomVal = Random.getRandomIntInclusive(1, 100);

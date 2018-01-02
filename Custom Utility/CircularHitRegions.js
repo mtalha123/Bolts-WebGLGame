@@ -1,4 +1,4 @@
-define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/CircularHitBoxWithAlgorithm'], function(distance, rotateCoord, Vector, CircularHitBoxWithAlgorithm){    
+define(['Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/CircularHitBoxWithAlgorithm'], function(rotateCoord, Vector, CircularHitBoxWithAlgorithm){    
     function CircularHitRegions(centerPosition){
         this._centerPositionOfAllRegions = centerPosition;
         this._regions = [];

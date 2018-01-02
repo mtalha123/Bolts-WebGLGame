@@ -1,4 +1,4 @@
-define(['Custom Utility/distance'], function(distance){
+define([], function(){
     function dot(vector1, vector2){
         return (vector1.getX() * vector2.getX()) + (vector1.getY() * vector2.getY());
     }
@@ -6,7 +6,7 @@ define(['Custom Utility/distance'], function(distance){
     function Vector(x, y){
         this._x = x;
         this._y = y;
-        this._magnitude = distance(0, 0, x, y);
+        this._magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
     
     Vector.prototype.getNormalized = function(){

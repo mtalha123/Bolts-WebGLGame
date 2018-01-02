@@ -1,4 +1,4 @@
-define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, distance){
+define(['Custom Utility/Vector'], function(Vector){
     function SliceAlgorithm(position, radius, gl, EffectsManager){
         this._inputArray = [];   
         this._position = position;

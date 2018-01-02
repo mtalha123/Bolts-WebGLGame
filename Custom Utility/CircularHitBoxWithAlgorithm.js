@@ -1,4 +1,4 @@
-define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/CircularHitBox'], function(distance, rotateCoord, Vector, CircularHitBox){
+define(['Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/CircularHitBox'], function(rotateCoord, Vector, CircularHitBox){
     function CircularHitBoxWithAlgorithm(centerPosition, radius, algorithm, label){
         CircularHitBox.call(this, centerPosition, radius, label);
         this.activated = true;
