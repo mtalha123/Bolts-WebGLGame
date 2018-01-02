@@ -1,6 +1,6 @@
 define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', "Handlers/BasicParticlesHandler"], function(EntityHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler){
     
-    function SpikeEnemyHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, noiseTextureData){       
+    function SpikeEnemyHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary, noiseTextureData){       
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -20,7 +20,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             },
             numBolts: {
                 type: "float",
-                value: [1]
+                value: [0]
             },
             noise: {
                 type: "sampler2D",
@@ -31,28 +31,28 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.ENEMY_SPIKE); 
         
-        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);   
+        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);   
         
-        this.setPosition(x, y);
+        this.setPosition(position);
     }
     
     //inherit from Handler
     SpikeEnemyHandler.prototype = Object.create(EntityHandler.prototype);
     SpikeEnemyHandler.prototype.constructor = SpikeEnemyHandler; 
     
-    SpikeEnemyHandler.prototype.setPosition = function(newX, newY){
-        this._uniforms.center.value[0] = newX;
-        this._uniforms.center.value[1] = newY;
+    SpikeEnemyHandler.prototype.setPosition = function(newPosition){
+        this._uniforms.center.value[0] = newPosition.getX();
+        this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
     }
     
-    SpikeEnemyHandler.prototype.doSpawnEffect = function(x, y){
-        EntityHandler.prototype.doSpawnEffect.call(this, x, y);
+    SpikeEnemyHandler.prototype.doSpawnEffect = function(position){
+        EntityHandler.prototype.doSpawnEffect.call(this, position);
         this._particlesHandler.setParticlesColor(1.0, 0.0, 0.0);
     }
     
-    SpikeEnemyHandler.prototype.doDestroyEffect = function(x, y){
-        EntityHandler.prototype.doDestroyEffect.call(this, x, y);
+    SpikeEnemyHandler.prototype.doDestroyEffect = function(position){
+        EntityHandler.prototype.doDestroyEffect.call(this, position);
         this._particlesHandler.setParticlesColor(1.0, 0.2, 0.2);
     }
     

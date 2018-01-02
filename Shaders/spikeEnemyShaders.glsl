@@ -86,27 +86,28 @@ void main()
     
     
     /* Dealing with lg bolts */
+    if(numBolts > 0.0){
+        uv = rotateCoord(uv, -0.04 * iGlobalTime * numBolts, center); // make lg spin faster, relative to how many bolts there are   
+        vec4 lgContribution;
+        float angleMultipleDeg = 360.0 / numBolts;
+        float UVAngleDeg = getUVAngleDeg(uv, center);
+        float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
+        vec2 rotatedCoord = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
+        vec2 lgStartCoord = center;
     
-    uv = rotateCoord(uv, -0.04 * iGlobalTime * numBolts, center); // make lg spin faster, relative to how many bolts there are   
-    vec4 lgContribution;
-    float angleMultipleDeg = 360.0 / numBolts;
-    float UVAngleDeg = getUVAngleDeg(uv, center);
-    float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
-    vec2 rotatedCoord = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
-    vec2 lgStartCoord = center;
+        float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, 0.001, 0.002, 4.0, 0.0, noise, iGlobalTime, iResolution);
+        if(distToLg == 0.0){
+            distToLg = 0.0000001;
+        }
+        
+        vec3 lgColor = vec3(1.0, 1.0, 0.7);
+        float glowMult = 0.003;
 
-    float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, 0.001, 0.002, 4.0, 0.0, noise, iGlobalTime, iResolution);
-    if(distToLg == 0.0){
-        distToLg = 0.0000001;
+        lgContribution.rgb = (1.0 / distToLg) * glowMult * lgColor;
+        lgContribution.a = pow((1.0 / distToLg) * glowMult, 1.5);
+
+        color += lgContribution;
     }
-
-    vec3 lgColor = vec3(1.0, 1.0, 0.7);
-    float glowMult = 0.003;
-
-    lgContribution.rgb = (1.0 / distToLg) * glowMult * lgColor;
-    lgContribution.a = pow((1.0 / distToLg) * glowMult, 1.5);
-    
-    color += lgContribution;
     
     gl_FragColor = color;
 }

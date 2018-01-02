@@ -1,24 +1,27 @@
- define(['Entities/BonusTargetBubblyOrb', 'Custom Utility/Random'], function(BonusTargetBubblyOrb, Random){
-    function getPositionsFor2Targets(canvasWidth, canvasHeight, xToSplitFrom, yToSplitFrom){
+ define(['Entities/BonusTargetBubblyOrb', 'Custom Utility/Random', 'Custom Utility/Vector'], function(BonusTargetBubblyOrb, Random, Vector){
+    function getPositionsFor2Targets(canvasWidth, canvasHeight, posToSplitFrom){
         var splitDirection = Random.getRandomIntInclusive(1, 2); // 1 represents left and right split, 2 represents up and down split
         
+        var gap;
         if(splitDirection === 1){
-            var gap = canvasWidth * 0.07;
-            return [xToSplitFrom - gap, yToSplitFrom, xToSplitFrom + gap, yToSplitFrom];
+            gap = canvasWidth * 0.07;
+            return [new Vector(posToSplitFrom.getX() - gap, posToSplitFrom.getY()), 
+                    new Vector(posToSplitFrom.getX() + gap, posToSplitFrom.getY())];
         }else{
-            var gap = canvasHeight * 0.1;
-            return [xToSplitFrom, yToSplitFrom - gap, xToSplitFrom, yToSplitFrom + gap];
+            gap = canvasHeight * 0.1;
+            return [new Vector(posToSplitFrom.getX(), posToSplitFrom.getY() - gap), 
+                    new Vector(posToSplitFrom.getX(), posToSplitFrom.getY() + gap)];
         }
     }
      
      
-     function BonusTargetBubblyOrbCompound(gl, appMetaData, targetRadius, x, y, EffectsManager){
+     function BonusTargetBubblyOrbCompound(gl, appMetaData, targetRadius, position, EffectsManager){
         this._appMetaData = appMetaData;
         this._currActivatedTargetObjs = [];
         this._transitioningTargetObjs = [];
 
         this._initialTargetObj = {
-            target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, x, y, EffectsManager),
+            target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, position, EffectsManager),
             stage: 1
         };
 
@@ -28,13 +31,13 @@
         for(var i = 0; i < 4; i++){
             if(i < 2){
                this._targetObjsSecondStage[i] = {
-                    target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 1.5, x, y, EffectsManager),
+                    target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 1.5, position, EffectsManager),
                     stage: 2
                 }; 
             }
 
             this._targetObjsThirdStage[i] = {
-                target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 2, x, y, EffectsManager),
+                target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 2, position, EffectsManager),
                 stage: 3
             };
         }
@@ -45,27 +48,27 @@
         this._currActivatedTargetObjs.push(this._initialTargetObj);
     }
 
-    BonusTargetBubblyOrbCompound.prototype.setPosition = function(newX, newY){
-        this._initialTargetObj.target.setPosition(newX, newY);
+    BonusTargetBubblyOrbCompound.prototype.setPosition = function(newposition){
+        this._initialTargetObj.target.setPosition(newposition);
     }
 
     BonusTargetBubblyOrbCompound.prototype.update = function(){
-        for(var i = 0; i < this._currActivatedTargetObjs.length; i++){
-            this._currActivatedTargetObjs[i].target.update();
+        for(var a = 0; a < this._currActivatedTargetObjs.length; a++){
+            this._currActivatedTargetObjs[a].target.update();
         }
 
-        for(var i = 0; i < this._transitioningTargetObjs.length; i++){
-            this._transitioningTargetObjs[i].target.update();
+        for(var b = 0; b < this._transitioningTargetObjs.length; b++){
+            this._transitioningTargetObjs[b].target.update();
         }
     }
 
     BonusTargetBubblyOrbCompound.prototype.prepareForDrawing = function(interpolation){
-        for(var i = 0; i < this._currActivatedTargetObjs.length; i++){
-            this._currActivatedTargetObjs[i].target.prepareForDrawing(interpolation);
+        for(var a = 0; a < this._currActivatedTargetObjs.length; a++){
+            this._currActivatedTargetObjs[a].target.prepareForDrawing(interpolation);
         }
 
-        for(var i = 0; i < this._transitioningTargetObjs.length; i++){
-            this._transitioningTargetObjs[i].target.prepareForDrawing(interpolation);
+        for(var b = 0; b < this._transitioningTargetObjs.length; b++){
+            this._transitioningTargetObjs[b].target.prepareForDrawing(interpolation);
         }
     }
 
@@ -99,10 +102,10 @@
                         this._targetObjsSecondStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
                     }
 
-                    var positions = getPositionsFor2Targets(this._appMetaData.getCanvasWidth(), this._appMetaData.getCanvasHeight(), currActivatedTargetObj.target.getX(), currActivatedTargetObj.target.getY());
-                    targetObj1.target.setPosition(positions[0], positions[1]);
+                    var positions = getPositionsFor2Targets(this._appMetaData.getCanvasWidth(), this._appMetaData.getCanvasHeight(), currActivatedTargetObj.target.getPosition());
+                    targetObj1.target.setPosition(positions[0]);
                     targetObj1.target.spawn(function(){});
-                    targetObj2.target.setPosition(positions[2], positions[3]);
+                    targetObj2.target.setPosition(positions[1]);
                     targetObj2.target.spawn(function(){});
 
                     this._currActivatedTargetObjs.push(targetObj1);
@@ -121,6 +124,10 @@
 
     BonusTargetBubblyOrbCompound.prototype.getCharge = function(){
         return 1;
+    }
+    
+    BonusTargetBubblyOrbCompound.prototype.reset = function(){
+        // FIX
     }
     
     return BonusTargetBubblyOrbCompound;

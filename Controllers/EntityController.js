@@ -36,8 +36,8 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
             this._entitiesActivated[a].prepareForDrawing(interpolation);
         }
         
-        for(var a = 0; a < this._entitiesInTransition.length; a++){
-            this._entitiesInTransition[a].prepareForDrawing(interpolation);
+        for(var b = 0; b < this._entitiesInTransition.length; b++){
+            this._entitiesInTransition[b].prepareForDrawing(interpolation);
         }
     }
     
@@ -56,8 +56,8 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 
             this._entitiesActivated[a].update();
         }
         
-        for(var a = 0; a < this._entitiesInTransition.length; a++){
-            this._entitiesInTransition[a].update();
+        for(var b = 0; b < this._entitiesInTransition.length; b++){
+            this._entitiesInTransition[b].update();
         }
     }
     

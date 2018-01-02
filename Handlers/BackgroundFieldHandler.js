@@ -23,7 +23,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.BACKGROUND_FIELD); 
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts); 
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts); 
                
         this._effectTimer = SynchronizedTimers.getTimer();
         

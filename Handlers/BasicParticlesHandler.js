@@ -1,6 +1,6 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector){
     
-    function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary){        
+    function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -42,7 +42,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
         
         this._numParticles = numParticles;
         
@@ -59,7 +59,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this._callback = undefined;
         
-        this.setPosition(x, y);
+        this.setPosition(position);
     }   
     
     //inherit from Handler
@@ -94,9 +94,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     }
     
     
-    BasicParticlesHandler.prototype.setPosition = function(newX, newY){
-        this._uniforms.center.value[0] = newX;
-        this._uniforms.center.value[1] = newY;
+    BasicParticlesHandler.prototype.setPosition = function(newPosition){
+        this._uniforms.center.value[0] = newPosition.getX();
+        this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
     }
     

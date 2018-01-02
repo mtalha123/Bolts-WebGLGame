@@ -1,14 +1,14 @@
-define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetBubblyOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityController){
+define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BonusTargetBubblyOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function BonusTargetBubblyOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
+        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.07;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){              
 //            this._entitiesPool[i] = new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
-            this._entitiesPool[i] = new BonusTargetBubblyOrbCompound(gl, appMetaData, this._targetRadius, 100, 100, EffectsManager);
+            this._entitiesPool[i] = new BonusTargetBubblyOrbCompound(gl, appMetaData, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -19,14 +19,12 @@ define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border',
     BonusTargetBubblyOrbsController.prototype.constructor = BonusTargetBubblyOrbsController;
     
     BonusTargetBubblyOrbsController.prototype._spawn = function(){
-        var random = Random.getRandomIntInclusive(1, 4);
         var spawnX = Random.getRandomInt(this._canvasWidth * 0.3, this._canvasWidth * 0.7);
         var spawnY = Random.getRandomInt(this._canvasHeight * 0.3, this._canvasHeight * 0.7);
-        var movementAngle = Random.getRandomIntInclusive(0, 360);;
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
         
-        newlyActivatedTarget.setPosition(spawnX, spawnY);     
+        newlyActivatedTarget.setPosition(new Vector(spawnX, spawnY));     
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){ });

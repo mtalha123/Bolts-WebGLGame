@@ -10,11 +10,11 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     SimpleMovingBody.prototype.update = function(){
         if(this._position.getY() > this._destPosition.getY()){
             this._position = this._position.addTo(this._velocity);
-            this._handler.setPosition(this._position.getX(), this._position.getY());
+            this._handler.setPosition(this._position);
             return false;
         }else{
             this._position = this._destPosition;
-            this._handler.setPosition(this._position.getX(), this._position.getY());
+            this._handler.setPosition(this._position);
         }
         
         return true;
@@ -22,7 +22,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     
     SimpleMovingBody.prototype.setPosition = function(position){
         this._position = position;
-        this._handler.setPosition(position.getX(), position.getY());
+        this._handler.setPosition(position);
     }
     
     SimpleMovingBody.prototype.getPosition = function(){
@@ -51,19 +51,19 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         
         var cWidth = appMetaData.getCanvasWidth(), cHeight = appMetaData.getCanvasHeight(); 
         
-        restartButtonHandler = EffectsManager.requestBubblyOrbEffect(false, gl, 70, 0, 0, {radius: [radiusOfIndicators], particlesBool: [0.0]});
+        restartButtonHandler = EffectsManager.requestBubblyOrbEffect(false, gl, 70, new Vector(0, 0), {radius: [radiusOfIndicators], particlesBool: [0.0]});
         restartButtonBody = new SimpleMovingBody( restartButtonHandler, cWidth, cHeight, new Vector(cWidth / 2, cHeight + (cHeight / 3.3)), new Vector(cWidth / 2, (cHeight / 3.3)) );
         
-        bestScoreHandler = EffectsManager.requestTriangularTargetEffect(false, gl, 70, 0, 0, {radius: [radiusOfIndicators], lgBool: [0.0], autoRotationBool: [1.0]});
+        bestScoreHandler = EffectsManager.requestTriangularTargetEffect(false, gl, 70, new Vector(0, 0), {radius: [radiusOfIndicators], lgBool: [0.0], autoRotationBool: [1.0]});
         bestScoreBody = new SimpleMovingBody( bestScoreHandler, cWidth, cHeight, new Vector(cWidth / 3, cHeight + (cHeight / 1.5)), new Vector(cWidth / 3, (cHeight / 1.5)) );
         
-        scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 70, 0, 0, {radius: [radiusOfIndicators], numBolts: [0.0]});
+        scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 70, new Vector(0, 0), {radius: [radiusOfIndicators], numBolts: [0.0]});
         scoreBody = new SimpleMovingBody( scoreHandler, cWidth, cHeight, new Vector(cWidth / 1.3, cHeight + (cHeight / 2)), new Vector(cWidth / 1.3, (cHeight / 2)) );
         
         darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 60, gl);
         callbackToSwitchState = callback;
-        hitRegions = new CircularHitRegions(cWidth / 2, cHeight / 3.3);
-        hitRegions.addRegion(cWidth / 2, cHeight / 3.3, radiusOfIndicators);
+        hitRegions = new CircularHitRegions(new Vector(cWidth / 2, cHeight / 3.3));
+        hitRegions.addRegion(new Vector(cWidth / 2, cHeight / 3.3), radiusOfIndicators);
         
         context = p_context;
         Cursor = p_Cursor;
@@ -74,7 +74,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         restartButtonHandler.update();
         if(restartButtonBody.update()){
             isActivating = false;
-        };
+        }
 
         bestScoreHandler.update();
         bestScoreBody.update();
@@ -108,16 +108,16 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
             var inputObj = InputEventsManager.getCurrentInputObj();
 
             if(inputObj.mouseState.type === "mouse_down" || inputObj.mouseState.type === "mouse_held_down"){
-                if(hitRegions.isInAnyRegion(inputObj.mouseState.x, inputObj.mouseState.y)){
+                if(hitRegions.isInAnyRegion(new Vector(inputObj.mouseState.x, inputObj.mouseState.y))){
                     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
                     isDestroying = true;
                     darkerScreenHandler.shouldDraw(false);
-                    restartButtonHandler.doDestroyEffect(context.canvas.width / 2, context.canvas.height / 3.3, function(){
+                    restartButtonHandler.doDestroyEffect(new Vector(context.canvas.width / 2, context.canvas.height / 3.3), function(){
                         EventSystem.publishEventImmediately("game_restart", {});
                         callbackToSwitchState(PlayingState);
                     });                
-                    bestScoreHandler.doDestroyEffect(context.canvas.width / 3, context.canvas.height / 1.5, function(){});                
-                    scoreHandler.doDestroyEffect(context.canvas.width / 1.3, context.canvas.height / 2, function(){});
+                    bestScoreHandler.doDestroyEffect(new Vector(context.canvas.width / 3, context.canvas.height / 1.5), function(){});                
+                    scoreHandler.doDestroyEffect(new Vector(context.canvas.width / 1.3, context.canvas.height / 2), function(){});
                 }
             }
         }

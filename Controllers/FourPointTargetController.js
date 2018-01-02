@@ -1,11 +1,11 @@
-define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController){
+define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
+        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new FourPointTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 10, 10, EffectsManager);
+            this._entitiesPool[i] = new FourPointTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 10, 10, EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -48,7 +48,7 @@ define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Util
                 break;
         }
         
-        newlyActivatedTarget.setPosition(spawnX, spawnY);     
+        newlyActivatedTarget.setPosition(new Vector(spawnX, spawnY));     
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){

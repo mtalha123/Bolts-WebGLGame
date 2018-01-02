@@ -18,12 +18,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreakNormalState.prototype.constructor = BonusTargetOrbStreakNormalState;
     
     
-    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, x, y);
+    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius, gl, EffectsManager));
+        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
-        this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, x, y, {});
+        this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         
         this._normalState = new BonusTargetOrbStreakNormalState(this);
         this._destructionState = new BonusTargetOrbStreakDestructionState(this._handler);
@@ -40,16 +40,16 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         return this._radius;
     }
     
-    BonusTargetOrbStreak.prototype.setPosition = function(newX, newY){
-        Entity.Entity.prototype.setPosition.call(this, newX, newY);
+    BonusTargetOrbStreak.prototype.setPosition = function(newPosition){
+        Entity.Entity.prototype.setPosition.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
     }
     
-    BonusTargetOrbStreak.prototype._setPositionWithInterpolation = function(newX, newY){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+    BonusTargetOrbStreak.prototype._setPositionWithInterpolation = function(newPosition){
+        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
     }
     
     BonusTargetOrbStreak.prototype.setAchievementPercentage = function(percent){
@@ -60,7 +60,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         if(this._hitBox.processInput(mouseInputObj)){
             this.destroyAndReset(callback);
             return true;
-        };
+        }
         
         return false;
     }

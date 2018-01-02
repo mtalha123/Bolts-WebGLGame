@@ -1,28 +1,24 @@
-define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'SliceAlgorithm'], function(distance, rotateCoord, Vector, SliceAlgorithm){
-    function CircularHitBox(centerX, centerY, radius, label){
-        this._centerX = centerX;
-        this._centerY = centerY;
+define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector'], function(distance, rotateCoord, Vector){
+    function CircularHitBox(centerPosition, radius, label){
+        this._centerPosition = centerPosition;
         this._radius = radius;
         this._label = label;
     }
     
-    CircularHitBox.prototype.isInRegion = function(checkX, checkY){
-        if( distance(checkX, checkY, this._centerX, this._centerY) <= this._radius ){
+    CircularHitBox.prototype.isInRegion = function(checkPosition){
+        if( this._centerPosition.distanceTo(checkPosition) <= this._radius ){
             return true;
         }
         
         return false;
     }
     
-    CircularHitBox.prototype.setPosition = function(newX, newY){
-        this._centerX = newX;
-        this._centerY = newY;
+    CircularHitBox.prototype.setPosition = function(newPosition){
+        this._centerPosition = newPosition;
     }
     
     CircularHitBox.prototype.getPosition = function(){
-        var x = this._centerX;
-        var y = this._centerY;
-        return [x, y];
+        return this._centerPosition;
     }
     
     CircularHitBox.prototype.getLabel = function(){

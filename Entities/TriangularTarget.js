@@ -26,22 +26,20 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     
-    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, x, y, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);    
-        this._x = this._prevX = x; 
-        this._y = this._prevY = y;
+    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);    
         
         this._radius = p_radius;
-        this._hitBoxRegions = new CircularHitRegions(x, y);
-        var firstRegion = new Vector(x + p_radius, y);
-        var secondRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI - (Math.PI/3), new Vector(x, y));
-        var thirdRegion = rotateCoord(new Vector(x + p_radius, y), Math.PI + (Math.PI/3), new Vector(x, y));
-        this._hitBoxRegions.addRegion(firstRegion.getX(), firstRegion.getY(), p_radius / 3, new SliceAlgorithm(firstRegion.getX(), firstRegion.getY(), p_radius / 3, gl, EffectsManager));
-        this._hitBoxRegions.addRegion(secondRegion.getX(), secondRegion.getY(), p_radius / 3, new SliceAlgorithm(secondRegion.getX(), secondRegion.getY(), p_radius / 3, gl, EffectsManager));
-        this._hitBoxRegions.addRegion(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3, new SliceAlgorithm(thirdRegion.getX(), thirdRegion.getY(), p_radius / 3, gl, EffectsManager));
+        this._hitBoxRegions = new CircularHitRegions(position);
+        var firstRegion = new Vector(position.getX() + p_radius, position.getY());
+        var secondRegion = rotateCoord(new Vector(position.getX() + p_radius, position.getY()), Math.PI - (Math.PI/3), position);
+        var thirdRegion = rotateCoord(new Vector(position.getX() + p_radius, position.getY()), Math.PI + (Math.PI/3), position);
+        this._hitBoxRegions.addRegion(firstRegion, p_radius / 3, new SliceAlgorithm(firstRegion, p_radius / 3, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(secondRegion, p_radius / 3, new SliceAlgorithm(secondRegion, p_radius / 3, gl, EffectsManager));
+        this._hitBoxRegions.addRegion(thirdRegion, p_radius / 3, new SliceAlgorithm(thirdRegion, p_radius / 3, gl, EffectsManager));
         
-        this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
-        this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, x, y, {radius: [p_radius]});
+        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, position, {radius: [p_radius]});
         
         this._normalState = new TriangularTargetNormalState(this);
         this._destructionState = new TriangularTargetDestructionState(this._handler);
@@ -56,20 +54,20 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     TriangularTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     TriangularTarget.prototype.constructor = TriangularTarget;
     
-    TriangularTarget.prototype.setPosition = function(newX, newY){
-        MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
+    TriangularTarget.prototype.setPosition = function(newPosition){
+        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
         
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBoxRegions.setPosition(newPosition);
         
-        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
+        MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
-    TriangularTarget.prototype._setPositionWithInterpolation = function(newX, newY){
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+    TriangularTarget.prototype._setPositionWithInterpolation = function(newPosition){
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBoxRegions.setPosition(newX, newY);
+        this._hitBoxRegions.setPosition(newPosition);
         
-        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
+        MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     TriangularTarget.prototype.reset = function(){
@@ -93,7 +91,6 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
 
             this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
             this._handler.setGuardPrefs(this._guardPrefs);
-            console.log("guardprefs: " + this._guardPrefs);
             this._handler.increaseLgGlowFactor(1.5);
             possibleHitBox.activated = false;
         }
@@ -103,7 +100,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     
     TriangularTarget.prototype.spawn = function(callback){        
         this._hitBoxRegions.activateAllRegions();
-        MainTargetsPositions.addTargetObj(this, new Vector(this._x, this._y));
+        MainTargetsPositions.addTargetObj(this, this._position);
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
     

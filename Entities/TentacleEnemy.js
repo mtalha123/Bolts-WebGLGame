@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, distance, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/distance', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, distance, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions){
 
     function getQuadrant(point, center){        
         var angle;
@@ -36,20 +36,20 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     function TentacleEnemyDestructionState(targetHandler){
-        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
+        Entity.EntityDestructionState.call(this, targetHandler);
     }
     
-    //inherit from MovingEntityDestructionState
-    TentacleEnemyDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
+    //inherit from EntityDestructionState
+    TentacleEnemyDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
     TentacleEnemyDestructionState.prototype.constructor = TentacleEnemyDestructionState; 
     
     
     function TentacleEnemyNormalState(target){
-        MovingEntity.MovingEntityNormalState.call(this, target);
+        Entity.EntityNormalState.call(this, target);
     }
     
-    //inherit from MovingEntityNormalState
-    TentacleEnemyNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
+    //inherit from EntityNormalState
+    TentacleEnemyNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
     TentacleEnemyNormalState.prototype.constructor = TentacleEnemyNormalState;
     
     TentacleEnemyNormalState.prototype.update = function(){ 
@@ -61,8 +61,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             }
             
             if(allTargetObjs[i].target.getCharge() === 1 && 
-               ((new Vector(this._entity._x, this._entity._y)).distanceTo(allTargetObjs[i].position) <= (this._entity._radius * 4))){
-                var quadOfEntity = getQuadrant(allTargetObjs[i].position, new Vector(this._entity._x, this._entity._y));
+               this._entity._position.distanceTo(allTargetObjs[i].position) <= (this._entity._radius * 4)){
+                var quadOfEntity = getQuadrant(allTargetObjs[i].position, this._entity._position);
                 if((this._entity._listTentaclesHoldLg[quadOfEntity - 1] === 1) || this._entity._listTentaclesAlive[quadOfEntity-1] == 0){
                     break;
                 }
@@ -80,13 +80,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     
-    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, x, y, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, 0, speed);
+    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
-        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius, gl, EffectsManager));
+        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
-        this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, x, y, {});
+        this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
         
         this._normalState = new TentacleEnemyNormalState(this);
         this._destructionState = new TentacleEnemyDestructionState(this._handler);
@@ -105,28 +105,27 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._listTentaclesAlive = [1, 1, 1, 1];
     }
     
-    //inherit from MovingEntity
-    TentacleEnemy.prototype = Object.create(MovingEntity.MovingEntity.prototype);
+    //inherit from Entity
+    TentacleEnemy.prototype = Object.create(Entity.Entity.prototype);
     TentacleEnemy.prototype.constructor = TentacleEnemy;
     
     TentacleEnemy.prototype.getRadius = function(){
         return this._radius;
     }
     
-    TentacleEnemy.prototype.setPosition = function(newX, newY){
-        this._x = this._prevX = newX;  
-        this._y = this._prevY = newY;
-        this._hitBox.setPosition(newX, newY);
+    TentacleEnemy.prototype.setPosition = function(newPosition){
+        Entity.Entity.prototype.setPosition.call(this, newPosition);
+        this._hitBox.setPosition(newPosition);
     }
     
-    TentacleEnemy.prototype._setPositionWithInterpolation = function(newX, newY){
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+    TentacleEnemy.prototype._setPositionWithInterpolation = function(newPosition){
+        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
     }
     
     TentacleEnemy.prototype.reset = function(){
-        MovingEntity.MovingEntity.prototype.reset.call(this);
+        Entity.Entity.prototype.reset.call(this);
         this._charge = 0;
         this._numTimesSliced = 0;
         this._numSlicesNeeded = 4;
@@ -134,7 +133,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     } 
     
     TentacleEnemy.prototype.spawn = function(callback){
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        Entity.Entity.prototype.spawn.call(this, callback);
     } 
     
     TentacleEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
@@ -166,7 +165,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 this.destroyAndReset(callback);
                 return true;
             }
-        };
+        }
         
         return false;
     }

@@ -1,6 +1,6 @@
 define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Handlers/BasicParticlesHandler', 'Custom Utility/Vector'], function(EntityHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler, Vector){
     
-    function LinkHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x1, y1, x2, y2, opts, ShaderLibrary){        
+    function LinkHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, startPos, endPos, opts, ShaderLibrary){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -34,10 +34,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LINK); 
         
-        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);   
+        EntityHandler.call(this, shouldDraw, gl, zOrder, endPos, canvasWidth, canvasHeight, ShaderLibrary, opts);   
         
         this._padding = canvasHeight * 0.01;
-        this.setCoords(x1, y1, x2, y2);
+        this.setCoords(startPos, endPos);
     }
     
     //inherit from Handler
@@ -48,9 +48,9 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._particlesHandler.update();
     }
     
-    LinkHandler.prototype.setCoords = function(newX1, newY1, newX2, newY2){
-        this._uniforms.startCoord.value = [newX1, newY1];
-        this._uniforms.endCoord.value = [newX2, newY2];
+    LinkHandler.prototype.setCoords = function(startPos, endPos){
+        this._uniforms.startCoord.value = [startPos.getX(), startPos.getY()];
+        this._uniforms.endCoord.value = [endPos.getX(), endPos.getY()];
         this._generateVerticesFromCurrentState();
     }
     

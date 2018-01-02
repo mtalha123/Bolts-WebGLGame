@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Handlers/LightningHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Vector'], function(Handler, LightningHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, Vector){
     
-    function SliceHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x1, y1, x2, y2, opts, ShaderLibrary, noiseTextureData, coordsSamplerVal){        
+    function SliceHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, startPos, endPos, opts, ShaderLibrary, noiseTextureData, coordsSamplerVal){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -26,12 +26,12 @@ define(['Handlers/Handler', 'Handlers/LightningHandler', 'Custom Utility/getVert
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIFEBAR); 
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts); 
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts); 
         
-        this._lightningHandler = new LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, {}, [x1, y1, x2, y2], ShaderLibrary, noiseTextureData, coordsSamplerVal);
+        this._lightningHandler = new LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, {}, [startPos.getX(), startPos.getY(), endPos.getX(), endPos.getY()], ShaderLibrary, noiseTextureData, coordsSamplerVal);
         
         this._padding = canvasHeight * 0.01;
-        this.setCoords(x1, y1, x2, y2);
+        this.setCoords(startPos, endPos);
     }
     
     //inherit from Handler
@@ -40,9 +40,9 @@ define(['Handlers/Handler', 'Handlers/LightningHandler', 'Custom Utility/getVert
     
     SliceHandler.prototype.update = function(){ }
     
-    SliceHandler.prototype.setCoords = function(newX1, newY1, newX2, newY2){
-        this._uniforms.startCoord.value = [newX1, newY1];
-        this._uniforms.endCoord.value = [newX2, newY2];
+    SliceHandler.prototype.setCoords = function(newStartPos, newEndPos){
+        this._uniforms.startCoord.value = [newStartPos.getX(), newStartPos.getY()];
+        this._uniforms.endCoord.value = [newEndPos.getX(), newEndPos.getY()];
         this._generateVerticesFromCurrentState();
     }
     

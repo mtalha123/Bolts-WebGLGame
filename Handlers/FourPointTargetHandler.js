@@ -1,6 +1,6 @@
 define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Handlers/BasicParticlesHandler'], function(EntityHandler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler){
     
-    function FourPointTargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, noiseTextureData){        
+    function FourPointTargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary, noiseTextureData){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -39,18 +39,18 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.FOUR_POINT_TARGET);
         
-        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);  
+        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);  
         
-        this.setPosition(x, y);
+        this.setPosition(position);
     }
     
     //inherit from Handler
     FourPointTargetHandler.prototype = Object.create(EntityHandler.prototype);
     FourPointTargetHandler.prototype.constructor = FourPointTargetHandler; 
     
-    FourPointTargetHandler.prototype.setPosition = function(newX, newY){
-        this._uniforms.center.value[0] = newX;
-        this._uniforms.center.value[1] = newY;
+    FourPointTargetHandler.prototype.setPosition = function(newPosition){
+        this._uniforms.center.value[0] = newPosition.getX();
+        this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
     }
     

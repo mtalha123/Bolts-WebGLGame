@@ -1,4 +1,4 @@
-define(['Entities/TentacleEnemy', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/distance'], function(TentacleEnemy, SynchronizedTimers, Border, Random, EventSystem, EntityController, distance){
+define(['Entities/TentacleEnemy', 'Custom Utility/Random', 'Controllers/EntityController', 'Custom Utility/Vector'], function(TentacleEnemy, Random, EntityController, Vector){
     
     function TentacleEnemyController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
         EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
@@ -6,7 +6,7 @@ define(['Entities/TentacleEnemy', 'SynchronizedTimers', 'Border', 'Custom Utilit
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < 2; i++){
-            this._entitiesPool[i] = new TentacleEnemy(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, 5, EffectsManager);
+            this._entitiesPool[i] = new TentacleEnemy(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 5, EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -17,13 +17,13 @@ define(['Entities/TentacleEnemy', 'SynchronizedTimers', 'Border', 'Custom Utilit
     TentacleEnemyController.prototype.constructor = TentacleEnemyController;
     
     TentacleEnemyController.prototype._spawn = function(){
-        var spawnX = Random.getRandomInt(0.2 * this._canvasWidth, 0.7 * this._canvasWidth);
-        var spawnY = Random.getRandomInt(0.3 * this._canvasHeight, 0.7 * this._canvasHeight);
+        var spawnPosition = new Vector( Random.getRandomInt(0.2 * this._canvasWidth, 0.7 * this._canvasWidth),
+                                        Random.getRandomInt(0.3 * this._canvasHeight, 0.7 * this._canvasHeight));
         var movementAngle;
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
         
-        newlyActivatedTarget.setPosition(spawnX, spawnY);  
+        newlyActivatedTarget.setPosition(spawnPosition);  
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){});

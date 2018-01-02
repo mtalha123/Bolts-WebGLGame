@@ -18,13 +18,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     BasicTargetNormalState.prototype.constructor = BasicTargetNormalState;
     
     
-    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, x, y, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, movementangle, speed);
+    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, movementangle, speed, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius, gl, EffectsManager));
+        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
-        this._physicsBody = new CirclePhysicsBody(x, y, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
-        this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, x, y, {radius: [p_radius], fluctuation: [5]});  
+        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});  
         
         this._normalState = new BasicTargetNormalState(this);
         this._destructionState = new BasicTargetDestructionState(this._handler);
@@ -39,20 +39,20 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         return this._radius;
     }
     
-    BasicTarget.prototype.setPosition = function(newX, newY){
-        MovingEntity.MovingEntity.prototype.setPosition.call(this, newX, newY);
+    BasicTarget.prototype.setPosition = function(newPosition){
+        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
         
-        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
+        MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
-    BasicTarget.prototype._setPositionWithInterpolation = function(newX, newY){                
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+    BasicTarget.prototype._setPositionWithInterpolation = function(newPosition){                
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
         
-        MainTargetsPositions.updateTargetPosition(this, new Vector(newX, newY));
+        MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     BasicTarget.prototype.reset = function(){
@@ -62,7 +62,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     BasicTarget.prototype.spawn = function(callback){
-        MainTargetsPositions.addTargetObj(this, new Vector(this._x, this._y));
+        MainTargetsPositions.addTargetObj(this, this._position);
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
     

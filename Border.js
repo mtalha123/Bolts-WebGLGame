@@ -1,4 +1,4 @@
-define(['EventSystem', 'Custom Utility/coordsToRGB'], function(EventSystem, coordsToRGB){
+define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], function(EventSystem, coordsToRGB, Vector){
     
     var margin;    
     var borderLength;
@@ -36,8 +36,8 @@ define(['EventSystem', 'Custom Utility/coordsToRGB'], function(EventSystem, coor
         ];
         
         handler = EffectsManager.requestLightningEffect(false, gl, 3, {}, borderPath, true);
-        scoreHandler = EffectsManager.requestTextEffect(false, gl, 4, {}, 100, 100, "0");
-        healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, borderPath[0], borderPath[1] - 50, borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50);
+        scoreHandler = EffectsManager.requestTextEffect(false, gl, 4, {}, new Vector(100, 100), "0");
+        healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, new Vector(borderPath[0], borderPath[1] - 50), new Vector(borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50), {});
         
         EventSystem.register(receiveEvent, "score_achieved");
         EventSystem.register(receiveEvent, "entity_spawned");
@@ -53,7 +53,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB'], function(EventSystem, coor
         
         scoreHandler.setText(score.toString());
         //FIX: SHOULD BE "scoreHandler.width / 2"
-        scoreHandler.setPosition(scoreX - (scoreHandler.getWidth() / 3.5), appMetaData.getCanvasHeight() - scoreY);
+        scoreHandler.setPosition(new Vector(scoreX - (scoreHandler.getWidth() / 3.5), appMetaData.getCanvasHeight() - scoreY));
         handler.update();
         
     }
@@ -81,7 +81,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB'], function(EventSystem, coor
             currentCharge -= eventInfo.eventData.charge;
             healthBarHandler.setCompletion(currentCharge / totalCharge);
             if(currentCharge === 0){
-                EventSystem.publishEventImmediately("game_lost", {score: score});
+               // EventSystem.publishEventImmediately("game_lost", {score: score});
                 healthBarHandler.shouldDraw(false);
                 scoreHandler.shouldDraw(false);
                 return;

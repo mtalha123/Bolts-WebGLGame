@@ -1,52 +1,46 @@
-define(['Border'], function(Border){
+define(['Border', 'Custom Utility/Vector'], function(Border, Vector){
     
-    function CirclePhysicsBody(x, y, canvasHeight, radius, velocity){
+    function CirclePhysicsBody(position, canvasHeight, radius, velocity){
         this._radius = radius;
         this._velocity = velocity;
-        this.setPosition(x, y);
+        this.setPosition(position);
         this._isInSimulation = false;
     }
     
-    CirclePhysicsBody.prototype.setPosition = function(newX, newY){
-        this._x = newX;
-        this._y = newY;
+    CirclePhysicsBody.prototype.setPosition = function(newPosition){
+        this._position = newPosition;
     }
     
     CirclePhysicsBody.prototype.update = function(){          
-        if( (this._x - this._radius) <= Border.getLeftX()){
-            this._x += 5;
-            this._velocity[0] *= -1;
+        if( (this._position.getX() - this._radius) <= Border.getLeftX()){
+            this._position.setCoords(this._position.getX() + 5, this._position.getY());
+            this._velocity.setCoords(this._velocity.getX() * -1, this._velocity.getY());;
         }
 
-        if( (this._y + this._radius) >= Border.getTopY()){
-            this._y -= 5;
-            this._velocity[1] *= -1;
+        if( (this._position.getY() + this._radius) >= Border.getTopY()){
+            this._position.setCoords(this._position.getX(), this._position.getY() - 5);
+            this._velocity.setCoords(this._velocity.getX(), this._velocity.getY() * -1);;
         }
 
-        if( (this._x + this._radius) >= Border.getRightX()){
-            this._x -= 5;
-            this._velocity[0] *= -1;
+        if( (this._position.getX() + this._radius) >= Border.getRightX()){
+            this._position.setCoords(this._position.getX() - 5, this._position.getY());
+            this._velocity.setCoords(this._velocity.getX() * -1, this._velocity.getY());;
         }
 
-        if(this._y - this._radius <= Border.getBottomY()){
-            this._y += 5;
-            this._velocity[1] *= -1;
+        if(this._position.getY() - this._radius <= Border.getBottomY()){
+            this._position.setCoords(this._position.getX(), this._position.getY() + 5);
+            this._velocity.setCoords(this._velocity.getX(), this._velocity.getY() * -1);;
         }
 
-        this._x += this._velocity[0];
-        this._y += this._velocity[1];
+        this._position = this._position.addTo(this._velocity);
     }
     
-    CirclePhysicsBody.prototype.setLinearVelocity = function(velX, velY){
-        this._velocity = [velX, velY];
+    CirclePhysicsBody.prototype.setLinearVelocity = function(velocity){
+        this._velocity = velocity;
     }
     
-    CirclePhysicsBody.prototype.getX = function(){
-        return this._x;
-    }
-    
-    CirclePhysicsBody.prototype.getY = function(){
-        return this._y;
+    CirclePhysicsBody.prototype.getPosition = function(){
+        return this._position;
     }
     
     return CirclePhysicsBody;

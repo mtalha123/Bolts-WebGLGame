@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
-    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){        
+    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){        
         var comboTextInfo = getTextInfo(comboText);
         var firstCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[0]], fontTextureData.width, fontTextureData.height);
         var secondCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[1]], fontTextureData.width, fontTextureData.height);
@@ -71,26 +71,26 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
 
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
         
         this._fontTextureWidth = fontTextureData.width;
         this._fontTextureHeight = fontTextureData.height;
         this._charWidth = 0.025 * canvasHeight;
         this._gapBetweenChars = 0.004 * canvasHeight;
         this.setComboText(comboText);
-        this.setPosition(x, y);
+        this.setPosition(position);
     }
     
     //inherit from Handler
     ComboHandler.prototype = Object.create(Handler.prototype);
     ComboHandler.prototype.constructor = ComboHandler; 
     
-    ComboHandler.prototype.setPosition = function(newX, newY){
+    ComboHandler.prototype.setPosition = function(newPosition){
         var distanceToEdgeOfEffect = (this._uniforms.radiusFromText.value[0] + this._uniforms.radiusOfEdgeEffect.value[0] + this._uniforms.spreadOfEdgeEffect.value[0]);
-        this._uniforms.center.value[0] = newX + distanceToEdgeOfEffect;
-        this._uniforms.center.value[1] = newY - distanceToEdgeOfEffect;
+        this._uniforms.center.value[0] = newPosition.getX() + distanceToEdgeOfEffect;
+        this._uniforms.center.value[1] = newPosition.getY() - distanceToEdgeOfEffect;
 
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(newX, newY - (distanceToEdgeOfEffect * 2), distanceToEdgeOfEffect * 2, distanceToEdgeOfEffect * 2, this._canvasWidth, this._canvasHeight) );
+        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(newPosition.getX(), newPosition.getY() - (distanceToEdgeOfEffect * 2), distanceToEdgeOfEffect * 2, distanceToEdgeOfEffect * 2, this._canvasWidth, this._canvasHeight) );
         
         //make sure text appears in right spot
         this._setPositionOfChars();

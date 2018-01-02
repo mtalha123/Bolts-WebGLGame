@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Vector'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, Vector){
     
-    function LifebarHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x1, y1, x2, y2, opts, ShaderLibrary){        
+    function LifebarHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, startPosition, endPosition, opts, ShaderLibrary){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -34,10 +34,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIFEBAR); 
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);   
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
         this._padding = canvasHeight * 0.01;
-        this.setCoords(x1, y1, x2, y2);
+        this.setCoords(startPosition, endPosition);
     }
     
     //inherit from Handler
@@ -46,9 +46,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
     
     LifebarHandler.prototype.update = function(){ }
     
-    LifebarHandler.prototype.setCoords = function(newX1, newY1, newX2, newY2){
-        this._uniforms.startCoord.value = [newX1, newY1];
-        this._uniforms.endCoord.value = [newX2, newY2];
+    LifebarHandler.prototype.setCoords = function(newStartPos, newEndPos){
+        this._uniforms.startCoord.value = [newStartPos.getX(), newStartPos.getY()];
+        this._uniforms.endCoord.value = [newEndPos.getX(), newEndPos.getY()];
         this._generateVerticesFromCurrentState();
     }
     

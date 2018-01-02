@@ -1,13 +1,13 @@
-define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
+define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 0, maxEntitiesToSpawn); 
+        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 5000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new BonusTargetOrbStreak(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
+            this._entitiesPool[i] = new BonusTargetOrbStreak(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -25,7 +25,7 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
         
-        newlyActivatedTarget.setPosition(spawnX, spawnY);     
+        newlyActivatedTarget.setPosition(new Vector(spawnX, spawnY));     
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){ });

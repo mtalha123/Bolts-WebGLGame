@@ -1,4 +1,4 @@
-define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, ){
+define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
         EntityController.call(this, appMetaData, 100, maxEntitesToSpawn); 
@@ -6,7 +6,7 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < maxEntitesToSpawn; i++){
-            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, 0, 0, 30, 10, EffectsManager);
+            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), 30, 10, EffectsManager);
         }
         
         this._spawnTimer.start();
@@ -49,7 +49,7 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
                 break;
         }
         
-        newlyActivatedTarget.setPosition(spawnX, spawnY);     
+        newlyActivatedTarget.setPosition(new Vector(spawnX, spawnY));     
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){

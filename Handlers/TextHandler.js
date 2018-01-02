@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
     
-    function TextHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, fontTextureData, x, y, text){
+    function TextHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, fontTextureData, position, text){
         this._uniforms = {
             fontTexture: {
                 type: "sampler2D",
@@ -15,10 +15,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TEXT);
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);   
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
         this._attributes.texCoord = [];
-        this._width = 0, this._x = x, this._y = y;
+        this._width = 0, this._x = position.getX(), this._y = position.getY();
         this._fontTextureWidth = fontTextureData.width;
         this._fontTextureHeight = fontTextureData.height;
         
@@ -29,13 +29,12 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     TextHandler.prototype = Object.create(Handler.prototype);
     TextHandler.prototype.constructor = TextHandler; 
     
-    TextHandler.prototype.setPosition = function(newX, newY){
+    TextHandler.prototype.setPosition = function(newPosition){
         var prevX_t = getGLCoordsFromNormalizedShaderCoords([this._x / this._canvasWidth])[0];
-        var newX_t = getGLCoordsFromNormalizedShaderCoords([newX / this._canvasWidth])[0];
+        var newX_t = getGLCoordsFromNormalizedShaderCoords([newPosition.getX() / this._canvasWidth])[0];
         
         var prevY_t = getGLCoordsFromNormalizedShaderCoords([this._y / this._canvasHeight])[0];
-        var newY_t = getGLCoordsFromNormalizedShaderCoords([newY / this._canvasHeight])[0];
-
+        var newY_t = getGLCoordsFromNormalizedShaderCoords([newPosition.getY() / this._canvasHeight])[0];
 
         var moveX = 0;
         var moveY = 0;
@@ -57,8 +56,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             this._attributes.vertexPosition[i+1] += moveY;
         }
 
-        this._x = newX;
-        this._y = newY;
+        this._x = newPosition.getX();
+        this._y = newPosition.getY();
     }
     
     TextHandler.prototype.setText = function(string){
@@ -76,8 +75,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             var widthOfChar = textObject[string[i]].width;
             var heightOfChar = textObject[string[i]].height;
 
-            var xOffset = textObject[string[i]].xoffset / this._canvasWidth;
-            var yOffset = textObject[string[i]].yoffset / this._canvasHeight;
             var xAdvance = textObject[string[i]].xadvance / this._canvasWidth;
 
             y -= heightOfChar;

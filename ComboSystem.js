@@ -1,4 +1,4 @@
-define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, SynchronizedTimers){
+define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(EventSystem, SynchronizedTimers, Vector){
     var baseTargetCharge = 10;
     var chargeMultiplier = 1;
     var maxChargeMultiplier = 10;
@@ -13,7 +13,7 @@ define(['EventSystem', 'SynchronizedTimers'], function(EventSystem, Synchronized
     EventSystem.register(receiveEvent, "game_restart");
     
     function initialize(gl, EffectsManager, Border){
-        comboHandler = EffectsManager.requestComboEffect(false, gl, 0, Border.getLeftX(), Border.getTopY(), {}, "1x");
+        comboHandler = EffectsManager.requestComboEffect(false, gl, 0, new Vector(Border.getLeftX(), Border.getTopY()), {}, "1x");
     }
     
     function update(){

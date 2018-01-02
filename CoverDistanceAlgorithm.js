@@ -1,45 +1,37 @@
 define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, distance){
-    function CoverDistanceAlgorithm(x, y, radius, areaToAchieve){
-        this._x = x;
-        this._y = y;
+    function CoverDistanceAlgorithm(position, radius, areaToAchieve){
+        this._position = position;
         this._radius = radius;
         this._distCovered = 0;
-        this._startX = undefined;
-        this._startY = undefined;
+        this._startPos = undefined;
         this._areaToAchieve = areaToAchieve;
     }
     
     CoverDistanceAlgorithm.prototype.processInput = function(mouseInputObj){
         if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
-            var mouseX = mouseInputObj.x;
-            var mouseY = mouseInputObj.y;
+            var mousePos = new Vector(mouseInputObj.x, mouseInputObj.y);
         
-            if(distance(this._x, this._y, mouseX, mouseY) <= this._radius){
-                if(!(this._startX && this._startY)){
-                    this._startX = mouseX - this._x;;
-                    this._startY = mouseY - this._y;;
+            if(this._position.distanceTo(mousePos) <= this._radius){
+                if(!this._startPos){
+                    this._startPos = this._position.subtractFrom(mousePos);
                 }
 
-                var mouseXRelative = mouseX - this._x;
-                var mouseYRelative = mouseY - this._y;
-                this._distCovered += distance(this._startX, this._startY, mouseXRelative, mouseYRelative);
+                var mousePosRelative = this._position.subtractFrom(mousePos);
+                this._distCovered += this._startPos.distanceTo(mousePos);
 
-                this._startX = mouseXRelative;
-                this._startY = mouseYRelative;
+                this._startPos = this._startPos.addTo(mousePos);
 
                 if(this._distCovered >= this._areaToAchieve){
                     return true;
                 }
             }else{
-                this._startX = undefined;
-                this._startY = undefined;
+                this._startPos = undefined;
             }
         }
     }
     
-    CoverDistanceAlgorithm.prototype.setPosition = function(x, y){
-        this._x = x;
-        this._y = y;
+    CoverDistanceAlgorithm.prototype.setPosition = function(newPosition){
+        this._position = newPosition;
     }
     
     CoverDistanceAlgorithm.prototype.getPercentageDone = function(){
@@ -48,8 +40,7 @@ define(['Custom Utility/Vector', 'Custom Utility/distance'], function(Vector, di
     
     CoverDistanceAlgorithm.prototype.reset = function(){
         this._distCovered = 0;
-        this._startX = undefined;
-        this._startY = undefined;
+        this._startPos = undefined;
     }
     
     return CoverDistanceAlgorithm;

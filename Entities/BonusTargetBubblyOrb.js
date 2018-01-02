@@ -18,12 +18,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetBubblyOrbNormalState.prototype.constructor = BonusTargetBubblyOrbNormalState;
     
     
-    function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, x, y);
+    function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new SliceAlgorithm(x, y, p_radius, gl, EffectsManager));
+        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
-        this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, x, y, {radius: [p_radius]});
+        this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
         
         this._normalState = new BonusTargetBubblyOrbNormalState(this);
         this._destructionState = new BonusTargetBubblyOrbDestructionState(this._handler);
@@ -40,16 +40,16 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         return this._radius;
     }
     
-    BonusTargetBubblyOrb.prototype.setPosition = function(newX, newY){
-        Entity.Entity.prototype.setPosition.call(this, newX, newY);
+    BonusTargetBubblyOrb.prototype.setPosition = function(newPosition){
+        Entity.Entity.prototype.setPosition.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
     }
     
-    BonusTargetBubblyOrb.prototype._setPositionWithInterpolation = function(newX, newY){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+    BonusTargetBubblyOrb.prototype._setPositionWithInterpolation = function(newPosition){
+        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
     }
     
     BonusTargetBubblyOrb.prototype.setAchievementPercentage = function(percent){

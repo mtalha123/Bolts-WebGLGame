@@ -1,8 +1,6 @@
 define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords'], function(getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords){ 
-    function Handler(shouldDraw, x, y, zOrder, gl, canvasWidth, canvasHeight, opts){
+    function Handler(shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts){
         this._shouldDraw = shouldDraw;
-        this._x = x;
-        this._y = y;
         this._width = 300;
         this._height = 300;
         this._attributes = {

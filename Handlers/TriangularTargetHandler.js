@@ -1,6 +1,6 @@
 define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Handlers/BasicParticlesHandler'], function(EntityHandler, getVerticesNormalized, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, BasicParticlesHandler){
     
-    function TriangularTargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, x, y, opts, ShaderLibrary, noiseTextureData){        
+    function TriangularTargetHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary, noiseTextureData){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -47,18 +47,18 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TRIANGULAR_TARGET); 
         
-        EntityHandler.call(this, shouldDraw, gl, 0, 0, zOrder, canvasWidth, canvasHeight, ShaderLibrary, opts);   
+        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);   
         
-        this.setPosition(x, y);
+        this.setPosition(position);
     }
     
     //inherit from Handler
     TriangularTargetHandler.prototype = Object.create(EntityHandler.prototype);
     TriangularTargetHandler.prototype.constructor = TriangularTargetHandler; 
     
-    TriangularTargetHandler.prototype.setPosition = function(newX, newY){
-        this._uniforms.center.value[0] = newX;
-        this._uniforms.center.value[1] = newY;
+    TriangularTargetHandler.prototype.setPosition = function(newPosition){
+        this._uniforms.center.value[0] = newPosition.getX();
+        this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
     }
     

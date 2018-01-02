@@ -68,5 +68,10 @@ define(['Custom Utility/distance'], function(distance){
         return Math.sqrt(Math.pow(this._x - vec.getX(), 2) + Math.pow(this._y - vec.getY(), 2));
     }
     
+    Vector.prototype.setCoords = function(x, y){
+        this._x = x;
+        this._y = y;
+    } 
+    
     return Vector;
 });

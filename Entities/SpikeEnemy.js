@@ -18,13 +18,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     SpikeEnemyNormalState.prototype.constructor = SpikeEnemyNormalState;
     
     SpikeEnemyNormalState.prototype.update = function(){ 
-        if(distance(this._entity._x, this._entity._y, this._entity._destination.getX(), this._entity._destination.getY()) > this._entity._radius * 1.3){
-            var newX = this._entity._x + this._entity._velocity.getX();
-            var newY = this._entity._y + this._entity._velocity.getY();
-            this._entity._setPositionWithInterpolation(newX, newY);   
+        if(this._entity._position.distanceTo(this._entity._destination) > this._entity._radius * 1.3){
+            var newPos = this._entity._position.addTo(this._entity._velocity);
+            this._entity._setPositionWithInterpolation(newPos);   
         }else{
-            this._entity._prevX = this._entity._x;
-            this._entity._prevY = this._entity._y;
+            this._entity._prevPosition = this._entity._position;
             
             if(this._entity._lightningStealTimer.getTime() >= 2000){
                 if(this._entity._charge < this._entity._maxCharge){
@@ -39,20 +37,20 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     
-    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, x, y, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, x, y, 0, speed);
+    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
-        this._hitBox = new CircularHitBoxWithAlgorithm(x, y, p_radius, new CoverDistanceAlgorithm(x, y, p_radius, canvasHeight * 0.25));
+        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new CoverDistanceAlgorithm(position, p_radius, canvasHeight * 0.25));
         
-        this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, x, y, {});
+        this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
         
         this._normalState = new SpikeEnemyNormalState(this);
         this._destructionState = new SpikeEnemyDestructionState(this._handler);
         this._currentState = this._normalState;
         
         this._destination = new Vector(0, 0);
-        this._velocity = ((new Vector(-x, -y)).getNormalized()).multiplyWithScalar(speed);
+        this._velocity = (position.multiplyWithScalar(-1).getNormalized()).multiplyWithScalar(speed);
         
         this._charge = 0;
         this._maxCharge = 5;
@@ -68,16 +66,16 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         return this._radius;
     }
     
-    SpikeEnemy.prototype.setPosition = function(newX, newY){
-        this._x = this._prevX = newX;  
-        this._y = this._prevY = newY;
-        this._hitBox.setPosition(newX, newY);
+    SpikeEnemy.prototype.setPosition = function(newPosition){
+        this._position = this._prevPosition = newPosition; 
+        this._handler.setPosition(newPosition);
+        this._hitBox.setPosition(newPosition);
     }
     
-    SpikeEnemy.prototype._setPositionWithInterpolation = function(newX, newY){
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newX, newY);
+    SpikeEnemy.prototype._setPositionWithInterpolation = function(newPosition){
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBox.setPosition(newX, newY);
+        this._hitBox.setPosition(newPosition);
     }
     
     SpikeEnemy.prototype.setAchievementPercentage = function(percent){
@@ -106,7 +104,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         if(this._hitBox.processInput(mouseInputObj)){
             this.destroyAndReset(callback);
             return true;
-        };
+        }
         
         return false;
     }
@@ -115,9 +113,9 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     //    this._targetAreaToAchieve = targetAreaToAchieve;
     }
     
-    SpikeEnemy.prototype.setDestination = function(x, y){
-        this._destination = new Vector(x, y);
-        this._velocity = ((new Vector(x - this._x, y - this._y)).getNormalized()).multiplyWithScalar(this._speed);
+    SpikeEnemy.prototype.setDestination = function(destPosition){
+        this._destination = destPosition;
+        this._velocity = ((this._position.subtractFrom(destPosition)).getNormalized()).multiplyWithScalar(this._speed);
     }
     
     return SpikeEnemy;

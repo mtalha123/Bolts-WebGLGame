@@ -10,8 +10,8 @@ define([], function(){
 
     EntityDestructionState.prototype.update = function(){ }
     
-    EntityDestructionState.prototype.startDestruction = function(callback, x, y){
-        this._handler.doDestroyEffect(x, y, callback);
+    EntityDestructionState.prototype.startDestruction = function(callback, position){
+        this._handler.doDestroyEffect(position, callback);
     }
     
     
@@ -27,9 +27,8 @@ define([], function(){
     EntityNormalState.prototype.update = function(){ }
     
     
-    function Entity(canvasWidth, canvasHeight, gl, x, y){       
-        this._x = this._prevX = x; 
-        this._y = this._prevY = y;
+    function Entity(canvasWidth, canvasHeight, gl, position){       
+        this._position = this._prevPosition = position; 
         this._hitBoxRegions = null;
         this._charge = 1;
         
@@ -48,32 +47,24 @@ define([], function(){
         this._currentState.update();
     } 
     
-    Entity.prototype.setPosition = function(newX, newY){
-        this._x = this._prevX = newX;  
-        this._y = this._prevY = newY;
-        this._handler.setPosition(newX, newY);
+    Entity.prototype.setPosition = function(newPosition){
+        this._position = this._prevPosition = newPosition; 
+        this._handler.setPosition(newPosition);
     }
     
-    Entity.prototype._setPositionWithInterpolation = function(newX, newY){
-        this._prevX = this._x;
-        this._x = newX;
+    Entity.prototype._setPositionWithInterpolation = function(newPosition){
+        this._prevPosition = this._position;
+        this._position = newPosition;
         
-        this._prevY = this._y;
-        this._y = newY;
-        
-        this._handler.setPosition(newX, newY);
+        this._handler.setPosition(newPosition);
     }
     
-    Entity.prototype.getX = function(){
-        return this._x;
-    }
-    
-    Entity.prototype.getY = function(){
-        return this._y;
+    Entity.prototype.getPosition = function(){
+        return this._position;
     }
     
     Entity.prototype.spawn = function(callback){
-        this._handler.doSpawnEffect(this._x, this._y);
+        this._handler.doSpawnEffect(this._position);
         callback();
     }
     
@@ -93,11 +84,11 @@ define([], function(){
         this._currentState.startDestruction(function(){
             this.reset();
             callback();
-        }.bind(this), this._x, this._y);
+        }.bind(this), this._position);
     }
     
-    Entity.prototype.areCoordsInHitRegions = function(checkX, checkY){
-        return this._hitBoxRegions.isInAnyRegion(checkX, checkY);
+    Entity.prototype.areCoordsInHitRegions = function(checkPosition){
+        return this._hitBoxRegions.isInAnyRegion(checkPosition);
     }
     
     Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(){

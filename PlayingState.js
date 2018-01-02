@@ -1,4 +1,4 @@
-define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'ComboSystem', 'Background', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers'], function(FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, ComboSystem, Background, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers){
+define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'ComboSystem', 'Background', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector'], function(FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, ComboSystem, Background, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector){
     var Cursor;
     var Background;
     var Border;
@@ -40,7 +40,7 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 3, EffectsManager);
         tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 3, EffectsManager);
         
-        fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88, fpsCounter.getFPS().toString());
+        fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88), fpsCounter.getFPS().toString());
         
         Cursor = p_Cursor;
         

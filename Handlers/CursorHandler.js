@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getVerticesNormalized'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, getVerticesNormalized){
     
-    function CursorHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, x, y){
+    function CursorHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, ShaderLibrary, position){
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -8,7 +8,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             },
             mouseCoords: {
                 type: "vec2",
-                value: [x, y]
+                value: [position.getX(), position.getY()]
             },
             clicked: {
                 type: "float",
@@ -25,11 +25,11 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         };
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.CURSOR);
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, opts);   
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
         this._padding = 0.03 * canvasHeight;
         
-        this.setPosition(x, y);
+        this.setPosition(position);
         this._setVerticesFromCurrState();   
     }
     
@@ -37,9 +37,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     CursorHandler.prototype = Object.create(Handler.prototype);
     CursorHandler.prototype.constructor = CursorHandler; 
     
-    CursorHandler.prototype.setPosition = function(newX, newY){
-        this._uniforms.mouseCoords.value[0] = newX;
-        this._uniforms.mouseCoords.value[1] = newY;
+    CursorHandler.prototype.setPosition = function(newPosition){
+        this._uniforms.mouseCoords.value[0] = newPosition.getX();
+        this._uniforms.mouseCoords.value[1] = newPosition.getY();
 
         this._setVerticesFromCurrState();
     }

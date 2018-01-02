@@ -1,21 +1,20 @@
 define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/CircularHitBoxWithAlgorithm'], function(distance, rotateCoord, Vector, CircularHitBoxWithAlgorithm){    
-    function CircularHitRegions(centerXOfAllRegions, centerYOfAllRegions){
-        this._centerX = centerXOfAllRegions;
-        this._centerY = centerYOfAllRegions;
+    function CircularHitRegions(centerPosition){
+        this._centerPositionOfAllRegions = centerPosition;
         this._regions = [];
         this._labelCounter = 1;
     }
     
-    CircularHitRegions.prototype.addRegion = function(centerX, centerY, radius, algorithm){
-        var hitbox = new CircularHitBoxWithAlgorithm(centerX, centerY, radius, algorithm, this._labelCounter);
+    CircularHitRegions.prototype.addRegion = function(centerPosition, radius, algorithm){
+        var hitbox = new CircularHitBoxWithAlgorithm(centerPosition, radius, algorithm, this._labelCounter);
         this._regions.push(hitbox);
         
         this._labelCounter++;
     }
     
-    CircularHitRegions.prototype.isInAnyRegion = function(checkX, checkY){
+    CircularHitRegions.prototype.isInAnyRegion = function(checkPosition){
         for(var i = 0; i < this._regions.length; i++){
-            if(this._regions[i].activated && this._regions[i].isInRegion(checkX, checkY)){
+            if(this._regions[i].activated && this._regions[i].isInRegion(checkPosition)){
                 return this._regions[i];
             }
         }
@@ -33,21 +32,19 @@ define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility
         return false;
     }
     
-    CircularHitRegions.prototype.setPosition = function(newX, newY){        
-        var xDiff = newX - this._centerX;
-        var yDiff = newY - this._centerY;
+    CircularHitRegions.prototype.setPosition = function(newPosition){        
+        var positionDiff = this._centerPositionOfAllRegions.subtractFrom(newPosition);
         
-        this._centerX += xDiff;
-        this._centerY += yDiff;
+        this._centerPositionOfAllRegions = this._centerPositionOfAllRegions.addTo(positionDiff);
         
         for(var i = 0; i < this._regions.length; i++){
             var currentRegionPosition = this._regions[i].getPosition();
-            this._regions[i].setPosition(currentRegionPosition[0] + xDiff, currentRegionPosition[1] + yDiff);
+            this._regions[i].setPosition(currentRegionPosition.addTo(positionDiff));
         }
     }
     
     CircularHitRegions.prototype.getPosition = function(){
-        return [this._centerX, this._centerY];
+        return this._centerPositionOfAllRegions;
     }
     
     CircularHitRegions.prototype.getRegions = function(){
@@ -58,8 +55,8 @@ define(['Custom Utility/distance', 'Custom Utility/rotateCoord', 'Custom Utility
         for(var i = 0; i < this._regions.length; i++){
             var currRegion = this._regions[i];
             var currPos = currRegion.getPosition();
-            var newPos = rotateCoord(new Vector(currPos[0], currPos[1]), angle, new Vector(this._centerX, this._centerY));
-            currRegion.setPosition(newPos.getX(), newPos.getY());
+            var newPos = rotateCoord(currPos, angle, this._centerPositionOfAllRegions);
+            currRegion.setPosition(newPos);
         }
     }
     

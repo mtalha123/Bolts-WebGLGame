@@ -9,7 +9,7 @@ define(['Handlers/Handler', 'SynchronizedTimers', 'Custom Utility/getVerticesUnN
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.FULL_SCREEN_COLOR); 
         
-        Handler.call(this, shouldDraw, 0, 0, zOrder, gl, canvasWidth, canvasHeight, {});   
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, {});   
         
         this._timer = SynchronizedTimers.getTimer();
         this._duration = 1000;

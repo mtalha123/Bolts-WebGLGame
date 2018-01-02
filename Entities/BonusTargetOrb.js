@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'], function(SynchronizedTimers, Entity, CircularHitBox){
+define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector'], function(SynchronizedTimers, Entity, CircularHitBox, Vector){
 
     function BonusTargetOrbDestructionState(targetHandler){
         Entity.EntityDestructionState.call(this, targetHandler);
@@ -20,22 +20,20 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     
     
     BonusTargetOrbNormalState.prototype.prepareForDrawing = function(interpolation){
-        this._handler.setPosition(this._entity._x, this._entity._y);
+        this._handler.setPosition(this._entity._position);
         this._handler.update();        
     }
     
     BonusTargetOrbNormalState.prototype.update = function(){ }
     
     
-    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, x, y, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, x, y);     
-        this._x = this._prevX = x; 
-        this._y = this._prevY = y;
+    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);     
         
         this._radius = p_radius;
-        this._hitBox = new CircularHitBox(x, y, p_radius * 1.5);
+        this._hitBox = new CircularHitBox(position, p_radius * 1.5);
         
-        this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, x, y, {radius: [p_radius]});
+        this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [p_radius]});
         
         this._normalState = new BonusTargetOrbNormalState(this);
         this._destructionState = new BonusTargetOrbDestructionState(this._handler);
@@ -48,17 +46,14 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     BonusTargetOrb.prototype = Object.create(Entity.Entity.prototype);
     BonusTargetOrb.prototype.constructor = BonusTargetOrb;
     
-    BonusTargetOrb.prototype.setPosition = function(newX, newY){
-        this._x = this._prevX = newX;  
-        this._y = this._prevY = newY;
-        this._hitBox.setPosition(newX, newY);
-        this._handler.setPosition(newX, newY);
+    BonusTargetOrb.prototype.setPosition = function(newPosition){
+        Entity.Entity.prototype.setPosition.call(this, newPosition);
+        this._hitBox.setPosition(newPosition);
     }
     
-    BonusTargetOrb.prototype._setPositionWithInterpolation = function(newX, newY){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newX, newY);
-        
-        this._hitBox.setPosition(newX, newY);
+    BonusTargetOrb.prototype._setPositionWithInterpolation = function(newPosition){
+        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
+        this._hitBox.setPosition(newPosition);
     }
     
     BonusTargetOrb.prototype.turnOnLightning = function(){ 
@@ -77,10 +72,9 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     
     BonusTargetOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj){
         if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
-            var mouseX = mouseInputObj.x;
-            var mouseY = mouseInputObj.y;
+            var mousePos = new Vector(mouseInputObj.x, mouseInputObj.y);
             
-            if(this._hitBox.isInRegion(mouseX, mouseY)){
+            if(this._hitBox.isInRegion(mousePos)){
                 return true;
             }
         }

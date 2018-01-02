@@ -1,6 +1,6 @@
-define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
+define(['Custom Utility/Timer', 'EventSystem', 'Custom Utility/Vector'], function(Timer, EventSystem, Vector){
     
-    var x = 0, y = 0; 
+    var position = new Vector(0, 0);
     var mouseHeldDown = false;  
     var radius = 20;
     EventSystem.register(receiveEvent, "combo_level_increased");
@@ -10,7 +10,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     
     function initialize(gl, p_appMetaData, EffectsManager){
         appMetaData = p_appMetaData;
-        handler = EffectsManager.requestCursorEffect(false, 100, {}, gl, 100, 100);
+        handler = EffectsManager.requestCursorEffect(false, 100, {}, gl, new Vector(100, 100));
     }
     
     function draw(interpolation){
@@ -20,7 +20,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
         }else{
             handler.setClicked(false);
         } 
-        handler.setPosition(x, y);
+        handler.setPosition(position);
         handler.update();
     }
     
@@ -28,17 +28,12 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
         return mouseHeldDown;
     }
     
-    function getX(){
-        return x;
+    function getPosition(){
+        return position;
     }
     
-    function getY(){
-        return y;
-    }
-    
-    function changePosition(p_x, p_y){
-        x = p_x;
-        y = p_y;
+    function changePosition(newPosition){
+        position = newPosition;
     }
     
     function press(){
@@ -85,8 +80,7 @@ define(['Custom Utility/Timer', 'EventSystem'], function(Timer, EventSystem){
     return {
         initialize: initialize,
         draw : draw,
-        getX: getX,
-        getY: getY,
+        getPosition: getPosition,
         changePosition: changePosition,
         press: press,
         release: release,
