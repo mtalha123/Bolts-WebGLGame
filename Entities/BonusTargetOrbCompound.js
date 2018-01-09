@@ -50,9 +50,9 @@ define(['Entities/BonusTargetOrb', 'Link', 'Custom Utility/Vector'], function(Bo
         this._config[6].setPosition(newPositions[9]);
     }
     
-    BonusTargetOrbCompound.prototype.prepareForDrawing = function(){
+    BonusTargetOrbCompound.prototype.prepareForDrawing = function(interpolation){
         for(var i = 0; i < this._config.length; i++){
-            this._config[i].prepareForDrawing();
+            this._config[i].prepareForDrawing(interpolation);
         } 
     }
     

@@ -1,6 +1,6 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getGLTextureToPassInfoFromRGBData', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'SynchronizedTimers'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, getGLTextureToPassInfoFromRGBData, coordsToRGB, Vector, SynchronizedTimers){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getGLTextureToPassInfoFromRGBData', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'addToAutomaticDrawing'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, getGLTextureToPassInfoFromRGBData, coordsToRGB, Vector, addToAutomaticDrawing){
     
-    function LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, noiseTextureData, coordsSamplerVal, funcToCallForAutomaticUpdates){
+    function LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, noiseTextureData, coordsSamplerVal){
         var widthOfCoordsTexture = coordsToRGB(coords, canvasWidth, canvasHeight).length / 3;
         this._uniforms = { 
             iResolution: { 
@@ -68,10 +68,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         //CHANGE AFTER
         this._padding = 0.06 * this._canvasHeight;
         this.setLightningCoords(coords);   
-        this.funcToCallForAutomaticUpdates = funcToCallForAutomaticUpdates;
-        this.timerForDisappearEffect = SynchronizedTimers.getTimer();
         this.shouldAnimateLg = shouldAnimateLg;
-        this.isDisappearing = false;
     }
     
     //inherit from Handler
@@ -82,10 +79,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     LightningHandler.prototype.update = function(){
         if(this.shouldAnimateLg){
             Handler.prototype.update.call(this);
-        }
-        
-        if(this.timerForDisappearEffect.getTime() <= 500 && this.isDisappearing){ 
-            this._uniforms.completion.value[0] = this.timerForDisappearEffect.getTime() / 500;   
         }
     }
     
@@ -165,11 +158,13 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     }
     
     LightningHandler.prototype.doDisappearEffect = function(){
-        this.timerForDisappearEffect.reset();
-        this.timerForDisappearEffect.start();
-        this.isDisappearing = true;
         this._shouldDraw = true;
-        this.funcToCallForAutomaticUpdates(this, 1000, this.update, function(){this._shouldDraw = false; this.isDisappearing = false;}.bind(this));
+        
+        addToAutomaticDrawing.addToAutomaticDrawing(this, 500, function(time){
+            this._uniforms.completion.value[0] = time / 500;
+        }, function(){
+            this._shouldDraw = false; 
+        });
     }
     
     return LightningHandler;

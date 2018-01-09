@@ -67,7 +67,6 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         spikeEnemyController.prepareForDrawing(interpolation);
         tentacleEnemyController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
-        EffectsManager.prepareForDrawing();
 
         ComboSystem.draw();
         Background.draw();
@@ -131,25 +130,25 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         
         if(gameLevelTimer.getTime() >= 290000){
 //            EventSystem.publishEvent("game_level_up", {level: 8})
-            console.log("LEVEL 8");
+//            console.log("LEVEL 8");
         }else if(gameLevelTimer.getTime() >= 230000){
 //            EventSystem.publishEvent("game_level_up", {level: 7})
-            console.log("LEVEL 7");
+//            console.log("LEVEL 7");
         }else if(gameLevelTimer.getTime() >= 170000){
 //            EventSystem.publishEvent("game_level_up", {level: 6})
-            console.log("LEVEL 6");
+//            console.log("LEVEL 6");
         }else if(gameLevelTimer.getTime() >= 130000){
 //            EventSystem.publishEvent("game_level_up", {level: 5})
-            console.log("LEVEL 5");
+//            console.log("LEVEL 5");
         }else if(gameLevelTimer.getTime() >= 90000){
 //            EventSystem.publishEvent("game_level_up", {level: 4})
-            console.log("LEVEL 4");
+//            console.log("LEVEL 4");
         }else if(gameLevelTimer.getTime() >= 60000){
 //            EventSystem.publishEvent("game_level_up", {level: 3})
-            console.log("LEVEL 3");
+//            console.log("LEVEL 3");
         }else if(gameLevelTimer.getTime() >= 20000){
 //            EventSystem.publishEvent("game_level_up", {level: 2})
-            console.log("LEVEL 2");
+//            console.log("LEVEL 2");
         }
     }
     

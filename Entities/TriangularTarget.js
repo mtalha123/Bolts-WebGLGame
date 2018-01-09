@@ -1,31 +1,5 @@
 define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions){
 
-    function TriangularTargetDestructionState(targetHandler){
-        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
-    }
-    
-    //inherit from MovingEntityDestructionState
-    TriangularTargetDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
-    TriangularTargetDestructionState.prototype.constructor = TriangularTargetDestructionState; 
-    
-    
-    function TriangularTargetNormalState(target){
-        MovingEntity.MovingEntityNormalState.call(this, target);
-    }
-    
-    //inherit from MovingEntityNormalState
-    TriangularTargetNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
-    TriangularTargetNormalState.prototype.constructor = TriangularTargetNormalState;
-    
-    TriangularTargetNormalState.prototype.update = function(){
-        MovingEntity.MovingEntityNormalState.prototype.update.call(this);
-        
-        this._entity._rotationAngle+=0.05;
-        this._handler.setAngle(this._entity._rotationAngle);
-        this._entity._hitBoxRegions.rotateAllRegions(0.05);
-    }
-    
-    
     function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);    
         
@@ -40,10 +14,6 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, position, {radius: [p_radius]});
-        
-        this._normalState = new TriangularTargetNormalState(this);
-        this._destructionState = new TriangularTargetDestructionState(this._handler);
-        this._currentState = this._normalState;
         
         this._rotationAngle = 0;
         this._numGuardsActivated = 0;
@@ -75,6 +45,13 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0];
         MainTargetsPositions.removeTargetObj(this);
+    }
+    
+    TriangularTarget.prototype.update = function(){
+        MovingEntity.MovingEntity.prototype.update.call(this);
+        this._rotationAngle+=0.05;
+        this._handler.setAngle(this._rotationAngle);
+        this._hitBoxRegions.rotateAllRegions(0.05);
     }
     
     TriangularTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){

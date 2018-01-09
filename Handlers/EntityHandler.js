@@ -28,7 +28,7 @@ define(['Handlers/Handler', 'Handlers/BasicParticlesHandler'], function(Handler,
     
     EntityHandler.prototype.update = function(){
         Handler.prototype.update.call(this);   
-        this._particlesHandler.update();
+       // this._particlesHandler.update();
     }
     
     EntityHandler.prototype.doSpawnEffect = function(position){

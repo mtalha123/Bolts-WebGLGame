@@ -33,52 +33,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         }else if(angle >= 270 && angle <= 360){
             return 4;           
         }    
-    }
-    
-    function TentacleEnemyDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
-    }
-    
-    //inherit from EntityDestructionState
-    TentacleEnemyDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
-    TentacleEnemyDestructionState.prototype.constructor = TentacleEnemyDestructionState; 
-    
-    
-    function TentacleEnemyNormalState(target){
-        Entity.EntityNormalState.call(this, target);
-    }
-    
-    //inherit from EntityNormalState
-    TentacleEnemyNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
-    TentacleEnemyNormalState.prototype.constructor = TentacleEnemyNormalState;
-    
-    TentacleEnemyNormalState.prototype.update = function(){ 
-        var allTargetObjs = MainTargetsPositions.getAllTargetObjs();
-        
-        for(var i = 0; i < allTargetObjs.length; i++){
-            if(this._entity._charge >= this._entity._maxCharge){
-                break;
-            }
-            
-            if(allTargetObjs[i].target.getCharge() === 1 && 
-               this._entity._position.distanceTo(allTargetObjs[i].position) <= (this._entity._radius * 4)){
-                var quadOfEntity = getQuadrant(allTargetObjs[i].position, this._entity._position);
-                if((this._entity._listTentaclesHoldLg[quadOfEntity - 1] === 1) || this._entity._listTentaclesAlive[quadOfEntity-1] == 0){
-                    break;
-                }
-                
-                this._entity._listTentaclesHoldLg[quadOfEntity - 1] = 1;
-                this._entity._listEntitiesCaptured[quadOfEntity - 1] = allTargetObjs[i].target;
-                this._entity._charge += allTargetObjs[i].target.getCharge();
-                this._entity._numSlicesNeeded += 2;
-                this._entity._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
-                this._entity._handler.setYellowColorPrefs(this._entity._listTentaclesHoldLg);
-                
-                EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target});
-            }
-        }
-    }
-    
+    }    
     
     function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
@@ -87,10 +42,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
-        
-        this._normalState = new TentacleEnemyNormalState(this);
-        this._destructionState = new TentacleEnemyDestructionState(this._handler);
-        this._currentState = this._normalState;
         
         this._charge = 0;
         this._maxCharge = 4;
@@ -135,6 +86,33 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     TentacleEnemy.prototype.spawn = function(callback){
         Entity.Entity.prototype.spawn.call(this, callback);
     } 
+    
+    TentacleEnemy.prototype.update = function(){
+        var allTargetObjs = MainTargetsPositions.getAllTargetObjs();
+
+        for(var i = 0; i < allTargetObjs.length; i++){
+            if(this._charge >= this._maxCharge){
+                break;
+            }
+
+            if(allTargetObjs[i].target.getCharge() === 1 && 
+               this._position.distanceTo(allTargetObjs[i].position) <= (this._radius * 4)){
+                var quadOfEntity = getQuadrant(allTargetObjs[i].position, this._position);
+                if((this._listTentaclesHoldLg[quadOfEntity - 1] === 1) || this._listTentaclesAlive[quadOfEntity-1] == 0){
+                    break;
+                }
+
+                this._listTentaclesHoldLg[quadOfEntity - 1] = 1;
+                this._listEntitiesCaptured[quadOfEntity - 1] = allTargetObjs[i].target;
+                this._charge += allTargetObjs[i].target.getCharge();
+                this._numSlicesNeeded += 2;
+                this._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
+                this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
+
+                EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target});
+            }
+        }
+    }
     
     TentacleEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
         if(this._hitBox.processInput(mouseInputObj)){

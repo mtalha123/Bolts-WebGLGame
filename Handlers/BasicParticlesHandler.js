@@ -1,14 +1,10 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector', 'addToAutomaticDrawing'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector, addToAutomaticDrawing){
     
     function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
                 value: [canvasWidth, canvasHeight]
-            },
-            particleFX: {
-                type: "float",
-                value: [1.0]
             },
             iGlobalTime: {
                 type: "float",
@@ -18,21 +14,13 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "vec2",
                 value: [800, 500]
             },
-            radius: {
+            radiusOfExplosion: {
                 type: "float",
-                value: [50]
+                value: [150]
             },
             maxLifetime: {
                 type: "float",
-                value: [50]
-            },
-            velocityMagnitude: {
-                type: "float",
-                value: [3]
-            },
-            accelerationMagnitude: {
-                type: "float",
-                value: [0.0]
+                value: [1500]
             },
             particlesColor: {
                 type: "vec3",
@@ -43,7 +31,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);
         
         Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
-        
+    
         this._numParticles = numParticles;
         
         var randVals = [];
@@ -57,8 +45,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this.additiveBlending = true;
         
-        this._callback = undefined;
-        
         this.setPosition(position);
     }   
     
@@ -67,29 +53,22 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     BasicParticlesHandler.prototype.constructor = BasicParticlesHandler;
     
     
-    BasicParticlesHandler.prototype.update = function(){
-        if((this._time <= this._uniforms.maxLifetime.value[0])){
-            this._time++;
-            this._uniforms.iGlobalTime.value[0] = this._time;
-        }else{
-            this._shouldDraw = false;
-//            this._time = 1;
-            if(this._callback){
-                this._callback();
-                this._callback = undefined;
-            }
-        }   
-    }
+    BasicParticlesHandler.prototype.update = function(){ }
     
     BasicParticlesHandler.prototype.doEffect = function(optCallback){
-        this._callback = optCallback;
-        this._time = 1;
+        addToAutomaticDrawing.addToAutomaticDrawing(this, this._uniforms.maxLifetime.value[0], function(time){
+            this._uniforms.iGlobalTime.value[0] = time;
+        }, function(){
+            this._shouldDraw = false;
+            if(optCallback){
+                optCallback();
+            }
+        });
+        
         this._shouldDraw = true;
     }
     
     BasicParticlesHandler.prototype.reset = function(){
-        this._callback = undefined;
-        this._time = 1;
         this._shouldDraw = false;
     }
     
@@ -106,13 +85,13 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
 
     
     BasicParticlesHandler.prototype._generateVerticesFromCurrentState = function(){        
-        var radius_t = this._uniforms.radius.value[0] * 1.5;
         var centerX = this._uniforms.center.value[0];
         var centerY = this._uniforms.center.value[1];
+        var radiusOfParticle = 0.03 * this._canvasHeight;
         
         this._attributes.vertexPosition = [];
         for(var i = 0; i < this._numParticles; i++){
-            this._attributes.vertexPosition = this._attributes.vertexPosition.concat( getVerticesUnNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
+            this._attributes.vertexPosition = this._attributes.vertexPosition.concat( getVerticesUnNormalized(centerX - radiusOfParticle, centerY - radiusOfParticle, radiusOfParticle * 2, radiusOfParticle * 2) );
         }
     }
 

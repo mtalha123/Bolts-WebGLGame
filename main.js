@@ -23,7 +23,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'addToAutomaticDrawing'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, addToAutomaticDrawing){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -146,7 +146,8 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     gameLoop();
     
 
-    function draw(interpolation){        
+    function draw(interpolation){
+        addToAutomaticDrawing.prepareForDrawing();
         currentState.draw(gl, interpolation);
     }
     

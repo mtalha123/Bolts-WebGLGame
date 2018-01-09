@@ -49,7 +49,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords, shouldAnimateLg){
-        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, width: 1024, height: 1024, sampler: 0}, 1, addHandlerToAutomaticUpdates);
+        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, width: 1024, height: 1024, sampler: 0}, 1);
         
         addHandlers(handler.getAllHandlers());
         return handler;
@@ -161,7 +161,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
     }
     
     function requestTentacleEnemyHandler(shouldDraw, gl, zOrder, position, opts){
-        var handler = new TentacleEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureSlower, sampler: 0}, addHandlerToAutomaticUpdates);
+        var handler = new TentacleEnemyHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureSlower, sampler: 0});
 
         addHandlers(handler.getAllHandlers());
         return handler;
@@ -176,32 +176,6 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
             }
         }
         return handlersToReturn;
-    }
-    
-    function addHandlerToAutomaticUpdates(handler, timeToStopUpdates, updateFunc, callback){
-        var timer = new Timer();
-        timer.start();
-        
-        var handlerObj = {
-            handler: handler,
-            timeToStopUpdates: timeToStopUpdates,
-            timer: timer,
-            updateFunc: updateFunc,
-            callback: callback
-        };
-        
-        automaticUpdatesHandlerObjs.push(handlerObj);
-    }
-    
-    function prepareForDrawing(){
-        for(var i = 0; i < automaticUpdatesHandlerObjs.length; i++){
-            if(automaticUpdatesHandlerObjs[i].timer.getTime() > automaticUpdatesHandlerObjs[i].timeToStopUpdates){
-                automaticUpdatesHandlerObjs[i].callback.call(automaticUpdatesHandlerObjs[i].handler);
-                automaticUpdatesHandlerObjs.splice(i, 1);
-            }else{
-                automaticUpdatesHandlerObjs[i].updateFunc.call(automaticUpdatesHandlerObjs[i].handler, automaticUpdatesHandlerObjs[i].timer.getTime());  
-            }
-        }
     }
     
     return {
@@ -223,8 +197,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestLinkHandler: requestLinkHandler,
         requestFullScreenColorHandler: requestFullScreenColorHandler,
         requestLifebarHandler: requestLifebarHandler,
-        requestTentacleEnemyHandler: requestTentacleEnemyHandler,
-        prepareForDrawing: prepareForDrawing
+        requestTentacleEnemyHandler: requestTentacleEnemyHandler
     };
     
 });

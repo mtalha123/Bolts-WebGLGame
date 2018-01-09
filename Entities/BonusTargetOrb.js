@@ -1,32 +1,5 @@
 define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector'], function(SynchronizedTimers, Entity, CircularHitBox, Vector){
 
-    function BonusTargetOrbDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
-    }
-    
-    //inherit from EntityDestructionState
-    BonusTargetOrbDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
-    BonusTargetOrbDestructionState.prototype.constructor = BonusTargetOrbDestructionState; 
-    
-    
-    function BonusTargetOrbNormalState(target){
-        this._entity = target;
-        this._handler = target._handler;
-    }
-    
-    //inherit from EntityNormalState
-    BonusTargetOrbNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
-    BonusTargetOrbNormalState.prototype.constructor = BonusTargetOrbNormalState;
-    
-    
-    BonusTargetOrbNormalState.prototype.prepareForDrawing = function(interpolation){
-        this._handler.setPosition(this._entity._position);
-        this._handler.update();        
-    }
-    
-    BonusTargetOrbNormalState.prototype.update = function(){ }
-    
-    
     function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);     
         
@@ -34,10 +7,6 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._hitBox = new CircularHitBox(position, p_radius * 1.5);
         
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [p_radius]});
-        
-        this._normalState = new BonusTargetOrbNormalState(this);
-        this._destructionState = new BonusTargetOrbDestructionState(this._handler);
-        this._currentState = this._normalState;
         
         this._charge = 0;
     }

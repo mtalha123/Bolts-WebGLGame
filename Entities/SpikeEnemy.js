@@ -1,41 +1,4 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'CoverDistanceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, EventSystem, CoverDistanceAlgorithm){
-
-    function SpikeEnemyDestructionState(targetHandler){
-        MovingEntity.MovingEntityDestructionState.call(this, targetHandler);
-    }
-    
-    //inherit from MovingEntityDestructionState
-    SpikeEnemyDestructionState.prototype = Object.create(MovingEntity.MovingEntityDestructionState.prototype);
-    SpikeEnemyDestructionState.prototype.constructor = SpikeEnemyDestructionState; 
-    
-    
-    function SpikeEnemyNormalState(target){
-        MovingEntity.MovingEntityNormalState.call(this, target);
-    }
-    
-    //inherit from MovingEntityNormalState
-    SpikeEnemyNormalState.prototype = Object.create(MovingEntity.MovingEntityNormalState.prototype);
-    SpikeEnemyNormalState.prototype.constructor = SpikeEnemyNormalState;
-    
-    SpikeEnemyNormalState.prototype.update = function(){ 
-        if(this._entity._position.distanceTo(this._entity._destination) > this._entity._radius * 1.3){
-            var newPos = this._entity._position.addTo(this._entity._velocity);
-            this._entity._setPositionWithInterpolation(newPos);   
-        }else{
-            this._entity._prevPosition = this._entity._position;
-            
-            if(this._entity._lightningStealTimer.getTime() >= 2000){
-                if(this._entity._charge < this._entity._maxCharge){
-                    this._entity._charge++;
-                }
-                this._entity._handler.setNumBolts(this._entity._charge);
-                EventSystem.publishEventImmediately("lightning_stolen", {amount: 1})
-                this._entity._lightningStealTimer.reset();
-                this._entity._lightningStealTimer.start();
-            }
-        }
-    }
-    
     
     function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
@@ -44,11 +7,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new CoverDistanceAlgorithm(position, p_radius, canvasHeight * 0.25));
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
-        
-        this._normalState = new SpikeEnemyNormalState(this);
-        this._destructionState = new SpikeEnemyDestructionState(this._handler);
-        this._currentState = this._normalState;
-        
+                
         this._destination = new Vector(0, 0);
         this._velocity = (position.multiplyWithScalar(-1).getNormalized()).multiplyWithScalar(speed);
         
@@ -99,6 +58,25 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._lightningStealTimer.start();
     } 
+    
+    SpikeEnemy.prototype.update = function(){
+        if(this._position.distanceTo(this._destination) > this._radius * 1.3){
+            var newPos = this._position.addTo(this._velocity);
+            this._setPositionWithInterpolation(newPos);   
+        }else{
+            this._prevPosition = this._position;
+            
+            if(this._lightningStealTimer.getTime() >= 2000){
+                if(this._charge < this._maxCharge){
+                    this._charge++;
+                }
+                this._handler.setNumBolts(this._charge);
+                EventSystem.publishEventImmediately("lightning_stolen", {amount: 1})
+                this._lightningStealTimer.reset();
+                this._lightningStealTimer.start();
+            }
+        }
+    }
     
     SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
         if(this._hitBox.processInput(mouseInputObj)){

@@ -1,33 +1,5 @@
 define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
 
-    function MovingEntityDestructionState(handler){
-        Entity.EntityDestructionState.call(this, handler);
-    }
-    
-    MovingEntityDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
-    MovingEntityDestructionState.prototype.constructor = MovingEntityDestructionState;
-    
-    
-    function MovingEntityNormalState(entity){
-        Entity.EntityNormalState.call(this, entity);
-        this._physicsBody = entity._physicsBody;
-    }
-    
-    MovingEntityNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
-    MovingEntityNormalState.prototype.constructor = MovingEntityNormalState;
-    
-    MovingEntityNormalState.prototype.prepareForDrawing = function(interpolation){
-        Entity.EntityNormalState.prototype.prepareForDrawing.call(this);
-        
-        this._handler.setPosition( this._entity._prevPosition.addTo((this._entity._position.subtract(this._entity._prevPosition)).multiplyWithScalar(interpolation)) );      
-    }
-
-    MovingEntityNormalState.prototype.update = function(){
-        this._physicsBody.update();        
-        this._entity._setPositionWithInterpolation(this._physicsBody.getPosition());      
-    }
-    
-    
     function MovingEntity(canvasWidth, canvasHeight, gl, position, movementangle, speed){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         
@@ -48,8 +20,6 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
     
     MovingEntity.prototype.setMovementAngle = function(newAngle){
         this._currentMovementAngleInDeg = newAngle;
-        //this._xUnits = Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
-        //this._yUnits = Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180)) * this._speed;
         this._velocity = new Vector(Math.cos(newAngle * (Math.PI / 180)) * this._speed, 
                                     Math.sin(newAngle * (Math.PI / 180)) * this._speed);
         this._physicsBody.setLinearVelocity(this._velocity);
@@ -75,9 +45,18 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
         this._velocity = (new Vector(Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)), Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180))).multiplyWithScalar(newSpeed)); 
     }
     
+    MovingEntity.prototype.prepareForDrawing = function(interpolation){
+        Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
+        
+        this._handler.setPosition( this._prevPosition.addTo((this._position.subtract(this._prevPosition)).multiplyWithScalar(interpolation)) ); 
+    }
+    
+    MovingEntity.prototype.update = function(){
+        this._physicsBody.update();        
+        this._setPositionWithInterpolation(this._physicsBody.getPosition());      
+    }
+    
     return {
-        MovingEntity: MovingEntity,
-        MovingEntityNormalState: MovingEntityNormalState,
-        MovingEntityDestructionState: MovingEntityDestructionState
+        MovingEntity: MovingEntity
     };
 });

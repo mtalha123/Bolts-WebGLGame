@@ -12,8 +12,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
     function EntityController(appMetaData, spawnChance, maxEntitiesToSpawn){
         this._entitiesPool = [];
         this._entitiesActivated = [];
-        this._entitiesInTransition = [];
-        this._entitiesCaptured = [];
+        this._entitiesHolding = [];
         this._spawnAttemptDelay = 1000;
         this._chanceOfSpawning = spawnChance;
         this._spawnTimer = SynchronizedTimers.getTimer();  
@@ -35,10 +34,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         for(var a = 0; a < this._entitiesActivated.length; a++){
             this._entitiesActivated[a].prepareForDrawing(interpolation);
         }
-        
-        for(var b = 0; b < this._entitiesInTransition.length; b++){
-            this._entitiesInTransition[b].prepareForDrawing(interpolation);
-        }
     }
     
     EntityController.prototype.update = function(){
@@ -55,10 +50,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         for(var a = 0; a < this._entitiesActivated.length; a++){
             this._entitiesActivated[a].update();
         }
-        
-        for(var b = 0; b < this._entitiesInTransition.length; b++){
-            this._entitiesInTransition[b].update();
-        }
     }
     
     EntityController.prototype._spawn = function(entitySpawned){
@@ -70,19 +61,18 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             this.reset();
         }else if(eventInfo.eventType === "entity_captured"){
             for(var i = 0; i < this._entitiesActivated.length; i++){
-                if(this._entitiesActivated[i] === eventInfo.eventData.entity){
-                    this._entitiesActivated[i].destroyAndReset(function(){
-                        var indexOfTarget = 0;     
-                        this._entitiesCaptured.push(this._entitiesInTransition.splice(indexOfTarget, 1)[0]); 
-                    }.bind(this));
-                    this._entitiesInTransition.push(this._entitiesActivated.splice(i, 1)[0]);
+                var currEntity = this._entitiesActivated[i];
+                
+                if(currEntity === eventInfo.eventData.entity){
+                    currEntity.destroyAndReset(function(){});                    
+                    this._entitiesHolding.push(this._entitiesActivated.splice(i, 1)[0]);
                     break;
                 }
             }
         }else if(eventInfo.eventType === "captured_entity_destroyed"){
-            for(var i = 0; i < this._entitiesCaptured.length; i++){
-                if(this._entitiesCaptured[i] === eventInfo.eventData.entity){
-                    this._entitiesPool.push(this._entitiesCaptured.splice(i, 1)[0]);
+            for(var i = 0; i < this._entitiesHolding.length; i++){
+                if(this._entitiesHolding[i] === eventInfo.eventData.entity){
+                    this._entitiesPool.push(this._entitiesHolding.splice(i, 1)[0]);
                     break;
                 }
             }
@@ -95,12 +85,14 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             inputToBeProcessed.mouseState.type = eventInfo.eventType;
             
             for(var i = 0; i < this._entitiesActivated.length; i++){
-                if(this._entitiesActivated[i].runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(){
-                    var indexOfTarget = 0;     
-                    this._entitiesPool.push(this._entitiesInTransition.splice(indexOfTarget, 1)[0]); 
-                }.bind(this))){
-                    EventSystem.publishEventImmediately("entity_destroyed", {entity: this._entitiesActivated[i], charge: this._entitiesActivated[i].getCharge()});
-                    this._entitiesInTransition.push(this._entitiesActivated.splice(i, 1)[0]);
+                var currEntity = this._entitiesActivated[i];
+                
+                if(currEntity.runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(destroyedEntity){                    
+                    var indexOfTarget = this._entitiesHolding.indexOf(destroyedEntity);
+                    this._entitiesPool.push(this._entitiesHolding.splice(indexOfTarget, 1)[0]); 
+                }.bind(this, currEntity))){ 
+                    EventSystem.publishEventImmediately("entity_destroyed", {entity: currEntity, charge: currEntity.getCharge()});
+                    this._entitiesHolding.push(this._entitiesActivated.splice(i, 1)[0]);
                 }
             }
         }
@@ -126,9 +118,9 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             this._entitiesPool.push(entity);
         }
         
-        len = this._entitiesInTransition.length;
+        len = this._entitiesHolding.length;
         for(var i = 0; i < len; i++){
-            var entity = this._entitiesInTransition.shift();
+            var entity = this._entitiesHolding.shift();
             entity.reset();
             this._entitiesPool.push(entity);
         }

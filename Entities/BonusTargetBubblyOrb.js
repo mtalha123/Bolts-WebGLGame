@@ -1,33 +1,11 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm){
 
-    function BonusTargetBubblyOrbDestructionState(targetHandler){
-        Entity.EntityDestructionState.call(this, targetHandler);
-    }
-    
-    //inherit from EntityDestructionState
-    BonusTargetBubblyOrbDestructionState.prototype = Object.create(Entity.EntityDestructionState.prototype);
-    BonusTargetBubblyOrbDestructionState.prototype.constructor = BonusTargetBubblyOrbDestructionState; 
-    
-    
-    function BonusTargetBubblyOrbNormalState(target){
-        Entity.EntityNormalState.call(this, target);
-    }
-    
-    //inherit from EntityNormalState
-    BonusTargetBubblyOrbNormalState.prototype = Object.create(Entity.EntityNormalState.prototype);
-    BonusTargetBubblyOrbNormalState.prototype.constructor = BonusTargetBubblyOrbNormalState;
-    
-    
     function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
-        
-        this._normalState = new BonusTargetBubblyOrbNormalState(this);
-        this._destructionState = new BonusTargetBubblyOrbDestructionState(this._handler);
-        this._currentState = this._normalState;
         
         this._charge = 0;
     }
