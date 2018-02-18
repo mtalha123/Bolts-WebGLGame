@@ -106,11 +106,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                                this._padding, this._padding * 3, this._padding, height - (this._padding * 3)                              
                               ];
 
-//        this._addToPath( [this._padding, this._padding, width - this._padding, this._padding] );
-//        this._addToPath( [width - this._padding, this._padding * 3, width - this._padding, height - this._padding] );
-//        this._addToPath( [this._padding, height - this._padding, width - (this._padding * 3), height - this._padding] );
-//        this._addToPath( [this._padding, this._padding * 3, this._padding, height - (this._padding * 3)] );        
-        
         this._addToPath([ lightningCoords[0], lightningCoords[1], lightningCoords[2], lightningCoords[3] ]);
         this._addToPath([ lightningCoords[4], lightningCoords[5], lightningCoords[6], lightningCoords[7] ]);
         this._addToPath([ lightningCoords[8], lightningCoords[9], lightningCoords[10], lightningCoords[11] ]);
