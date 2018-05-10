@@ -1,4 +1,5 @@
 #define PI 3.1415926535897932384626433832795
+#define RIGHT_ANGLE PI / 2.0
 
 float sinPositive(float value){
 	return (sin(value) + 1.0) / 2.0;
@@ -35,6 +36,30 @@ float getUVAngleDeg(vec2 uv, vec2 center){
     	angle = 180.0 + (180.0 - abs(angle));
     }
     return angle;
+}
+
+//returns angle between 0 and 2.0 * PI
+float getUVAngle(vec2 uv, vec2 center){
+    return radians(getUVAngleDeg(uv, center));
+}
+
+float getQuadrantNum(vec2 uv, vec2 center){
+	float uvAngle = getUVAngle(uv, center);
+    if(uvAngle <= RIGHT_ANGLE){
+    	return 1.0;
+    }
+    
+    if(uvAngle > RIGHT_ANGLE && uvAngle <= PI){
+    	return 2.0;
+    }
+    
+    if(uvAngle > PI && uvAngle <= (3.0 * PI / 2.0)){
+    	return 3.0;
+    }
+    
+    if(uvAngle > (3.0 * PI / 2.0)){
+    	return 4.0;
+    }
 }
 
 float getClosestMultiple(int number, int multiple){

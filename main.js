@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.18:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.11:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
@@ -85,11 +85,10 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     
     var windowFocused = true;
     
+    // Additive blending
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    
     function gameLoop(){
-//        if(!initializationDone){
-//            LoadingState.draw();
-//        }
-        
         if(NetworkManager.connectedToServer() && windowFocused){                
                 //set to 0 each time game loop runs so that it can be utilized for the next set of updates
                 loops = 0;

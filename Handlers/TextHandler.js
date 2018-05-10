@@ -18,6 +18,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
         this._attributes.texCoord = [];
+        this._vertexBuffers.push(gl.createBuffer()); // For texCoord attribute
         this._width = 0, this._x = position.getX(), this._y = position.getY();
         this._fontTextureWidth = fontTextureData.width;
         this._fontTextureHeight = fontTextureData.height;

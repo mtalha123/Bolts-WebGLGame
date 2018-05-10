@@ -1,39 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions){
-
-    function getQuadrant(point, center){        
-        var angle;
-        var point_t = point.subtract(center);
-    
-        if(point_t.getX() == 0.0){
-            if(point_t.getY() >= 0.0){
-                angle = 90.0;
-            }
-
-            if(point_t.getY() < 0.0){
-                angle = -90.0;
-            }
-        }
-
-        angle = Math.atan2(point_t.getY(), point_t.getX());
-        //convert to degrees
-        angle *= (180 / Math.PI);
-
-        if(angle < 0.0){
-            angle = 180.0 + (180.0 - Math.abs(angle));
-        }
-        
-        angle = parseInt(angle.toString());
-        
-        if(angle >= 0 && angle <= 90){
-            return 1;
-        }else if(angle >= 90 && angle < 180){
-            return 2;
-        }else if(angle >= 180 && angle < 270){
-            return 3;            
-        }else if(angle >= 270 && angle <= 360){
-            return 4;           
-        }    
-    }    
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant){  
     
     function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
@@ -109,7 +74,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
                 this._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
                 this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
 
-                EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target});
+                EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target, capture_type: "destroy"});
             }
         }
     }

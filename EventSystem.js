@@ -15,6 +15,7 @@ define([], function(){
         entity_spawned: [],
         entity_destroyed: [],
         captured_entity_destroyed: [],
+        captured_entity_released: [],
         entity_captured: [],
         score_achieved: [],
         combo_level_increased: [],

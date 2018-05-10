@@ -5,7 +5,9 @@ define(['Entities/BonusTargetOrbCompound', 'SynchronizedTimers', 'Border', 'Cust
         this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
         this._spawnAttemptDelay = 2000;
         
-        this._entitiesPool.push(new BonusTargetOrbCompound(gl, appMetaData, EffectsManager, this._targetRadius, new Vector(400, 400)));
+        for(var i = 0; i < maxEntitiesToSpawn; i++){
+            this._entitiesPool.push(new BonusTargetOrbCompound(gl, appMetaData, EffectsManager, this._targetRadius, new Vector(400, 400)));
+        }
         
         this._spawnTimer.start();
     }

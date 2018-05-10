@@ -9,33 +9,6 @@ void main(){
 //FRAGMENT SHADER
 precision mediump float;
 
-#define PI 3.1415926535897932384626433832795
-#define RIGHT_ANGLE PI / 2.0
-
-//returns angle between 0 and 2.0 * PI
-float getUVAngle(vec2 uv, vec2 center){
-    return radians(getUVAngleDeg(uv, center));
-}
-
-float getQuadrantNum(vec2 uv, vec2 center, float radius){
-	float uvAngle = getUVAngle(uv, center);
-    if(uvAngle <= RIGHT_ANGLE){
-    	return 1.0;
-    }
-    
-    if(uvAngle > RIGHT_ANGLE && uvAngle <= PI){
-    	return 2.0;
-    }
-    
-    if(uvAngle > PI && uvAngle <= (3.0 * PI / 2.0)){
-    	return 3.0;
-    }
-    
-    if(uvAngle > (3.0 * PI / 2.0)){
-    	return 4.0;
-    }
-}
-
 vec4 getSpikeColor(vec2 uv, vec2 start, float angle, float radius){
     uv.y += radius * 4.0;
     float uvAngle = getUVAngle(uv, start);    
@@ -76,7 +49,7 @@ void main()
     center.x *= aspectRatio;
     
     uv = rotateCoord(uv, -0.01 * iGlobalTime, center);
-    float quadrantNum = getQuadrantNum(uv, center, radius);
+    float quadrantNum = getQuadrantNum(uv, center);
     float angleToReverseRotate = (quadrantNum - 1.0) * RIGHT_ANGLE;
     vec2 uv_t = rotateCoord(uv, -angleToReverseRotate, center);
     

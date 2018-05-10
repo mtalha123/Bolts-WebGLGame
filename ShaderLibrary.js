@@ -16,6 +16,8 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var FULL_SCREEN_COLOR = "FULL_SCREEN_COLOR";
     var LIFEBAR = "LIFEBAR";
     var TENTACLE_ENEMY = "TENTACLE_ENEMY";
+    var ENEMY_ORBIT = "ENEMY_ORBIT";
+    var RING_LIGHTNING = "RING_LIGHTNING";
     
     var allPrograms = {};    
     
@@ -88,6 +90,8 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         LINK: LINK,
         FULL_SCREEN_COLOR: FULL_SCREEN_COLOR,
         LIFEBAR: LIFEBAR,
-        TENTACLE_ENEMY: TENTACLE_ENEMY
+        TENTACLE_ENEMY: TENTACLE_ENEMY,
+        ENEMY_ORBIT: ENEMY_ORBIT,
+        RING_LIGHTNING: RING_LIGHTNING
     };
 });

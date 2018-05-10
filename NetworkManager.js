@@ -6,7 +6,7 @@ define(['socketio', 'Custom Utility/Timer'], function(io, Timer){
     var socket;
     
     function initializeAndConnect(canvasWidth, canvasHeight, listenerFunction){
-        socket = io.connect('http://192.168.0.18:4000');
+        socket = io.connect('http://192.168.0.11:4000');
  
         socket.on("connect", function(data){
             console.log("Connected to server.");

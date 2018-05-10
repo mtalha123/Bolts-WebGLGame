@@ -42,6 +42,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         }        
         this._attributes.randVals = randVals;
+        this._vertexBuffers.push(gl.createBuffer());
         
         this.additiveBlending = true;
         

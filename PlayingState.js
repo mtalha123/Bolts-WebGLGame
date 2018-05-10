@@ -1,4 +1,4 @@
-define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'ComboSystem', 'Background', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector'], function(FPSCounter, Border, Cursor, BasicTargetsController, EventSystem, NetworkManager, ComboSystem, Background, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector){
+define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'Background', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, Background, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector){
     var Cursor;
     var Background;
     var Border;
@@ -6,12 +6,12 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
     var basicTargetsController;
     var bonusTargetOrbsController;
     var bonusTargetOrbsStreakController;
-    var bonusTargetOrbsStreakController;
     var bonusTargetBubblyOrbsController;
     var triangularTargetController;
     var fourPointTargetController;
     var spikeEnemyController;
     var tentacleEnemyController;
+    var orbitEnemyController;
     
     var InputEventsManager;
     var EffectsManager;
@@ -38,7 +38,8 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         triangularTargetController = new TriangularTargetController(gl, appMetaData, 5, EffectsManager);
         fourPointTargetController = new FourPointTargetController(gl, appMetaData, 2, EffectsManager);
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 3, EffectsManager);
-        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 3, EffectsManager);
+        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, EffectsManager);
+        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 1, EffectsManager);
         
         fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88), fpsCounter.getFPS().toString());
         
@@ -62,10 +63,11 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         bonusTargetOrbsController.prepareForDrawing(interpolation);
         bonusTargetOrbsStreakController.prepareForDrawing(interpolation);
         bonusTargetBubblyOrbsController.prepareForDrawing(interpolation);
-        triangularTargetController.prepareForDrawing(interpolation);
+        //triangularTargetController.prepareForDrawing(interpolation);
         fourPointTargetController.prepareForDrawing(interpolation);
         spikeEnemyController.prepareForDrawing(interpolation);
         tentacleEnemyController.prepareForDrawing(interpolation);
+        orbitEnemyController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
 
         ComboSystem.draw();
@@ -86,19 +88,6 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
     function update(inputObj){
         gameLevelTimer.start();
         handleGameLeveling();
-//        if(intputObj != undefined){
-//            inputInfo.updateCounter = updateCounter;
-//            NetworkManager.sendToServer("input", inputInfo);
-//        }else{
-//            NetworkManager.sendToServer("input", "none");
-//        }
-        
-//        //testing
-//        var inputObj = InputEventsManager.getCurrentInputObj();
-//        if(inputObj.mouseState.type === "mouse_held_down" && inputObj.mouseState.x <= 100){
-//            RestartState.activate();
-//            callbackToSwitchState(RestartState);
-//        }
         
         InputEventsManager.notifyOfCurrentStateAndConsume();
         
@@ -108,10 +97,11 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
         bonusTargetOrbsController.update();
         bonusTargetOrbsStreakController.update();
         bonusTargetBubblyOrbsController.update();
-        triangularTargetController.update();
+        //triangularTargetController.update();
         fourPointTargetController.update();
         spikeEnemyController.update();
         tentacleEnemyController.update();
+        orbitEnemyController.update();
         EventSystem.update();
     }
     
@@ -151,6 +141,8 @@ define(['Custom Utility/FPSCounter', 'Border', 'Cursor', 'Controllers/BasicTarge
 //            console.log("LEVEL 2");
         }
     }
+    
+    
     
     return {
         initialize: initialize,

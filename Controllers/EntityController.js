@@ -12,7 +12,9 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
     function EntityController(appMetaData, spawnChance, maxEntitiesToSpawn){
         this._entitiesPool = [];
         this._entitiesActivated = [];
-        this._entitiesHolding = [];
+        // entitesCaptured will be used for entities that in a "temporary" stage where they are not activated but not in the pool to be respawned. These entities will be updated.
+        this._entitiesCaptured = []; 
+        this._entitiesCurrentlyDestroying = [];
         this._spawnAttemptDelay = 1000;
         this._chanceOfSpawning = spawnChance;
         this._spawnTimer = SynchronizedTimers.getTimer();  
@@ -28,6 +30,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         EventSystem.register(this.receiveEvent, "game_level_up", this);
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released", this);
     }
     
     EntityController.prototype.prepareForDrawing = function(interpolation){
@@ -50,6 +53,10 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         for(var a = 0; a < this._entitiesActivated.length; a++){
             this._entitiesActivated[a].update();
         }
+        
+        for(var a = 0; a < this._entitiesCaptured.length; a++){
+            this._entitiesCaptured[a].update();
+        }
     }
     
     EntityController.prototype._spawn = function(entitySpawned){
@@ -63,16 +70,22 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             for(var i = 0; i < this._entitiesActivated.length; i++){
                 var currEntity = this._entitiesActivated[i];
                 
-                if(currEntity === eventInfo.eventData.entity){
-                    currEntity.destroyAndReset(function(){});                    
-                    this._entitiesHolding.push(this._entitiesActivated.splice(i, 1)[0]);
+                if(currEntity === eventInfo.eventData.entity){                  
+                    this._entitiesCaptured.push(this._entitiesActivated.splice(i, 1)[0]);
                     break;
                 }
             }
         }else if(eventInfo.eventType === "captured_entity_destroyed"){
-            for(var i = 0; i < this._entitiesHolding.length; i++){
-                if(this._entitiesHolding[i] === eventInfo.eventData.entity){
-                    this._entitiesPool.push(this._entitiesHolding.splice(i, 1)[0]);
+            for(var i = 0; i < this._entitiesCaptured.length; i++){
+                if(this._entitiesCaptured[i] === eventInfo.eventData.entity){
+                    this._entitiesPool.push(this._entitiesCaptured.splice(i, 1)[0]);
+                    break;
+                }
+            }
+        }else if(eventInfo.eventType === "captured_entity_released"){
+            for(var i = 0; i < this._entitiesCaptured.length; i++){
+                if(this._entitiesCaptured[i] === eventInfo.eventData.entity){
+                    this._entitiesActivated.push(this._entitiesCaptured.splice(i, 1)[0]);
                     break;
                 }
             }
@@ -88,11 +101,11 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                 var currEntity = this._entitiesActivated[i];
                 
                 if(currEntity.runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(destroyedEntity){                    
-                    var indexOfTarget = this._entitiesHolding.indexOf(destroyedEntity);
-                    this._entitiesPool.push(this._entitiesHolding.splice(indexOfTarget, 1)[0]); 
+                    var indexOfTarget = this._entitiesCurrentlyDestroying.indexOf(destroyedEntity);
+                    this._entitiesPool.push(this._entitiesCurrentlyDestroying.splice(indexOfTarget, 1)[0]); 
                 }.bind(this, currEntity))){ 
                     EventSystem.publishEventImmediately("entity_destroyed", {entity: currEntity, charge: currEntity.getCharge()});
-                    this._entitiesHolding.push(this._entitiesActivated.splice(i, 1)[0]);
+                    this._entitiesCurrentlyDestroying.push(this._entitiesActivated.splice(i, 1)[0]); // Need to do this so that destroy animation doesn't get cut off. 
                 }
             }
         }
@@ -127,7 +140,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         
         this._spawnTimer.reset();
         this._spawnAttemptDelay = 5000;
-        this._chanceOfSpawning = 0;
     }
     
     return EntityController;

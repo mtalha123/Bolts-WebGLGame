@@ -66,8 +66,8 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._particlesHandler.setParticlesColor(1.0, 0.0, 0.0);
     }
     
-    TentacleEnemyHandler.prototype.doDestroyEffect = function(position){
-        EntityHandler.prototype.doDestroyEffect.call(this, position);
+    TentacleEnemyHandler.prototype.doDestroyEffect = function(position, optCallback){
+        EntityHandler.prototype.doDestroyEffect.call(this, position, optCallback);
         this._particlesHandler.setParticlesColor(1.0, 0.2, 0.2);
     }
     

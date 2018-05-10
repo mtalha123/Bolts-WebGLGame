@@ -1,4 +1,6 @@
 define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords'], function(getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords){ 
+    var vertexBuffers;
+    
     function Handler(shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts){
         this._shouldDraw = shouldDraw;
         this._width = 300;
@@ -23,6 +25,13 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         for(var uniform in this._uniforms){
             this._uniforms[uniform].location = gl.getUniformLocation(this._shaderProgram, uniform);
         }
+        
+        this._vertexBuffers = [gl.createBuffer()];
+        
+       // this._changedUniforms = [];
+      //  for(var uniform in this._uniforms){
+     //       this._changedUniforms.push(uniform);
+     //   }
     }
     
     Handler.prototype.shouldDraw = function(shouldDrawOrNot){
@@ -59,8 +68,9 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
     }
     
     Handler.prototype.setUpAttributes = function(gl){
-        for(var attribute in this._attributes){
-            var vertexBuffer = gl.createBuffer();
+        var bufferIndex = 0;
+        for(var attribute in this._attributes){            
+            var vertexBuffer = this._vertexBuffers[bufferIndex];
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._attributes[attribute]), gl.STATIC_DRAW);
             var attribLocation = gl.getAttribLocation(this._shaderProgram, attribute);
@@ -70,11 +80,14 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
             }else{
                 gl.vertexAttribPointer(attribLocation, 2, gl.FLOAT, false, 0, 0);
             }
+            
+            bufferIndex++;
         }
     }
     
     Handler.prototype.setUpUniforms = function(gl){
         for(var uniform in this._uniforms){
+     //   for(var i = 0; i < this._changedUniforms.length; i++){
             var uniformLocation = this._uniforms[uniform].location;
             switch(this._uniforms[uniform].type){
                 case "int":
@@ -112,6 +125,8 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
                     break;
             }
         }
+        
+        //this._changedUniforms = [];
     }
     
     return Handler;
