@@ -1,5 +1,5 @@
 define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture', 'Custom Utility/getWorleyNoiseTexture', 'Custom Utility/getGlTextureForImage', 'Custom Utility/getGLTextureForNoise'], function(getTextResource, getSimplexNoiseTexture, getWorleyNoiseTexture, getGLTextureForImage, getGLTextureForNoise){
-    var numTotalAssets = 26;
+    var numTotalAssets = 27;
     var numLoadedAssets = 0;
     var textures = {};
     var shaders = {};
@@ -219,6 +219,15 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                     shaders.ring_lightning = text;
                     callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                     resolve("Ring Lightning Shaders Loaded");
+                });
+            }),
+            
+            new Promise(function(resolve, reject){
+                getTextResource("http://192.168.0.11:4000/Shaders/teleportationTargetShaders.glsl", function(error, text){
+                    numLoadedAssets++;
+                    shaders.teleportation_target = text;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve("Teleportation Target Shaders Loaded");
                 });
             }),
 

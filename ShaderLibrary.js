@@ -18,6 +18,7 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var TENTACLE_ENEMY = "TENTACLE_ENEMY";
     var ENEMY_ORBIT = "ENEMY_ORBIT";
     var RING_LIGHTNING = "RING_LIGHTNING";
+    var TELEPORTATION_TARGET = "TELEPORTATION_TARGET"
     
     var allPrograms = {};    
     
@@ -92,6 +93,7 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         LIFEBAR: LIFEBAR,
         TENTACLE_ENEMY: TENTACLE_ENEMY,
         ENEMY_ORBIT: ENEMY_ORBIT,
-        RING_LIGHTNING: RING_LIGHTNING
+        RING_LIGHTNING: RING_LIGHTNING,
+        TELEPORTATION_TARGET: TELEPORTATION_TARGET
     };
 });

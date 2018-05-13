@@ -1,4 +1,4 @@
-define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'Background', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, Background, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector){
+define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'Background', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, Background, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector){
     var Cursor;
     var Background;
     var Border;
@@ -12,6 +12,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var spikeEnemyController;
     var tentacleEnemyController;
     var orbitEnemyController;
+    var teleportationTargetsController;
     
     var InputEventsManager;
     var EffectsManager;
@@ -31,15 +32,16 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         Background.initialize(gl, EffectsManager);
         Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager);
         ComboSystem.initialize(gl, EffectsManager, Border);
-        basicTargetsController = new BasicTargetsController(gl, appMetaData, 10, EffectsManager); 
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 2, EffectsManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 2, EffectsManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 2, EffectsManager);
-        triangularTargetController = new TriangularTargetController(gl, appMetaData, 5, EffectsManager);
-        fourPointTargetController = new FourPointTargetController(gl, appMetaData, 2, EffectsManager);
-        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 3, EffectsManager);
-        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, EffectsManager);
-        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 1, EffectsManager);
+        basicTargetsController = new BasicTargetsController(gl, appMetaData, /*10*/ 0, EffectsManager); 
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, /*2*/ 0, EffectsManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, /*2*/ 0, EffectsManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, /*2*/ 0, EffectsManager);
+        triangularTargetController = new TriangularTargetController(gl, appMetaData, /*5*/ 0, EffectsManager);
+        fourPointTargetController = new FourPointTargetController(gl, appMetaData, /*2*/ 0, EffectsManager);
+        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, /*3*/ 0, EffectsManager);
+        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, /*2*/ 0, EffectsManager);
+        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, /*1*/ 0, EffectsManager);
+        teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 2, EffectsManager);
         
         fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88), fpsCounter.getFPS().toString());
         
@@ -63,11 +65,12 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         bonusTargetOrbsController.prepareForDrawing(interpolation);
         bonusTargetOrbsStreakController.prepareForDrawing(interpolation);
         bonusTargetBubblyOrbsController.prepareForDrawing(interpolation);
-        //triangularTargetController.prepareForDrawing(interpolation);
+        triangularTargetController.prepareForDrawing(interpolation);
         fourPointTargetController.prepareForDrawing(interpolation);
         spikeEnemyController.prepareForDrawing(interpolation);
         tentacleEnemyController.prepareForDrawing(interpolation);
         orbitEnemyController.prepareForDrawing(interpolation);
+        teleportationTargetsController.prepareForDrawing(interpolation);
         Cursor.draw(interpolation);
 
         ComboSystem.draw();
@@ -97,11 +100,12 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         bonusTargetOrbsController.update();
         bonusTargetOrbsStreakController.update();
         bonusTargetBubblyOrbsController.update();
-        //triangularTargetController.update();
+        triangularTargetController.update();
         fourPointTargetController.update();
         spikeEnemyController.update();
         tentacleEnemyController.update();
         orbitEnemyController.update();
+        teleportationTargetsController.update();
         EventSystem.update();
     }
     
