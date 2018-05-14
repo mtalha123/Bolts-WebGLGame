@@ -82,19 +82,23 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                                     this._position.distanceTo(new Vector(this._position.getX(), Border.getBottomY()))
                                   );
         
-        if(this._timer.getTime() > this._timeForAppearanceOrDisappearance && closestDist > this._radius * 4){
+        if(this._timer.getTime() > this._timeForAppearanceOrDisappearance){
             if(this._visible){
-                this._handler.disappear(this._velocity.getNormalized());
-                this._visible = false;
+                if(closestDist > this._radius * 4){
+                    this._handler.disappear(this._velocity.getNormalized());
+                    this._visible = false;
+                    this._timer.reset();
+                    this._timer.start();
+                }
             }else{
                 var newPosition = new Vector(Random.getRandomInt(this._appearanceLeftBoundary, this._appearanceRightBoundary),
                                              Random.getRandomInt(this._appearanceBottomBoundary, this._appearanceTopBoundary));
                 this.setPosition(newPosition);
                 this._handler.appear(this._velocity.getNormalized());
                 this._visible = true;
+                this._timer.reset();
+                this._timer.start();
             }
-            this._timer.reset();
-            this._timer.start();
         }
     }
     
