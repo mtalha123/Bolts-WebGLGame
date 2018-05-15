@@ -123,9 +123,7 @@ void main()
         }
         
         float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, lgLineWidthUV, fluctuationUV, 4.0, 0.0, noise, iGlobalTime, iResolution);
-        if(distToLg == 0.0){
-            distToLg = 0.0000001;
-        }
+        distToLg = max(distToLg, 0.0000001);
 
         vec3 glowColor = vec3(1.0, 1.0, 0.7);
         vec3 solidColor = vec3(1.0, 1.0, 0.0);
