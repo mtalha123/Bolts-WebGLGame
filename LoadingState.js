@@ -17,22 +17,22 @@ define([''], function(){
         context.shadowColor = "rgb(90, 150, 255)";
         context.shadowBlur = 20;
         context.beginPath();
-        context.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2);
+        context.arc(canvas.width / 2, canvas.height / 2, 120, 0, Math.PI * 2);
         context.stroke();
         
         context.strokeStyle = "yellow";
         context.shadowColor = "rgb(255, 255, 100)";
         context.shadowBlur = 20;
         context.beginPath();
-        context.arc(canvas.width / 2, canvas.height / 2, 100, -(Math.PI/2), endAngle);
+        context.arc(canvas.width / 2, canvas.height / 2, 120, -(Math.PI/2), endAngle);
         context.stroke();
 
         context.fillStyle = "white";
-        context.font = '40px serif';
+        context.font = '40px Comic Sans MS';
         context.textAlign = "center";
         context.textBaseline = "middle"; 
         context.shadowBlur = 0;
-        context.fillText("Loading", (canvas.width / 2), canvas.height / 2);
+        context.fillText("LOADING", (canvas.width / 2), canvas.height / 2);
     }
     
     function update(){
