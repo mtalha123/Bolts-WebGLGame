@@ -104,6 +104,9 @@ void main()
     
     if(rotationBool == 1.0){
         uv = rotateCoord(uv, -iGlobalTime * 0.01, centerUV);
+    }else{
+        // rotating effect
+        uv = rotateCoord(uv, iGlobalTime / 15.0, centerUV);
     }
     
     vec3 finalColor = vec3(0.0);
