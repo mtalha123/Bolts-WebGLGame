@@ -60,7 +60,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
     }
     
     EntityController.prototype._spawn = function(entitySpawned){
-        EventSystem.publishEventImmediately("entity_spawned", {entity: entitySpawned, charge: entitySpawned.getCharge()})
+        // override
     } 
     
     EntityController.prototype.receiveEvent = function(eventInfo){
@@ -104,7 +104,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                     var indexOfTarget = this._entitiesCurrentlyDestroying.indexOf(destroyedEntity);
                     this._entitiesPool.push(this._entitiesCurrentlyDestroying.splice(indexOfTarget, 1)[0]); 
                 }.bind(this, currEntity))){ 
-                    EventSystem.publishEventImmediately("entity_destroyed", {entity: currEntity, charge: currEntity.getCharge()});
                     this._entitiesCurrentlyDestroying.push(this._entitiesActivated.splice(i, 1)[0]); // Need to do this so that destroy animation doesn't get cut off. 
                 }
             }

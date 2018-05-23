@@ -5,7 +5,7 @@ define(['Entities/SpikeEnemy', 'Border', 'Custom Utility/Random', 'Controllers/E
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
 
-        for(var i = 0; i < 2; i++){
+        for(var i = 0; i < maxEntitiesToSpawn; i++){
             this._entitiesPool[i] = new SpikeEnemy(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 5, EffectsManager);
         }
         
@@ -52,8 +52,6 @@ define(['Entities/SpikeEnemy', 'Border', 'Custom Utility/Random', 'Controllers/E
                     break;
             }
         });
-        
-//        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     SpikeEnemyController.prototype.receiveEvent = function(eventInfo){

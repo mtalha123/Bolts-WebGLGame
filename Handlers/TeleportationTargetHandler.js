@@ -84,13 +84,17 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     TeleportationTargetHandler.prototype.update = function(){
         EntityHandler.prototype.update.call(this);
         if(this._timer.getTime() > this._timeForPortalToDisappear){
-            if(!this._uniforms.appearing.value[0]){
-                this._shouldDraw = false;
-            }else{
+            if(this._uniforms.appearing.value[0]){
                 this._uniforms.portalActivated.value = [0.0];
+            }else{ 
+                this._shouldDraw = false;
             }
             this._timer.reset();
         }
+    }
+    
+    TeleportationTargetHandler.prototype.deactivatePortal = function(){
+        this._uniforms.portalActivated.value = [0.0];
     }
     
     TeleportationTargetHandler.prototype._generateVerticesFromCurrentState = function(){
@@ -99,6 +103,11 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         var centerY = this._uniforms.center.value[1];
 
         this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
+    }
+    
+    TeleportationTargetHandler.prototype.resetProperties = function(opts){
+        EntityHandler.prototype.resetProperties.call(this, opts);
+        this._timer.reset();
     }
     
     return TeleportationTargetHandler;

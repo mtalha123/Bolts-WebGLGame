@@ -7,8 +7,8 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         
         this._handler = EffectsManager.requestOrbitEnemy(false, gl, 20, position, {radius: [this._radius]});
                  
-        this._charge = 0;
-        this._maxCharge = 4;
+        this._numCapturedEntities = 0;
+        this._maxNumCaptureEntities = 4;
         this._captureArea = this._radius * 3;
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
         this._rotationSpeed = 10;
@@ -38,7 +38,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     
     OrbitEnemy.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
-        this._charge = 0;
+        this._numCapturedEntities = 0;
         this._hitBox.resetAlgorithm();
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
         this._capturedEntities = [];
@@ -51,14 +51,13 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         var allTargetObjs = MainTargetsPositions.getAllTargetObjs();
         
         for(var i = 0; i < allTargetObjs.length; i++){
-            console.log("charge: " + this._charge);
-            if(this._charge >= this._maxCharge){
+            if(this._numCapturedEntities >= this._maxNumCaptureEntities){
                 break;
             }
             
-            if(allTargetObjs[i].target.getCharge() === 1 && this._position.distanceTo(allTargetObjs[i].position) <= this._captureArea){
+            if(this._position.distanceTo(allTargetObjs[i].position) <= this._captureArea){
                 // DO CAPTURE EFFECT HERE
-                this._charge++;
+                this._numCapturedEntities++;
                 this._capturedEntities.push(allTargetObjs[i].target);
                 EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target, capture_type: "orbit", 
                                                                         center: this._position, 
@@ -80,11 +79,17 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
             for(var i = 0; i < this._capturedEntities.length; i++){
                 EventSystem.publishEventImmediately("captured_entity_released", {entity: this._capturedEntities[i]});
             }
+            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "enemy"});
             this.destroyAndReset(callback);
             return true;
         }
         
         return false;
+    }
+    
+    OrbitEnemy.prototype.spawn = function(callback){
+        Entity.Entity.prototype.spawn.call(this, callback);
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
     }
     
     return OrbitEnemy;

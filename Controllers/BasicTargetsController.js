@@ -55,8 +55,6 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         newlyActivatedTarget.spawn(function(){
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     BasicTargetsController.prototype.receiveEvent = function(eventInfo){

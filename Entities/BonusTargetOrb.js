@@ -7,8 +7,6 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._hitBox = new CircularHitBox(position, p_radius * 1.5);
         
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [p_radius]});
-        
-        this._charge = 0;
     }
     
     //inherit from Entity

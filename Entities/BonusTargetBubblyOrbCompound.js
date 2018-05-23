@@ -1,4 +1,4 @@
- define(['Entities/BonusTargetBubblyOrb', 'Custom Utility/Random', 'Custom Utility/Vector'], function(BonusTargetBubblyOrb, Random, Vector){
+ define(['Entities/BonusTargetBubblyOrb', 'Custom Utility/Random', 'Custom Utility/Vector', 'EventSystem'], function(BonusTargetBubblyOrb, Random, Vector, EventSystem){
     function getPositionsFor2Targets(canvasWidth, canvasHeight, posToSplitFrom){
         var splitDirection = Random.getRandomIntInclusive(1, 2); // 1 represents left and right split, 2 represents up and down split
         
@@ -46,6 +46,7 @@
     BonusTargetBubblyOrbCompound.prototype.spawn = function(callback){
         this._initialTargetObj.target.spawn(callback);
         this._currActivatedTargetObjs.push(this._initialTargetObj);
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
     }
 
     BonusTargetBubblyOrbCompound.prototype.setPosition = function(newposition){
@@ -115,15 +116,12 @@
                 if(currActivatedTargetObj.stage === 3){
                     this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
                     if(isLastTarget){
+                        EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                         return true;
                     }
                 }
             }
         }
-    }
-
-    BonusTargetBubblyOrbCompound.prototype.getCharge = function(){
-        return 1;
     }
     
     BonusTargetBubblyOrbCompound.prototype.reset = function(){

@@ -115,7 +115,7 @@ define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(
     
     function receiveEvent(eventInfo){
         if(eventInfo.eventType === "entity_destroyed"){
-            EventSystem.publishEventImmediately("score_achieved", chargeMultiplier * eventInfo.eventData.charge); 
+            EventSystem.publishEventImmediately("score_achieved", chargeMultiplier); 
 
             numTargetsAchievedSinceLastCombo++;
             if(numTargetsAchievedSinceLastCombo >= numTargetsNeededHigherCombo){

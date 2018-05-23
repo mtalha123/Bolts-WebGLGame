@@ -16,7 +16,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._appearanceTopBoundary = 0.6 * canvasHeight;
         this._appearanceBottomBoundary = 0.4 * canvasHeight;
         
-        this._charge = 3;
+        this._captured = false;
+        
+        EventSystem.register(this.recieveEvent, "entity_captured", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_released", this);
     }
     
     //inherit from MovingEntity
@@ -28,18 +32,14 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     TeleportationTarget.prototype.setPosition = function(newPosition){
-        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
-        
-        this._hitBox.setPosition(newPosition);
-        
+        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);        
+        this._hitBox.setPosition(newPosition);        
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     TeleportationTarget.prototype._setPositionWithInterpolation = function(newPosition){                
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        
-        this._hitBox.setPosition(newPosition);
-        
+        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);        
+        this._hitBox.setPosition(newPosition);        
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
@@ -48,6 +48,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MainTargetsPositions.removeTargetObj(this);
         this._hitBox.resetAlgorithm();
         this._visible = false;
+        this._captured = false;
         this._timer.reset();
     }
     
@@ -56,11 +57,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._timer.start();
         this._visible = true;
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
     }
     
     TeleportationTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){  
         if(this._visible){
             if(this._hitBox.processInput(mouseInputObj)){
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
                 this.destroyAndReset(callback);
                 return true;
             }
@@ -75,31 +78,67 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     TeleportationTarget.prototype.update = function(){
         MovingEntity.MovingEntity.prototype.update.call(this);
         
-        // get closest distance to a border edge
-        var closestDist = Math.min( this._position.distanceTo(new Vector(Border.getLeftX(), this._position.getY())),
-                                    this._position.distanceTo(new Vector(this._position.getX(), Border.getTopY())),                                 
-                                    this._position.distanceTo(new Vector(Border.getRightX(), this._position.getY())),
-                                    this._position.distanceTo(new Vector(this._position.getX(), Border.getBottomY()))
-                                  );
-        
-        if(this._timer.getTime() > this._timeForAppearanceOrDisappearance){
-            if(this._visible){
-                if(closestDist > this._radius * 4){
-                    this._handler.disappear(this._velocity.getNormalized());
-                    this._visible = false;
+        if(!this._captured){
+            if(this._timer.getTime() > this._timeForAppearanceOrDisappearance){
+                if(this._visible){
+                    // get closest distance to a border edge
+                    var closestDist = Math.min( this._position.distanceTo(new Vector(Border.getLeftX(), this._position.getY())),
+                                                this._position.distanceTo(new Vector(this._position.getX(), Border.getTopY())),                                 
+                                                this._position.distanceTo(new Vector(Border.getRightX(), this._position.getY())),
+                                                this._position.distanceTo(new Vector(this._position.getX(), Border.getBottomY()))
+                                              );
+
+                    if(closestDist > this._radius * 4){
+                        this._handler.disappear(this._velocity.getNormalized());
+                        this._visible = false;
+                        this._timer.reset();
+                        this._timer.start();
+                        MainTargetsPositions.removeTargetObj(this);
+                    }
+                }else{
+                    var newPosition = new Vector(Random.getRandomInt(this._appearanceLeftBoundary, this._appearanceRightBoundary),
+                                                 Random.getRandomInt(this._appearanceBottomBoundary, this._appearanceTopBoundary));
+                    this.setPosition(newPosition);
+                    var randomAngle = Random.getRandomInt(0, 360);
+                    this._velocity = new Vector(Math.cos(randomAngle * (Math.PI / 180)) * this._speed, 
+                                                Math.sin(randomAngle * (Math.PI / 180)) * this._speed);
+                    this._physicsBody.setLinearVelocity(this._velocity);
+                    this._handler.appear(this._velocity.getNormalized());
+                    this._visible = true;
                     this._timer.reset();
                     this._timer.start();
+                    MainTargetsPositions.addTargetObj(this, this._position);
                 }
-            }else{
-                var newPosition = new Vector(Random.getRandomInt(this._appearanceLeftBoundary, this._appearanceRightBoundary),
-                                             Random.getRandomInt(this._appearanceBottomBoundary, this._appearanceTopBoundary));
-                this.setPosition(newPosition);
-                this._handler.appear(this._velocity.getNormalized());
-                this._visible = true;
-                this._timer.reset();
-                this._timer.start();
             }
         }
+    }
+    
+    TeleportationTarget.prototype.recieveEvent = function(eventInfo){
+        if(eventInfo.eventData.entity === this){
+            if(eventInfo.eventType === "entity_captured"){
+                this._captured = true;
+                MainTargetsPositions.removeTargetObj(this);
+                this._handler.deactivatePortal();
+                
+                if(eventInfo.eventData.capture_type === "destroy"){
+                    this.destroyAndReset(function(){});
+                }else if(eventInfo.eventData.capture_type === "orbit"){
+                    this._timer.reset();
+                    this._physicsBody.setPosition(eventInfo.eventData.capture_position);
+                    this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
+                    this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
+                }
+            }else if(eventInfo.eventType === "captured_entity_destroyed"){
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
+            }else{
+                // Will take it out of orbit
+                this._physicsBody.setPosition(this._position);
+                MainTargetsPositions.addTargetObj(this, this._position);
+                this._captured = false;
+                this._physicsBody.setLinearVelocity(this._velocity);
+                this._timer.start();
+            }
+        }        
     }
     
     return TeleportationTarget;

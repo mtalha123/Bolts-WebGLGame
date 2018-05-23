@@ -57,6 +57,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     SpikeEnemy.prototype.spawn = function(callback){
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._lightningStealTimer.start();
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
     } 
     
     SpikeEnemy.prototype.update = function(){
@@ -80,6 +81,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
         if(this._hitBox.processInput(mouseInputObj)){
+            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "enemy"});
             this.destroyAndReset(callback);
             return true;
         }

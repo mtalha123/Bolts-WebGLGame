@@ -26,8 +26,6 @@ define(['Entities/BonusTargetOrbCompound', 'SynchronizedTimers', 'Border', 'Cust
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn();
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     BonusTargetOrbsController.prototype.receiveEvent = function(eventInfo){

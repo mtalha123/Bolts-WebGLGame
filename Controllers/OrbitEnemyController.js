@@ -26,8 +26,6 @@ define(['Entities/OrbitEnemy', 'Custom Utility/Random', 'Controllers/EntityContr
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){});
-        
-//        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     OrbitEnemyController.prototype.receiveEvent = function(eventInfo){

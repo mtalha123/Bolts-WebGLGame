@@ -55,8 +55,6 @@ define(['Entities/TeleportationTarget', 'Border', 'Custom Utility/Random', 'Cont
         newlyActivatedTarget.spawn(function(){
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     TeleportationTargetsController.prototype.receiveEvent = function(eventInfo){

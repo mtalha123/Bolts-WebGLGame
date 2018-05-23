@@ -45,11 +45,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     BasicTarget.prototype.spawn = function(callback){
         MainTargetsPositions.addTargetObj(this, this._position);
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
     
     BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){       
         if(this._hitBox.processInput(mouseInputObj)){
+            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
             this.destroyAndReset(callback);
             return true;
         }
@@ -72,7 +74,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                     MainTargetsPositions.removeTargetObj(this);
                 }
             }else if(eventInfo.eventType === "captured_entity_destroyed"){
-                this.destroyAndReset(function(){});
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
             }else{
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);

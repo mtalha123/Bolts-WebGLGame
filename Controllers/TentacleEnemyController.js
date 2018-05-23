@@ -26,8 +26,6 @@ define(['Entities/TentacleEnemy', 'Custom Utility/Random', 'Controllers/EntityCo
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){});
-        
-//        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     TentacleEnemyController.prototype.receiveEvent = function(eventInfo){

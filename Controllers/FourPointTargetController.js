@@ -54,8 +54,6 @@ define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Util
         newlyActivatedTarget.spawn(function(){
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     FourPointTargetController.prototype.receiveEvent = function(eventInfo){

@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem){
 
     function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);    
@@ -18,6 +18,10 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._rotationAngle = 0;
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0];
+        
+        EventSystem.register(this.recieveEvent, "entity_captured", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_released", this);
     }
     
     //inherit from MovingEntity
@@ -62,6 +66,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 this._numGuardsActivated = 0;
                 this._guardPrefs = [0, 0, 0];
                 this._handler.setGuardPrefs(this._guardPrefs);
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
                 this.destroyAndReset(callback);
                 return true;   
             }
@@ -78,7 +83,30 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     TriangularTarget.prototype.spawn = function(callback){        
         this._hitBoxRegions.activateAllRegions();
         MainTargetsPositions.addTargetObj(this, this._position);
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
+        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);    
+    }
+    
+    TriangularTarget.prototype.recieveEvent = function(eventInfo){
+        if(eventInfo.eventData.entity === this){
+            if(eventInfo.eventType === "entity_captured"){
+                MainTargetsPositions.removeTargetObj(this);
+                
+                if(eventInfo.eventData.capture_type === "destroy"){
+                    this.destroyAndReset(function(){});
+                }else if(eventInfo.eventData.capture_type === "orbit"){
+                    this._physicsBody.setPosition(eventInfo.eventData.capture_position);
+                    this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
+                    this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
+                }
+            }else if(eventInfo.eventType === "captured_entity_destroyed"){
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
+            }else{
+                // Will take it out of orbit
+                this._physicsBody.setPosition(this._position);
+                MainTargetsPositions.addTargetObj(this, this._position);
+            }
+        }        
     }
     
     return TriangularTarget;

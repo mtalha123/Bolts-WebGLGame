@@ -7,10 +7,7 @@ define([], function(){
         mouse_down: [],
         mouse_up: [],
         mouse_held_down: [],
-        key_press: [],
-        key_held_down: [],
-        key_up: [],
-        
+
         S_initialize: [],    
         entity_spawned: [],
         entity_destroyed: [],
@@ -26,9 +23,6 @@ define([], function(){
         lightning_stolen: []
     };
     
-    
-    function initialize(){
-    }
     
     function register(callback, eventType, optObject ){
         for(var key in subscribers){
@@ -82,7 +76,6 @@ define([], function(){
     }
 
     return {        
-        initialize: initialize,
         register: register,
         publishEvent: publishEvent,
         publishEventImmediately: publishEventImmediately,

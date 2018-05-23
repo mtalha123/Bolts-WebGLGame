@@ -28,8 +28,6 @@ define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border',
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){ });
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     BonusTargetBubblyOrbsController.prototype.receiveEvent = function(eventInfo){

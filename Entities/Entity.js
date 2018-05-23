@@ -3,7 +3,6 @@ define([], function(){
     function Entity(canvasWidth, canvasHeight, gl, position){       
         this._position = this._prevPosition = position; 
         this._hitBoxRegions = null;
-        this._charge = 1;
         
         this._handler = null;
     }
@@ -57,10 +56,6 @@ define([], function(){
     
     Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(){
         //override
-    }
-    
-    Entity.prototype.getCharge = function(){
-        return this._charge;
     }
     
     return {

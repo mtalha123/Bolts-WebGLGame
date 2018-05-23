@@ -29,8 +29,6 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
         this._entitiesActivated.push(newlyActivatedTarget);
 
         newlyActivatedTarget.spawn(function(){ });
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     BonusTargetOrbsStreakController.prototype.receiveEvent = function(eventInfo){

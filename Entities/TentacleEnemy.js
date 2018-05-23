@@ -8,8 +8,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
         
-        this._charge = 0;
-        this._maxCharge = 4;
+        this._numCapturedEntities = 0;
+        this._maxNumCaptureEntities = 4;
         this._numSlicesNeeded = 4;
         this._numTimesSliced = 0;
         
@@ -42,7 +42,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     TentacleEnemy.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
-        this._charge = 0;
+        this._numCapturedEntities = 0;
         this._numTimesSliced = 0;
         this._numSlicesNeeded = 4;
         this._hitBox.resetAlgorithm();
@@ -50,18 +50,18 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     TentacleEnemy.prototype.spawn = function(callback){
         Entity.Entity.prototype.spawn.call(this, callback);
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
     } 
     
     TentacleEnemy.prototype.update = function(){
         var allTargetObjs = MainTargetsPositions.getAllTargetObjs();
 
         for(var i = 0; i < allTargetObjs.length; i++){
-            if(this._charge >= this._maxCharge){
+            if(this._numCapturedEntities >= this._maxNumCaptureEntities){
                 break;
             }
 
-            if(allTargetObjs[i].target.getCharge() === 1 && 
-               this._position.distanceTo(allTargetObjs[i].position) <= (this._radius * 4)){
+            if(this._position.distanceTo(allTargetObjs[i].position) <= (this._radius * 4)){
                 var quadOfEntity = getQuadrant(allTargetObjs[i].position, this._position);
                 if((this._listTentaclesHoldLg[quadOfEntity - 1] === 1) || this._listTentaclesAlive[quadOfEntity-1] == 0){
                     break;
@@ -69,7 +69,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
 
                 this._listTentaclesHoldLg[quadOfEntity - 1] = 1;
                 this._listEntitiesCaptured[quadOfEntity - 1] = allTargetObjs[i].target;
-                this._charge += allTargetObjs[i].target.getCharge();
+                this._numCapturedEntities++;
                 this._numSlicesNeeded += 2;
                 this._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
                 this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
@@ -103,8 +103,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             }
             
             //check if last tentacle is alive. If so, destroy and reset
-            if(this._listTentaclesAlive[3] === 0)
-            {
+            if(this._listTentaclesAlive[3] === 0){
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "enemy"});
                 this.destroyAndReset(callback);
                 return true;
             }

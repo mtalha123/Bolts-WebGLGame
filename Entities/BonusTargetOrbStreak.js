@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem){
 
     function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
@@ -6,8 +6,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
-        
-        this._charge = 0;
     }
     
     //inherit from Entity
@@ -36,11 +34,17 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     BonusTargetOrbStreak.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(this._hitBox.processInput(mouseInputObj)){
+            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
             this.destroyAndReset(callback);
             return true;
         }
         
         return false;
+    }
+    
+    BonusTargetOrbStreak.prototype.spawn = function(callback){
+        Entity.Entity.prototype.spawn.call(this, callback);
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
     }
     
     return BonusTargetOrbStreak;

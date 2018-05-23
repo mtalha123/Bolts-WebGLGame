@@ -55,8 +55,6 @@ define(['Entities/TriangularTarget', 'Border', 'Custom Utility/Random', 'Control
         newlyActivatedTarget.spawn(function(){
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
-        
-        EntityController.prototype._spawn.call(this, newlyActivatedTarget);
     } 
     
     TriangularTargetController.prototype.receiveEvent = function(eventInfo){

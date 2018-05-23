@@ -1,4 +1,4 @@
-define(['Entities/BonusTargetOrb', 'Link', 'Custom Utility/Vector'], function(BonusTargetOrb, Link, Vector){
+define(['Entities/BonusTargetOrb', 'Link', 'Custom Utility/Vector', 'EventSystem'], function(BonusTargetOrb, Link, Vector, EventSystem){
     function BonusTargetOrbCompound(gl, appMetaData, EffectsManager, radiusForEachOrb, position){
         this._configPositions = [new Vector(0, 0),
                                  new Vector(0, radiusForEachOrb),
@@ -59,15 +59,12 @@ define(['Entities/BonusTargetOrb', 'Link', 'Custom Utility/Vector'], function(Bo
     BonusTargetOrbCompound.prototype.update = function(){ 
     }
     
-    BonusTargetOrbCompound.prototype.getCharge = function(){ 
-        return 0;
-    }
-    
     BonusTargetOrbCompound.prototype.spawn = function(){
         for(var i = 0; i < this._config.length; i++){
             this._config[i].spawn(function(){});
         }
         this._config[0].turnOnLightning();
+        EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
     }
     
     BonusTargetOrbCompound.prototype.reset = function(){
@@ -82,6 +79,7 @@ define(['Entities/BonusTargetOrb', 'Link', 'Custom Utility/Vector'], function(Bo
                 if(this._currentWorkingIndex === this._config.length - 1){
                     this._config[this._currentWorkingIndex].destroyAndReset(callback);
                     this._currentWorkingIndex = 0;
+                    EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                     return true;
                 }else{
                     this._config[this._currentWorkingIndex].destroyAndReset(function(){});

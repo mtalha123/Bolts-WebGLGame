@@ -78,17 +78,21 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         if(eventInfo.eventType === "score_achieved"){
             score += eventInfo.eventData;   
         }else if(eventInfo.eventType === "entity_spawned"){
-            currentCharge -= eventInfo.eventData.charge;
-            healthBarHandler.setCompletion(currentCharge / totalCharge);
-            if(currentCharge === 0){
-               // EventSystem.publishEventImmediately("game_lost", {score: score});
-                healthBarHandler.shouldDraw(false);
-                scoreHandler.shouldDraw(false);
-                return;
+            if(eventInfo.eventData.type === "main"){
+                currentCharge--;
+                healthBarHandler.setCompletion(currentCharge / totalCharge);
+                if(currentCharge === 0){
+                   // EventSystem.publishEventImmediately("game_lost", {score: score});
+                    healthBarHandler.shouldDraw(false);
+                    scoreHandler.shouldDraw(false);
+                    return;
+                }
             }
         }else if(eventInfo.eventType === "entity_destroyed"){
-            currentCharge += eventInfo.eventData.charge;
-            healthBarHandler.setCompletion(currentCharge / totalCharge );
+            if(eventInfo.eventData.type === "main"){
+                currentCharge++;
+                healthBarHandler.setCompletion(currentCharge / totalCharge );
+            }
         }else if(eventInfo.eventType === "lightning_stolen"){
             currentCharge -= eventInfo.eventData.amount;
             healthBarHandler.setCompletion(currentCharge / totalCharge );
