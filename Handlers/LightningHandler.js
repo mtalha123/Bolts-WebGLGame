@@ -1,6 +1,6 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getGLTextureToPassInfoFromRGBData', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'addToAutomaticDrawing'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, getGLTextureToPassInfoFromRGBData, coordsToRGB, Vector, addToAutomaticDrawing){
     
-    function LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, noiseTextureData, coordsSamplerVal){
+    function LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, coords, ShaderLibrary, noiseTextureData, coordsSamplerVal){
         var widthOfCoordsTexture = coordsToRGB(coords, canvasWidth, canvasHeight).length / 3;
         this._uniforms = { 
             iResolution: { 
@@ -65,54 +65,61 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this._gl = gl;
        
-        //CHANGE AFTER
-        this._padding = 0.06 * this._canvasHeight;
         this.setLightningCoords(coords);   
-        this.shouldAnimateLg = shouldAnimateLg;
     }
     
     //inherit from Handler
     LightningHandler.prototype = Object.create(Handler.prototype);
     LightningHandler.prototype.constructor = LightningHandler; 
     
-
-    LightningHandler.prototype.update = function(){
-        if(this.shouldAnimateLg){
-            Handler.prototype.update.call(this);
+    // startX refers to the x coordinate of the start of the border lightning
+    // endX refers to the x coordinate of the end of the border lightning
+    LightningHandler.prototype.setToBorderPath = function(gl, startX, endX){   
+        var width = 0.1 * this._canvasHeight;
+        var spaceForLightningEnds = 0.06 * this._canvasHeight; // so the lightning effect is not "cut off" sharply at the beginning and end (i.e. close to the score location)
+        var borderVertices = [  //              X                           Y
+                                0,                                   this._canvasHeight,
+                                startX + spaceForLightningEnds,      this._canvasHeight,
+                                startX + spaceForLightningEnds,      this._canvasHeight - width,
+                                startX + spaceForLightningEnds,      this._canvasHeight - width,
+                                0,                                   this._canvasHeight - width,
+                                0,                                   this._canvasHeight,
+                                
+                                0,                                   this._canvasHeight - width,
+                                width,                               this._canvasHeight - width,
+                                width,                               0,
+                                width,                               0,
+                                0,                                   0,
+                                0,                                   this._canvasHeight - width,
+                                
+                                width,                               width,
+                                this._canvasWidth,                   width,
+                                this._canvasWidth,                   0, 
+                                this._canvasWidth,                   0, 
+                                width,                               0,
+                                width,                               width,
+            
+                                this._canvasWidth - width,           width,
+                                this._canvasWidth - width,           this._canvasHeight - width,
+                                this._canvasWidth,                   this._canvasHeight - width,
+                                this._canvasWidth,                   this._canvasHeight - width,
+                                this._canvasWidth,                   width,
+                                this._canvasWidth - width,           width,
+            
+                                this._canvasWidth,                   this._canvasHeight - width,
+                                endX - spaceForLightningEnds,        this._canvasHeight - width,
+                                endX - spaceForLightningEnds,        this._canvasHeight,
+                                endX - spaceForLightningEnds,        this._canvasHeight,
+                                this._canvasWidth,                   this._canvasHeight,
+                                this._canvasWidth,                   this._canvasHeight - width
+                             ];
+        // normalize
+        for(var i = 0; i <= borderVertices.length - 2; i+=2){
+            borderVertices[i] /= this._canvasWidth;
+            borderVertices[i+1] /= this._canvasHeight;
         }
-    }
-    
-    //path can only contain two points (x1, y1, x2, y2)
-    LightningHandler.prototype._addToPath = function(path){
-        var x = path[0] - this._padding;
-        var y = path[1] - this._padding;
-        var width = (path[2] + this._padding) - x;
-        var height = (path[3] + this._padding) - y;
-
-        x /= this._canvasWidth;
-        y /= this._canvasHeight;
-        width /= this._canvasWidth;
-        height /= this._canvasHeight;
-
-        this._attributes.vertexPosition = this._attributes.vertexPosition.concat( getGLCoordsFromNormalizedShaderCoords(getVerticesUnNormalized(x, y, width, height)) );
-    }
-    
-    LightningHandler.prototype.setToBorderPath = function(gl){
-        this._attributes.vertexPosition = [];
-        var width = this._canvasWidth, height = this._canvasHeight;
-        var lightningCoords = [this._padding, this._padding, width - this._padding, this._padding, 
-                               width - this._padding, this._padding * 3, width - this._padding, height - this._padding,
-                               this._padding, height - this._padding, width - (this._padding * 3), height - this._padding,
-                               this._padding, this._padding * 3, this._padding, height - (this._padding * 3)                              
-                              ];
-
-        this._addToPath([ lightningCoords[0], lightningCoords[1], lightningCoords[2], lightningCoords[3] ]);
-        this._addToPath([ lightningCoords[4], lightningCoords[5], lightningCoords[6], lightningCoords[7] ]);
-        this._addToPath([ lightningCoords[8], lightningCoords[9], lightningCoords[10], lightningCoords[11] ]);
-        this._addToPath([ lightningCoords[12], lightningCoords[13], lightningCoords[14], lightningCoords[15] ]);
         
-        var coordsInRGB = coordsToRGB(lightningCoords, this._canvasWidth, this._canvasHeight);
-        this._uniforms.coords.texture = getGLTextureToPassInfoFromRGBData(coordsInRGB, gl);
+        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords(borderVertices);
     }
 
     LightningHandler.prototype.setLightningCoords = function(coords){
@@ -127,8 +134,10 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         for(var i = 0; i < coords.length - 2; i += 2){
             var startCoord = new Vector(coords[i], coords[i+1]);
             var endCoord = new Vector(coords[i+2], coords[i+3]);
+            
+            var padding = 0.06 * this._canvasHeight;
 
-            var dirVec = (endCoord.subtract(startCoord)).getNormalized().multiplyWithScalar(this._padding);
+            var dirVec = (endCoord.subtract(startCoord)).getNormalized().multiplyWithScalar(padding);
             var negDirVec = dirVec.multiplyWithScalar(-1);
             var perp1 = new Vector(-dirVec.getY(), dirVec.getX());
             var perp2 = new Vector(dirVec.getY(), -dirVec.getX());

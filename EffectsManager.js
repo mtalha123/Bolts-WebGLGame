@@ -48,8 +48,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         }   
     }
     
-    function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords, shouldAnimateLg){
-        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, shouldAnimateLg, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, width: 1024, height: 1024, sampler: 0}, 1);
+    function requestLightningEffect(shouldDraw, gl, zOrder, opts, coords){
+        var handler = new LightningHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, coords, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, width: 1024, height: 1024, sampler: 0}, 1);
         
         addHandlers(handler.getAllHandlers());
         return handler;
