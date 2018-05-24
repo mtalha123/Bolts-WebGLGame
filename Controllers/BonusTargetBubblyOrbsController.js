@@ -7,7 +7,6 @@ define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border',
         this._spawnAttemptDelay = 5000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){              
-//            this._entitiesPool[i] = new BonusTargetBubblyOrb(i, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 100, 100, EffectsManager);
             this._entitiesPool[i] = new BonusTargetBubblyOrbCompound(gl, appMetaData, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
         

@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant){  
     
-    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
+    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));

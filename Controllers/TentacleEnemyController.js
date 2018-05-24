@@ -6,7 +6,7 @@ define(['Entities/TentacleEnemy', 'Custom Utility/Random', 'Controllers/EntityCo
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new TentacleEnemy(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 5, EffectsManager);
+            this._entitiesPool[i] = new TentacleEnemy(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
         
         this._spawnTimer.start();

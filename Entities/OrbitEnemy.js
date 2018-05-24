@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm', 'MainTargetsPositions', 'Custom Utility/rotateCoord'], function(CirclePhysicsBody, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm, MainTargetsPositions, rotateCoord){
     
     function OrbitEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, 0, 0);
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
         

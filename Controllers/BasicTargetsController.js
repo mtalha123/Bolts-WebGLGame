@@ -4,9 +4,10 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         EntityController.call(this, appMetaData, 100, maxEntitesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
+        var speed = 0.01 * appMetaData.getCanvasHeight();
 
         for(var i = 0; i < maxEntitesToSpawn; i++){
-            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), 30, 10, EffectsManager);
+            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), 0, speed, EffectsManager);
         }
         
         this._spawnTimer.start();

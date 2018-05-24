@@ -4,9 +4,10 @@ define(['Entities/TriangularTarget', 'Border', 'Custom Utility/Random', 'Control
         EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
         this._spawnAttemptDelay = 5000;
+        var speed = 0.01 * appMetaData.getCanvasHeight();
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 10, 10, EffectsManager);
+            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 0, speed, EffectsManager);
         }
         
         this._spawnTimer.start();

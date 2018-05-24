@@ -3,9 +3,10 @@ define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Util
     function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
         EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
+        var speed = 0.01 * appMetaData.getCanvasHeight();
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new FourPointTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 10, 10, EffectsManager);
+            this._entitiesPool[i] = new FourPointTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 0, speed, EffectsManager);
         }
         
         this._spawnTimer.start();
