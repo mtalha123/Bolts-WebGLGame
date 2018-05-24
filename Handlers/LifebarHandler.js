@@ -16,7 +16,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
             },
             glowFactor: {
                 type: "float",
-                value: [2.0] 
+                value: [5.0] 
             },
             lifeBarColor: {
                 type: "vec3",
@@ -36,7 +36,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         
         Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);   
         
-        this._padding = canvasHeight * 0.01;
+        this._padding = canvasHeight * 0.06;
         this.setCoords(startPosition, endPosition);
     }
     
