@@ -4,9 +4,9 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, EffectsManager));
-        
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
-        this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});  
+        this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});
+        this._numSlicesToDestroy = 5;
         
         EventSystem.register(this.recieveEvent, "entity_captured", this);
         EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
@@ -23,17 +23,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     BasicTarget.prototype.setPosition = function(newPosition){
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
-        
         this._hitBox.setPosition(newPosition);
-        
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     BasicTarget.prototype._setPositionWithInterpolation = function(newPosition){                
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        
         this._hitBox.setPosition(newPosition);
-        
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
@@ -41,6 +37,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.reset.call(this);
         MainTargetsPositions.removeTargetObj(this);
         this._hitBox.resetAlgorithm();
+        this._numSlicesToDestroy = 5;
     }
     
     BasicTarget.prototype.spawn = function(callback){
@@ -51,9 +48,15 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){       
         if(this._hitBox.processInput(mouseInputObj)){
-            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
-            this.destroyAndReset(callback);
-            return true;
+            if(this._numSlicesToDestroy === 1){
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
+                this.destroyAndReset(callback);
+                return true;
+            }else{
+                this._numSlicesToDestroy--;
+                this._handler.setNumBolts(this._numSlicesToDestroy);
+                this._hitBox.resetAlgorithm();
+            }
         }
     }
     
