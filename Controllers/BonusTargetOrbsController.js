@@ -1,4 +1,4 @@
-define(['Entities/BonusTargetOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BonusTargetOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
+define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
         EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
@@ -6,7 +6,7 @@ define(['Entities/BonusTargetOrbCompound', 'SynchronizedTimers', 'Border', 'Cust
         this._spawnAttemptDelay = 2000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool.push(new BonusTargetOrbCompound(gl, appMetaData, EffectsManager, this._targetRadius, new Vector(400, 400)));
+            this._entitiesPool.push(new BonusTargetOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(400, 400), EffectsManager));
         }
         
         this._spawnTimer.start();
@@ -25,7 +25,7 @@ define(['Entities/BonusTargetOrbCompound', 'SynchronizedTimers', 'Border', 'Cust
         newlyActivatedTarget.setPosition(new Vector(spawnX, spawnY));    
         this._entitiesActivated.push(newlyActivatedTarget);
 
-        newlyActivatedTarget.spawn();
+        newlyActivatedTarget.spawn(function(){});
     } 
     
     BonusTargetOrbsController.prototype.receiveEvent = function(eventInfo){

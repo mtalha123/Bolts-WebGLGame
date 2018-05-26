@@ -19,24 +19,38 @@ vec2 explosionParticleFX(vec2 center, float radiusOfExplosion, float iGlobalTime
     return center + velocity;
 }
 
+vec2 directedParticlesFX(vec2 center, float radiusOfSource, vec2 dest, float moddedTime, vec4 randVals, float lifetime){
+    float randomAngle = randVals.y * PI * 2.0;
+    vec2 startLocation = center + vec2(cos(randomAngle), sin(randomAngle)) * (randVals.z * radiusOfSource);
+    vec2 dirVec = normalize(dest - startLocation);
+    return startLocation + (dirVec * moddedTime);
+}
+
 attribute vec2 vertexPosition;
 attribute vec4 randVals;
 uniform mediump float maxLifetime;
 uniform mediump float iGlobalTime;
 uniform mediump vec2 center;
-uniform mediump float radiusOfExplosion;
+uniform mediump float radiusOfExplosion; // for explosion effect
+uniform mediump float radiusOfSource;    // for directedParticles effect
+uniform mediump vec2 destination;       // for directedParticles effect
 uniform mediump vec2 iResolution;
+uniform mediump float FXType; // 1 = explosionFX, 2 = directedParticlesFX
 varying vec2 particleCenter;
 varying float sizeFactor;
 
 void main(){
-    //for fragment shader
-    sizeFactor = 1.0 - map(0.0, maxLifetime, 0.0, 0.95, iGlobalTime);
-
-    particleCenter = explosionParticleFX(center, radiusOfExplosion, iGlobalTime, randVals, maxLifetime);
+    if(FXType == 1.0){
+        sizeFactor = 1.0 - map(0.0, maxLifetime, 0.0, 0.95, iGlobalTime); // for fragment shader
+        particleCenter = explosionParticleFX(center, radiusOfExplosion, iGlobalTime, randVals, maxLifetime);
+    }else{
+        float lifetime = randVals.x * maxLifetime;
+        float moddedTime = mod(iGlobalTime, lifetime);
+        sizeFactor = 1.0 - map(0.0, lifetime, 0.0, 0.95, moddedTime); // for fragment shader
+        particleCenter = directedParticlesFX(center, radiusOfSource, destination, moddedTime, randVals, lifetime);
+    }
     
-    vec2 translateVector = particleCenter - center;
-    
+    vec2 translateVector = particleCenter - center;    
     vec2 vPos = vertexPosition + translateVector;
     vPos = shaderCoordsToGLCoords(vPos, iResolution);
     gl_Position = vec4(vPos, 0.0, 1.0);
@@ -67,7 +81,7 @@ void main()
     particleCenter.x *= aspectRatio;
         
     float dist = distance(uv, particleCenter);
-    float m = (1.0 / dist) * 0.007 * sizeFactor;
+    float m = (1.0 / dist) * 0.003 * sizeFactor;
     color = vec4(m * particlesColor, m);
     
 	gl_FragColor = color;

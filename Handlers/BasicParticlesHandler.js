@@ -22,6 +22,18 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "float",
                 value: [1500]
             },
+            radiusOfSource: {
+                type: "float",
+                value: [50]
+            },
+            destination: {
+                type: "vec2",
+                value: [0, 0]
+            },
+            FXType: {
+                type: "float",
+                value: [1]
+            },
             particlesColor: {
                 type: "vec3",
                 value: [1.0, 1.0, 1.0]
@@ -35,42 +47,47 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._numParticles = numParticles;
         
         var randVals = [];
+        var numVerticesPerParticle = 6;
         for(var i = 0; i < numParticles; i++){
-            var randomVal = Math.random();
-            for(var a = 0; a < 24; a++){
+            var randomVal = Math.random(); 
+            for(var a = 0; a < numVerticesPerParticle * 4; a++){
                 randVals.push(randomVal);
             }
         }        
         this._attributes.randVals = randVals;
         this._vertexBuffers.push(gl.createBuffer());
         
-        this.additiveBlending = true;
-        
         this.setPosition(position);
     }   
     
     //inherit from Handler
     BasicParticlesHandler.prototype = Object.create(Handler.prototype);
-    BasicParticlesHandler.prototype.constructor = BasicParticlesHandler;
+    BasicParticlesHandler.prototype.constructor = BasicParticlesHandler;  
     
-    
-    BasicParticlesHandler.prototype.update = function(){ }
+    BasicParticlesHandler.prototype.update = function(){
+        if(this._uniforms.FXType.value[0] === 2){
+            this._uniforms.iGlobalTime.value[0]+=2;
+        }
+    }
     
     BasicParticlesHandler.prototype.doEffect = function(optCallback){
-        addToAutomaticDrawing.addToAutomaticDrawing(this, this._uniforms.maxLifetime.value[0], function(time){
-            this._uniforms.iGlobalTime.value[0] = time;
-        }, function(){
-            this._shouldDraw = false;
-            if(optCallback){
-                optCallback();
-            }
-        });
-        
-        this._shouldDraw = true;
+        if(this._uniforms.FXType.value[0] === 1){
+            addToAutomaticDrawing.addToAutomaticDrawing(this, this._uniforms.maxLifetime.value[0], function(time){
+                this._uniforms.iGlobalTime.value[0] = time;
+            }, function(){
+                this._shouldDraw = false;
+                if(optCallback){
+                    optCallback();
+                }
+            });
+
+            this._shouldDraw = true;
+        }
     }
     
     BasicParticlesHandler.prototype.reset = function(){
         this._shouldDraw = false;
+        this._uniforms.iGlobalTime.value[0] = 0;
     }
     
     
@@ -83,12 +100,15 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     BasicParticlesHandler.prototype.setParticlesColor = function(r, g, b){
         this._uniforms.particlesColor.value = [r, g, b];
     }
-
+    
+    BasicParticlesHandler.prototype.setDestinationForParticles = function(destination){
+        this._uniforms.destination.value = [destination.getX(), destination.getY()];
+    }
     
     BasicParticlesHandler.prototype._generateVerticesFromCurrentState = function(){        
         var centerX = this._uniforms.center.value[0];
         var centerY = this._uniforms.center.value[1];
-        var radiusOfParticle = 0.03 * this._canvasHeight;
+        var radiusOfParticle = 0.02 * this._canvasHeight;
         
         this._attributes.vertexPosition = [];
         for(var i = 0; i < this._numParticles; i++){
