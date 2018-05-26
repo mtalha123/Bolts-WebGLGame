@@ -38,8 +38,8 @@ uniform float radius;
 uniform float lgGlowFactor;
 uniform float particleGlowFactor;
 uniform float circleGlowFactor;
+uniform float lightningTurnedOn;
 uniform sampler2D noise;
-
 
 void main()
 {
@@ -58,25 +58,26 @@ void main()
     uv.x *= aspectRatio;
     center.x *= aspectRatio;
 
-    float completion = sinPositive(iGlobalTime / 20.0);   
-    vec4 startAndEndPts = getStartAndEndPtsOnCirc(radius - 0.005, completion, center);
-    float dist = genLightningAndGetDist(uv, startAndEndPts.rg, startAndEndPts.ba, 0.0005, 0.02, 3.0, 0.0, noise, iGlobalTime, iResolution);
-    float m = pow((1.0 / dist) * lgGlowFactor, 1.5);
-    color = vec4( vec3(1.0, 1.0, 0.0) * m, m);
-    
+    if(lightningTurnedOn == 1.0){
+        float completion = sinPositive(iGlobalTime / 20.0);   
+        vec4 startAndEndPts = getStartAndEndPtsOnCirc(radius - 0.005, completion, center);
+        float dist = genLightningAndGetDist(uv, startAndEndPts.rg, startAndEndPts.ba, 0.0005, 0.02, 3.0, 0.0, noise, iGlobalTime, iResolution);
+        float m = pow((1.0 / dist) * lgGlowFactor, 1.5);
+        color = vec4( vec3(1.0, 1.0, 0.0) * m, m);
+    }
     
     vec2 closestPoint = center + (normalize(uv - center) * radius);
     float dist2 = distance(uv, closestPoint);
  	float m2 = (1.0 / dist2) * circleGlowFactor;
-  	color += vec4( m2 * vec3(0.0, 0.0, 1.0), m2 );
+  	color += vec4( m2 * vec3(0.0, 0.4, 1.0), m2 );
     
     float dist3 = getDistToParticle(uv, center, radius / 2.0, iGlobalTime);
     float m3 = (1.0 / dist3) * particleGlowFactor;
   	color += vec4( (m3 * vec3(1.0, 1.0, 0.0)) * 0.8, m3);
     
-    if(distance(uv, center) <= radius){
-   		color += vec4(0.0, 0.0, 0.2, 0.2);
-    }
+    color += vec4(0.0, 0.0, 0.1, 0.0);
+    
+    color.a = pow(color.a, 1.5);
     
     gl_FragColor = color;
 }

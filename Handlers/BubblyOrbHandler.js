@@ -53,11 +53,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
     }
-    
-    BubblyOrb.prototype.increaseGlow = function(amount){
-        this._uniforms.particleGlowFactor.value[0] += amount;
-        this._uniforms.circleGlowFactor.value[0] += amount;
-    }
 
     BubblyOrb.prototype._generateVerticesFromCurrentState = function(){
         var radius_t = this._uniforms.radius.value[0] * 1.5;

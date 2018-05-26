@@ -28,10 +28,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._hitBox.setPosition(newPosition);
     }
     
-    BonusTargetBubblyOrb.prototype.setAchievementPercentage = function(percent){
-        this._handler.increaseGlow(percent / 3.0);
-    }
-    
     BonusTargetBubblyOrb.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
         this._hitBox.resetAlgorithm();

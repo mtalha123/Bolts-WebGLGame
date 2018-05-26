@@ -29,10 +29,6 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
         return this._currentMovementAngleInDeg;
     }
     
-    MovingEntity.prototype.setAchievementPercentage = function(percent){
-        //override
-    }
-    
     MovingEntity.prototype.areCoordsInHitRegions = function(checkX, checkY){
         return this._hitBoxRegions.isInAnyRegion(checkX, checkY);
     }

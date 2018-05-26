@@ -39,10 +39,6 @@ define([], function(){
         this._handler.shouldDraw(false);
     }
     
-    Entity.prototype.setAchievementPercentage = function(percent){
-        //override
-    }
-    
     Entity.prototype.destroyAndReset = function(callback){        
         this._handler.doDestroyEffect(this._position, function(){
             this.reset();

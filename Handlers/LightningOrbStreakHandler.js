@@ -20,7 +20,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             },
             lgGlowFactor: {
                 type: "float",
-                value: [1.0] 
+                value: [3.0] 
             },
             particleGlowFactor: {
                 type: "float",
@@ -28,7 +28,11 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             },
             circleGlowFactor: {
                 type: "float",
-                value: [3.0] 
+                value: [5.0] 
+            },
+            lightningTurnedOn: {
+                type: "float",
+                value: [1.0] 
             },
             noise: {
                 type: "sampler2D",
@@ -52,16 +56,18 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._uniforms.center.value[0] = newPosition.getX();
         this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
-    }
+    }    
     
-    LightningOrbStreakHandler.prototype.increaseGlow = function(amount){
-        this._uniforms.lgGlowFactor.value[0] += amount;
-        this._uniforms.particleGlowFactor.value[0] += amount;
-        this._uniforms.circleGlowFactor.value[0] += amount;
+    LightningOrbStreakHandler.prototype.setLightningState = function(state){
+        if(state){
+            this._uniforms.lightningTurnedOn.value[0] = 1.0;
+        }else{
+            this._uniforms.lightningTurnedOn.value[0] = 0.0;
+        }
     }
 
     LightningOrbStreakHandler.prototype._generateVerticesFromCurrentState = function(){
-        var radius_t = this._uniforms.radius.value[0] * 1.3;
+        var radius_t = this._uniforms.radius.value[0] * 1.5;
         var centerX = this._uniforms.center.value[0];
         var centerY = this._uniforms.center.value[1];
 
