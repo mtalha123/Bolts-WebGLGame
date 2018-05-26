@@ -71,7 +71,11 @@ define([], function(){
     Vector.prototype.setCoords = function(x, y){
         this._x = x;
         this._y = y;
-    } 
+    }
+    
+    Vector.prototype.printCoordsToConsole = function(){
+        console.log("X: " + this._x + "     Y: " + this._y);
+    }
     
     return Vector;
 });
