@@ -53,10 +53,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
     }
-    
-    FourPointTargetHandler.prototype.setTime = function(newTime){
-        this._uniforms.iGlobalTime.value = [newTime];
-    }
 
     FourPointTargetHandler.prototype.setAngle = function(newAngle){
         this._uniforms.angle.value = [newAngle];

@@ -1,9 +1,11 @@
 define(['Custom Utility/Vector'], function(Vector){
-    function SliceAlgorithm(position, radius, gl, EffectsManager){
+    function SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager){
         this._inputArray = [];   
         this._position = position;
         this._radius = radius;
         this._handler = EffectsManager.requestLightningEffect(false, gl, 80, {lineWidth: [0.5], glowFactor: [7], spikedLgBool: [1.0], boltColor: [1.0, 0.0, 0.4], glowColor: [1.0, 0.1, 0.3], fluctuation: [35]}, [0, 0, 100, 100]);
+        this._degreeLeeway = 30;
+        this._maxDist = canvasHeight * 0.4;
     }
     
     SliceAlgorithm.prototype.processInput = function(mouseInputObj){
@@ -11,15 +13,21 @@ define(['Custom Utility/Vector'], function(Vector){
             var mousePos = new Vector(mouseInputObj.x, mouseInputObj.y);
             
             this._inputArray.push(mousePos);
-            if(this._inputArray.length > 4){
+            if(this._inputArray.length >= 5){
                 this._inputArray.shift();
             }
         
             var lastIndex = this._inputArray.length - 1;
+            
+            if(this._inputArray[0].distanceTo(this._inputArray[lastIndex]) >= this._maxDist){
+                this._inputArray = [];
+                return false;
+            }
+            
             var vec1 = this._inputArray[0].subtract(this._position);
             var vec2 = this._inputArray[lastIndex].subtract(this._position);
-            if( (Math.PI - vec1.getAngleBetweenThisAnd(vec2)) <= (10 * (Math.PI / 180)) ){
-                if(this._inputArray[0].distanceTo(this._inputArray[lastIndex]) >= this._radius * 2){
+            if( (Math.PI - vec1.getAngleBetweenThisAnd(vec2)) <= (this._degreeLeeway * (Math.PI / 180)) ){
+                if(this._inputArray[0].distanceTo(this._inputArray[lastIndex]) >= this._radius * 1.5){
                     var coordsForBolt = this._getCoordsForSliceBolt();
                     this._handler.setLightningCoords([coordsForBolt[0].getX(), coordsForBolt[0].getY(), coordsForBolt[1].getX(), coordsForBolt[1].getY()]);
                     this._handler.doDisappearEffect();

@@ -6,16 +6,16 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(position);
         this._hitBoxRegions.addRegion(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2.5, gl, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2, gl, canvasHeight, EffectsManager));
         
         this._hitBoxRegions.addRegion(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, gl, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
         this._hitBoxRegions.addRegion(new Vector(position.getX() - p_radius, position.getY()), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, gl, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
         this._hitBoxRegions.addRegion(new Vector(position.getX(), position.getY() - p_radius), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, gl, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, position, {radius: [p_radius]});
@@ -78,6 +78,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 return true;   
             }
 
+            this._hitBoxRegions.resetAllRegions();
             this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
             this._handler.setGuardPrefs(this._guardPrefs);
             this._handler.increaseLgGlowFactor(1.5);

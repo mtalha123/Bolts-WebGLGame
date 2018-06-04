@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.11:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.15:4000/socket.io/socket.io.js'
     },
     shim: {
         'Third Party/Matrix': {
