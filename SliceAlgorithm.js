@@ -21,16 +21,13 @@ define(['Custom Utility/Vector'], function(Vector){
             
             if(this._inputArray[0].distanceTo(this._inputArray[lastIndex]) >= this._maxDist){
                 this._inputArray = [];
-                console.log("too big!");
                 return false;
             }
             
             var vec1 = this._inputArray[0].subtract(this._position);
             var vec2 = this._inputArray[lastIndex].subtract(this._position);
             if( (Math.PI - vec1.getAngleBetweenThisAnd(vec2)) <= (this._degreeLeeway * (Math.PI / 180)) ){
-                console.log("FIRST");
                 if(this._inputArray[0].distanceTo(this._inputArray[lastIndex]) >= this._radius * 1.5){
-                    console.log("SECOND");
                     var coordsForBolt = this._getCoordsForSliceBolt();
                     this._handler.setLightningCoords([coordsForBolt[0].getX(), coordsForBolt[0].getY(), coordsForBolt[1].getX(), coordsForBolt[1].getY()]);
                     this._handler.doDisappearEffect();
