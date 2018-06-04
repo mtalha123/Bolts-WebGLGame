@@ -127,6 +127,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                     this._physicsBody.setPosition(eventInfo.eventData.capture_position);
                     this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
                     this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
+                    this._handler.setCapturedToTrue();
                 }
             }else if(eventInfo.eventType === "captured_entity_destroyed"){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
@@ -136,6 +137,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this._captured = false;
                 this._physicsBody.setLinearVelocity(this._velocity);
+                this._handler.setCapturedToFalse();
                 this._timer.start();
             }
         }        

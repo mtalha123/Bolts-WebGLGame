@@ -58,6 +58,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "float",
                 value: [0.0]
             },
+            capturedBool: {
+                type: "float",
+                value: [0.0]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,
@@ -88,6 +92,14 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     
     TargetHandler.prototype.setNumBolts = function(numBolts){
         this._uniforms.numBolts.value = [numBolts];
+    }    
+    
+    TargetHandler.prototype.setCapturedToTrue = function(){
+        this._uniforms.capturedBool.value = [1.0];
+    }    
+    
+    TargetHandler.prototype.setCapturedToFalse = function(){
+        this._uniforms.capturedBool.value = [0.0];
     }
     
     TargetHandler.prototype._generateVerticesFromCurrentState = function(){

@@ -34,6 +34,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "float",
                 value: [0.0]
             },
+            capturedBool: {
+                type: "float",
+                value: [0.0]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,
@@ -95,6 +99,14 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     
     TeleportationTargetHandler.prototype.deactivatePortal = function(){
         this._uniforms.portalActivated.value = [0.0];
+    }
+    
+    TeleportationTargetHandler.prototype.setCapturedToTrue = function(){
+        this._uniforms.capturedBool.value = [1.0];
+    }    
+    
+    TeleportationTargetHandler.prototype.setCapturedToFalse = function(){
+        this._uniforms.capturedBool.value = [0.0];
     }
     
     TeleportationTargetHandler.prototype._generateVerticesFromCurrentState = function(){

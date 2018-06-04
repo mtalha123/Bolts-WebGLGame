@@ -82,6 +82,7 @@ uniform float numBolts;
 uniform float lgGlowFactor;
 uniform float rotationBool;
 uniform float spaceInCenterBool;
+uniform float capturedBool;
 uniform sampler2D noise;
 
 void main()
@@ -159,6 +160,10 @@ void main()
     finalColor += (1.0 - glowMultiplier) * lightningContribution.rgb;
     alpha += lightningContribution.a * (1.0 - glowMultiplier);
      
+    if(capturedBool == 1.0){
+        finalColor.r = 1.0;
+        alpha = pow(alpha, 1.6);
+    }
     
     
 	gl_FragColor = vec4(finalColor, alpha);

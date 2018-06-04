@@ -37,6 +37,7 @@ uniform vec3 guardPref;
 uniform float lgGlowFactor;
 uniform float lgBool;
 uniform float autoRotationBool;
+uniform float capturedBool;
 uniform sampler2D noise;
 
 void main()
@@ -90,6 +91,11 @@ void main()
 //        color += vec4( m2 * vec3(1.0, 1.0, 0.0), m2);
         
          color += pow( genLightningAndGetColor(uv, center, rotatedCoord, 0.0005, 0.009, 2.0, noise, iGlobalTime, iResolution, vec3(1.0, 1.0, 0.0), vec3(1.0, 1.0, 0.7), lgGlowFactor), vec4(1.3) );
+    }
+
+    if(capturedBool == 1.0){
+        color.r = 1.0;
+        color.a = pow(color.a, 1.6);
     }
     
 	gl_FragColor = color;

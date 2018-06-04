@@ -56,6 +56,7 @@ uniform vec2 dirVec;
 uniform vec2 portalLocation;
 uniform float portalActivated;
 uniform float appearing;
+uniform float capturedBool;
 uniform sampler2D noise;
 
 void main()
@@ -144,6 +145,11 @@ void main()
             }
             color += portalColor;
         }
+    }
+    
+    if(capturedBool == 1.0){
+        color.r = 1.0;
+        color.a = pow(color.a, 2.0);
     }
     
 	gl_FragColor = color;

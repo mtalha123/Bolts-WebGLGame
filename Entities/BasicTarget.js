@@ -74,6 +74,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                     this._physicsBody.setPosition(eventInfo.eventData.capture_position);
                     this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
                     this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
+                    this._handler.setCapturedToTrue();
                     MainTargetsPositions.removeTargetObj(this);
                 }
             }else if(eventInfo.eventType === "captured_entity_destroyed"){
@@ -81,6 +82,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             }else{
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
+                this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
             }
         }        

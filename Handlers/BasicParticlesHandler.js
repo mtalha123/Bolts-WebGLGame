@@ -1,5 +1,9 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector', 'addToAutomaticDrawing'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector, addToAutomaticDrawing){
     
+    // FXType 1: Explosion
+    // FXType 2: Particles flowing toward destination
+    // FXType 3: Particles flowing out of center randomly
+    
     function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary){        
         this._uniforms = {
             iResolution: {
@@ -14,7 +18,11 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "vec2",
                 value: [800, 500]
             },
-            radiusOfExplosion: {
+            radiusOfExplosion: { // Used for FXType 1
+                type: "float",
+                value: [150]
+            },
+            radiusOfParticlesEmanating: { // Used for FXType 3
                 type: "float",
                 value: [150]
             },
@@ -22,11 +30,11 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "float",
                 value: [1500]
             },
-            radiusOfSource: {
+            radiusOfSource: { // Used for FXType 2
                 type: "float",
                 value: [50]
             },
-            destination: {
+            destination: { // Used for FXType 2
                 type: "vec2",
                 value: [0, 0]
             },
@@ -40,20 +48,26 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             }
         };  
         
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);
-        
-        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
-    
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.PARTICLE);        
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);    
         this._numParticles = numParticles;
+        this._timeIncrementor = 2;
         
         var randVals = [];
         var numVerticesPerParticle = 6;
         for(var i = 0; i < numParticles; i++){
-            var randomVal = Math.random(); 
-            for(var a = 0; a < numVerticesPerParticle * 4; a++){
-                randVals.push(randomVal);
+//            var randomVal = Math.random();  
+//            for(var a = 0; a < numVerticesPerParticle * 4; a++){
+//                randVals.push(randomVal);
+//            }
+            
+            //testing
+            var fourRandVals = [Math.random(), Math.random(), Math.random(), Math.random()];
+            for(var a = 0; a < numVerticesPerParticle; a++){
+                randVals = randVals.concat(fourRandVals);
             }
         }        
+        
         this._attributes.randVals = randVals;
         this._vertexBuffers.push(gl.createBuffer());
         
@@ -65,8 +79,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     BasicParticlesHandler.prototype.constructor = BasicParticlesHandler;  
     
     BasicParticlesHandler.prototype.update = function(){
-        if(this._uniforms.FXType.value[0] === 2){
-            this._uniforms.iGlobalTime.value[0]+=2;
+        if(this._uniforms.FXType.value[0] === 2 || this._uniforms.FXType.value[0] === 3){
+            this._uniforms.iGlobalTime.value[0]+=this._timeIncrementor;
         }
     }
     
@@ -103,6 +117,14 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     
     BasicParticlesHandler.prototype.setDestinationForParticles = function(destination){
         this._uniforms.destination.value = [destination.getX(), destination.getY()];
+    }
+    
+    BasicParticlesHandler.prototype.getDestinationForParticles = function(){
+        return new Vector(this._uniforms.destination.value[0], this._uniforms.destination.value[1]);
+    }    
+    
+    BasicParticlesHandler.prototype.setTimeIncrementor = function(timeIncrementor){
+        this._timeIncrementor = timeIncrementor;
     }
     
     BasicParticlesHandler.prototype._generateVerticesFromCurrentState = function(){        

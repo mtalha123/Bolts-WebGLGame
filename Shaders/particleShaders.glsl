@@ -21,9 +21,15 @@ vec2 explosionParticleFX(vec2 center, float radiusOfExplosion, float iGlobalTime
 
 vec2 directedParticlesFX(vec2 center, float radiusOfSource, vec2 dest, float moddedTime, vec4 randVals, float lifetime){
     float randomAngle = randVals.y * PI * 2.0;
-    vec2 startLocation = center + vec2(cos(randomAngle), sin(randomAngle)) * (randVals.z * radiusOfSource);
+    vec2 startLocation = center + (vec2(cos(randomAngle), sin(randomAngle)) * (randVals.z * radiusOfSource));
     vec2 dirVec = normalize(dest - startLocation);
     return startLocation + (dirVec * moddedTime);
+}
+
+vec2 particlesEmanatingFromCenterFX(vec2 center, float radius, float moddedTime, vec4 randVals, float lifetime){
+    float randomAngle = randVals.y * PI * 2.0;
+    vec2 dirVec = vec2(cos(randomAngle), sin(randomAngle));
+    return center + (dirVec * moddedTime);
 }
 
 attribute vec2 vertexPosition;
@@ -31,11 +37,12 @@ attribute vec4 randVals;
 uniform mediump float maxLifetime;
 uniform mediump float iGlobalTime;
 uniform mediump vec2 center;
-uniform mediump float radiusOfExplosion; // for explosion effect
-uniform mediump float radiusOfSource;    // for directedParticles effect
-uniform mediump vec2 destination;       // for directedParticles effect
+uniform mediump float radiusOfExplosion; // for FXType 1
+uniform mediump float radiusOfParticlesEmanating; // for FXType 3
+uniform mediump float radiusOfSource;    // for FXType 2
+uniform mediump vec2 destination;       // for FXType 2
 uniform mediump vec2 iResolution;
-uniform mediump float FXType; // 1 = explosionFX, 2 = directedParticlesFX
+uniform mediump float FXType; // Check BasicParticlesHandler for explanation of types
 varying vec2 particleCenter;
 varying float sizeFactor;
 
@@ -43,11 +50,17 @@ void main(){
     if(FXType == 1.0){
         sizeFactor = 1.0 - map(0.0, maxLifetime, 0.0, 0.95, iGlobalTime); // for fragment shader
         particleCenter = explosionParticleFX(center, radiusOfExplosion, iGlobalTime, randVals, maxLifetime);
-    }else{
+    }else if(FXType == 2.0){
         float lifetime = randVals.x * maxLifetime;
         float moddedTime = mod(iGlobalTime, lifetime);
         sizeFactor = 1.0 - map(0.0, lifetime, 0.0, 0.95, moddedTime); // for fragment shader
         particleCenter = directedParticlesFX(center, radiusOfSource, destination, moddedTime, randVals, lifetime);
+    }else{
+        float minLifetime = maxLifetime * 0.6;
+        float lifetime = minLifetime + (randVals.x * (maxLifetime - minLifetime));
+        float moddedTime = mod(iGlobalTime, lifetime);
+        sizeFactor = 1.0 - map(0.0, lifetime, 0.0, 0.95, moddedTime); // for fragment shader
+        particleCenter = particlesEmanatingFromCenterFX(center, radiusOfParticlesEmanating, moddedTime, randVals, lifetime);
     }
     
     vec2 translateVector = particleCenter - center;    

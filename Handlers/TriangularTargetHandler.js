@@ -38,6 +38,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "float",
                 value: [0.0]
             },
+            capturedBool: {
+                type: "float",
+                value: [0]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,
@@ -72,6 +76,14 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     
     TriangularTargetHandler.prototype.increaseLgGlowFactor = function(lgGlowFactor){
         this._uniforms.lgGlowFactor.value[0] += lgGlowFactor;
+    }
+    
+    TriangularTargetHandler.prototype.setCapturedToTrue = function(){
+        this._uniforms.capturedBool.value = [1.0];
+    }    
+    
+    TriangularTargetHandler.prototype.setCapturedToFalse = function(){
+        this._uniforms.capturedBool.value = [0.0];
     }
     
     TriangularTargetHandler.prototype._generateVerticesFromCurrentState = function(){

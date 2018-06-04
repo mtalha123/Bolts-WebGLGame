@@ -30,6 +30,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "float",
                 value: [3.0]
             },
+            capturedBool: {
+                type: "float",
+                value: [0]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,
@@ -64,6 +68,14 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     
     FourPointTargetHandler.prototype.increaseLgGlowFactor = function(lgGlowFactor){
         this._uniforms.lgGlowFactor.value[0] += lgGlowFactor;
+    }
+    
+    FourPointTargetHandler.prototype.setCapturedToTrue = function(){
+        this._uniforms.capturedBool.value = [1.0];
+    }    
+    
+    FourPointTargetHandler.prototype.setCapturedToFalse = function(){
+        this._uniforms.capturedBool.value = [0.0];
     }
 
     FourPointTargetHandler.prototype._generateVerticesFromCurrentState = function(){

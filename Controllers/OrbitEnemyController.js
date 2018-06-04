@@ -17,8 +17,8 @@ define(['Entities/OrbitEnemy', 'Custom Utility/Random', 'Controllers/EntityContr
     OrbitEnemyController.prototype.constructor = OrbitEnemyController;
     
     OrbitEnemyController.prototype._spawn = function(){
-        var spawnPosition = new Vector( Random.getRandomInt(0.2 * this._canvasWidth, 0.7 * this._canvasWidth),
-                                        Random.getRandomInt(0.3 * this._canvasHeight, 0.7 * this._canvasHeight));
+        var spawnPosition = new Vector( Random.getRandomInt(0.5 * this._canvasWidth, 0.6 * this._canvasWidth),
+                                        0.5 * this._canvasHeight);
         
         var newlyActivatedTarget = this._entitiesPool.shift();   
         
