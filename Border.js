@@ -40,11 +40,11 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         scoreHandler = EffectsManager.requestTextEffect(false, gl, 4, {}, new Vector(100, 100), "0");
         healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, new Vector(borderPath[0], borderPath[1] - 50), new Vector(borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50), {});
         
-        EventSystem.register(receiveEvent, "score_achieved");
         EventSystem.register(receiveEvent, "entity_spawned");
         EventSystem.register(receiveEvent, "entity_destroyed");
         EventSystem.register(receiveEvent, "game_restart");
         EventSystem.register(receiveEvent, "lightning_stolen");
+        EventSystem.register(receiveEvent, "lightning_returned");
     }
     
     function draw(interpolation){    
@@ -75,10 +75,8 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         return margin + borderWidth;
     }
     
-    function receiveEvent(eventInfo){
-        if(eventInfo.eventType === "score_achieved"){
-            score += eventInfo.eventData;   
-        }else if(eventInfo.eventType === "entity_spawned"){
+    function receiveEvent(eventInfo){  
+        if(eventInfo.eventType === "entity_spawned"){
             if(eventInfo.eventData.type === "main"){
                 currentCharge--;
                 healthBarHandler.setCompletion(currentCharge / totalCharge);
@@ -95,9 +93,12 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
                 healthBarHandler.setCompletion(currentCharge / totalCharge );
             }
         }else if(eventInfo.eventType === "lightning_stolen"){
-            currentCharge -= eventInfo.eventData.amount;
-            healthBarHandler.setCompletion(currentCharge / totalCharge );
-        }else {
+            currentCharge--;
+            healthBarHandler.setCompletion(currentCharge / totalCharge);
+        }else if(eventInfo.eventType === "lightning_returned"){
+            currentCharge++;
+            healthBarHandler.setCompletion(currentCharge / totalCharge);
+        }else if(eventInfo.eventType === "game_restart"){
             healthBarHandler.shouldDraw(true);
             scoreHandler.shouldDraw(true);
             currentCharge = totalCharge;

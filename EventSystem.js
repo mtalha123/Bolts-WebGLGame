@@ -14,13 +14,13 @@ define([], function(){
         captured_entity_destroyed: [],
         captured_entity_released: [],
         entity_captured: [],
-        score_achieved: [],
         combo_level_increased: [],
         combo_level_reset: [],
         game_lost: [],
         game_restart: [],
         game_level_up: [],
-        lightning_stolen: []
+        lightning_stolen: [],
+        lightning_returned: []
     };
     
     

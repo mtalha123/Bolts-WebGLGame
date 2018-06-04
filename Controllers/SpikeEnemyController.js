@@ -58,29 +58,29 @@ define(['Entities/SpikeEnemy', 'Border', 'Custom Utility/Random', 'Controllers/E
     SpikeEnemyController.prototype.receiveEvent = function(eventInfo){
         EntityController.prototype.receiveEvent.call(this, eventInfo);
         
-        if(eventInfo.eventType === "game_level_up"){
-            switch(eventInfo.eventData.level){
-                case 3:
-                    this._chanceOfSpawning = 20;
-                    break;
-                case 4:
-                    this._chanceOfSpawning = 25;
-                    break;
-                case 5:
-                    this._chanceOfSpawning = 35;
-                    break;
-                case 6:
-                    this._chanceOfSpawning = 50;
-                    break;
-                case 7:
-                    this._chanceOfSpawning = 60;
-                    break;
-                case 8:
-                    this._chanceOfSpawning = 70;
-                    break;
-                
-            }
-        }
+//        if(eventInfo.eventType === "game_level_up"){
+//            switch(eventInfo.eventData.level){
+//                case 3:
+//                    this._chanceOfSpawning = 20;
+//                    break;
+//                case 4:
+//                    this._chanceOfSpawning = 25;
+//                    break;
+//                case 5:
+//                    this._chanceOfSpawning = 35;
+//                    break;
+//                case 6:
+//                    this._chanceOfSpawning = 50;
+//                    break;
+//                case 7:
+//                    this._chanceOfSpawning = 60;
+//                    break;
+//                case 8:
+//                    this._chanceOfSpawning = 70;
+//                    break;
+//                
+//            }
+//        }
     }
     
     return SpikeEnemyController;

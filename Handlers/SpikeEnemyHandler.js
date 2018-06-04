@@ -51,8 +51,8 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._particlesHandler.setParticlesColor(1.0, 0.0, 0.0);
     }
     
-    SpikeEnemyHandler.prototype.doDestroyEffect = function(position){
-        EntityHandler.prototype.doDestroyEffect.call(this, position);
+    SpikeEnemyHandler.prototype.doDestroyEffect = function(position, callback){
+        EntityHandler.prototype.doDestroyEffect.call(this, position, callback);
         this._particlesHandler.setParticlesColor(1.0, 0.2, 0.2);
     }
     
