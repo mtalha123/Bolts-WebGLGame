@@ -74,6 +74,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
             this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
             this._handler.setGuardPrefs(this._guardPrefs);
             this._handler.increaseLgGlowFactor(1.5);
+            this._hitBoxRegions.resetAllRegions();
             possibleHitBox.activated = false;
         }
         
