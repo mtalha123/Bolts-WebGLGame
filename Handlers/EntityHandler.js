@@ -2,8 +2,10 @@ define(['Handlers/Handler', 'Handlers/BasicParticlesHandler'], function(Handler,
     function EntityHandler(shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts){
         Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
         
-        this._particlesHandler = new BasicParticlesHandler(false, 50, canvasWidth, canvasHeight, gl, zOrder-1, position, {}, ShaderLibrary);
-        this._handlers.push(this._particlesHandler);
+        this._spawnParticlesHandler = new BasicParticlesHandler(false, 50, canvasWidth, canvasHeight, gl, zOrder-1, position, {particlesColor: [0.0, 0.3, 1.0]}, ShaderLibrary);
+        this._destructionParticlesHandler = new BasicParticlesHandler(false, 50, canvasWidth, canvasHeight, gl, zOrder-1, position, {particlesColor: [1.0, 1.0, 0.5]}, ShaderLibrary);
+        this._handlers.push(this._spawnParticlesHandler);
+        this._handlers.push(this._destructionParticlesHandler);
         
         //clone uniforms
         this._uniformsDefault = {};
@@ -31,21 +33,19 @@ define(['Handlers/Handler', 'Handlers/BasicParticlesHandler'], function(Handler,
     }
     
     EntityHandler.prototype.doSpawnEffect = function(position){
-        this._particlesHandler.setPosition(position);
-        this._particlesHandler.doEffect();
-        this._particlesHandler.setParticlesColor(0.0, 0.3, 1.0);
+        this._spawnParticlesHandler.setPosition(position);
+        this._spawnParticlesHandler.doEffect();
         this._shouldDraw = true;
     }
     
     EntityHandler.prototype.doDestroyEffect = function(position, optCallback){
-        this._particlesHandler.setPosition(position);
-        this._particlesHandler.doEffect(function(){
-            this._particlesHandler.reset();
+        this._destructionParticlesHandler.setPosition(position);
+        this._destructionParticlesHandler.doEffect(function(){
+            this._destructionParticlesHandler.reset();
             if(optCallback){
                 optCallback();
             }
         }.bind(this));
-        this._particlesHandler.setParticlesColor(1.0, 1.0, 0.5);
         this._shouldDraw = false;
     }
     

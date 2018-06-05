@@ -127,7 +127,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
                                                     // so no need to set this._nextCapturePosition to entityToRelease.getPosition()
                     this._nextCapturePosition = entityToRelease.getPosition();
                 }
-                EventSystem.publishEventImmediately("captured_entity_released", {entity: entityToRelease});
+                EventSystem.publishEventImmediately("captured_entity_released_from_orbit", {entity: entityToRelease});
                 this._particlesDirectedHandlersActive[0].reset();
                 this._particlesDirectedHandlersPool.push(this._particlesDirectedHandlersActive.shift());
                 this._numCapturedEntities--;

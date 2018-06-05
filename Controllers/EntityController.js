@@ -14,7 +14,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         this._entitiesActivated = [];
         // entitesCaptured will be used for entities that in a "temporary" stage where they are not activated but not in the pool to be respawned. These entities will be updated.
         this._entitiesCaptured = []; 
-        this._entitiesCurrentlyDestroying = [];
         this._spawnAttemptDelay = 1000;
         this._chanceOfSpawning = spawnChance;
         this._spawnTimer = SynchronizedTimers.getTimer();  
@@ -101,11 +100,9 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             for(var i = 0; i < this._entitiesActivated.length; i++){
                 var currEntity = this._entitiesActivated[i];
                 
-                if(currEntity.runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(destroyedEntity){                    
-                    var indexOfTarget = this._entitiesCurrentlyDestroying.indexOf(destroyedEntity);
-                    this._entitiesPool.push(this._entitiesCurrentlyDestroying.splice(indexOfTarget, 1)[0]); 
-                }.bind(this, currEntity))){ 
-                    this._entitiesCurrentlyDestroying.push(this._entitiesActivated.splice(i, 1)[0]); // Need to do this so that destroy animation doesn't get cut off. 
+                if(currEntity.runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(){})){ 
+                    this._entitiesPool.push(this._entitiesActivated.splice(i, 1)[0]); 
+                    i--;
                 }
             }
         }

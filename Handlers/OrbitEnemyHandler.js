@@ -20,11 +20,11 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             }
         };
         
-        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.ENEMY_ORBIT); 
-        
-        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);   
-        
+        this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.ENEMY_ORBIT);         
+        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);           
         this.setPosition(position);
+        this._spawnParticlesHandler.setParticlesColor(1.0, 0.0, 0.0);
+        this._destructionParticlesHandler.setParticlesColor(1.0, 0.2, 0.2);
     }
     
     //inherit from Handler
@@ -35,16 +35,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._uniforms.center.value[0] = newPosition.getX();
         this._uniforms.center.value[1] = newPosition.getY();
         this._generateVerticesFromCurrentState();
-    }
-    
-    OrbitEnemyHandler.prototype.doSpawnEffect = function(position){
-        EntityHandler.prototype.doSpawnEffect.call(this, position);
-        this._particlesHandler.setParticlesColor(1.0, 0.0, 0.0);
-    }
-    
-    OrbitEnemyHandler.prototype.doDestroyEffect = function(position, optCallback){
-        EntityHandler.prototype.doDestroyEffect.call(this, position, optCallback);
-        this._particlesHandler.setParticlesColor(1.0, 0.2, 0.2);
     }
     
     OrbitEnemyHandler.prototype._generateVerticesFromCurrentState = function(){
