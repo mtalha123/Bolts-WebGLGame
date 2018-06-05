@@ -38,6 +38,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 type: "float",
                 value: [0.0]
             },
+            numBolts: {
+                type: "float",
+                value: [3]
+            },
             noise: {
                 type: "sampler2D",
                 value: noiseTextureData.sampler,
@@ -115,6 +119,10 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         var centerY = this._uniforms.center.value[1];
 
         this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
+    }
+    
+    TeleportationTargetHandler.prototype.setNumBolts = function(numBolts){
+        this._uniforms.numBolts.value = [numBolts];
     }
     
     TeleportationTargetHandler.prototype.resetProperties = function(opts){

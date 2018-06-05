@@ -15,8 +15,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._appearanceRightBoundary = 0.7 * canvasWidth;
         this._appearanceTopBoundary = 0.6 * canvasHeight;
         this._appearanceBottomBoundary = 0.4 * canvasHeight;
-        
         this._captured = false;
+        this._numSlicesNeededToDestroy = 3;
         
         EventSystem.register(this.recieveEvent, "entity_captured", this);
         EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
@@ -50,6 +50,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._visible = false;
         this._captured = false;
         this._timer.reset();
+        this._numSlicesNeededToDestroy = 3;
+        this._handler.setNumBolts(this._numSlicesNeededToDestroy);
     }
     
     TeleportationTarget.prototype.spawn = function(callback){
@@ -63,9 +65,15 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     TeleportationTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){  
         if(this._visible){
             if(this._hitBox.processInput(mouseInputObj)){
-                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
-                this.destroyAndReset(callback);
-                return true;
+                if(this._numSlicesNeededToDestroy > 1){
+                    this._numSlicesNeededToDestroy--;
+                    this._handler.setNumBolts(this._numSlicesNeededToDestroy);
+                    this._hitBox.resetAlgorithm();
+                }else if(this._numSlicesNeededToDestroy === 1){
+                    EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
+                    this.destroyAndReset(callback);
+                    return true;    
+                }
             }
         }
     }
@@ -94,6 +102,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                         this._timer.reset();
                         this._timer.start();
                         MainTargetsPositions.removeTargetObj(this);
+                        this._numSlicesNeededToDestroy = 3;
+                        this._handler.setNumBolts(this._numSlicesNeededToDestroy);
                     }
                 }else{
                     var newPosition = new Vector(Random.getRandomInt(this._appearanceLeftBoundary, this._appearanceRightBoundary),

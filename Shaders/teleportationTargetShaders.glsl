@@ -57,6 +57,7 @@ uniform vec2 portalLocation;
 uniform float portalActivated;
 uniform float appearing;
 uniform float capturedBool;
+uniform float numBolts;
 uniform sampler2D noise;
 
 void main()
@@ -88,7 +89,6 @@ void main()
         // rotating effect
         uv = rotateCoord(uv, iGlobalTime / 15.0, center);
 
-        float numBolts = 3.0;
         float angleMultipleDeg = 360.0 / numBolts;
         float UVAngleDeg = getUVAngleDeg(uv, center);
         float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
