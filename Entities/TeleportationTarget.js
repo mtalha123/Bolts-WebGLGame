@@ -20,7 +20,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         
         EventSystem.register(this.recieveEvent, "entity_captured", this);
         EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_released_from_orbit", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_released_from_destruction_capture", this);
     }
     
     //inherit from MovingEntity
@@ -141,7 +142,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 }
             }else if(eventInfo.eventType === "captured_entity_destroyed"){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
-            }else{
+            }else if(eventInfo.eventType === "captured_entity_released_from_orbit"){
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
                 MainTargetsPositions.addTargetObj(this, this._position);
@@ -149,6 +150,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 this._physicsBody.setLinearVelocity(this._velocity);
                 this._handler.setCapturedToFalse();
                 this._timer.start();
+            }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
+                MainTargetsPositions.addTargetObj(this, this._position);
+                this.setPosition(eventInfo.eventData.position);
+                this._handler.shouldDraw(true);
+                this._timer.start();
+                this._visible = true;
             }
         }        
     }

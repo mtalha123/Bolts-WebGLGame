@@ -21,7 +21,8 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         
         EventSystem.register(this.recieveEvent, "entity_captured", this);
         EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_released_from_orbit", this);
+        EventSystem.register(this.recieveEvent, "captured_entity_released_from_destruction_capture", this);
     }
     
     //inherit from MovingEntity
@@ -103,11 +104,16 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 }
             }else if(eventInfo.eventType === "captured_entity_destroyed"){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
-            }else{
+            }else if(eventInfo.eventType === "captured_entity_released_from_orbit"){
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
                 this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
+            }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
+                MainTargetsPositions.addTargetObj(this, this._position);
+                this.setPosition(eventInfo.eventData.position);
+                this._hitBoxRegions.activateAllRegions();
+                this._handler.shouldDraw(true);
             }
         }        
     }

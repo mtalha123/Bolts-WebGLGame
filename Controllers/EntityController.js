@@ -30,7 +30,8 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         EventSystem.register(this.receiveEvent, "game_level_up", this);
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
-        EventSystem.register(this.receiveEvent, "captured_entity_released", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_destruction_capture", this);
     }
     
     EntityController.prototype.prepareForDrawing = function(interpolation){
@@ -82,7 +83,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                     break;
                 }
             }
-        }else if(eventInfo.eventType === "captured_entity_released"){
+        }else if(eventInfo.eventType === "captured_entity_released_from_orbit" || eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
             for(var i = 0; i < this._entitiesCaptured.length; i++){
                 if(this._entitiesCaptured[i] === eventInfo.eventData.entity){
                     this._entitiesActivated.push(this._entitiesCaptured.splice(i, 1)[0]);

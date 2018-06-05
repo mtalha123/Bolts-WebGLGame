@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant){  
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant', 'Custom Utility/Timer'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant, Timer){  
     
     function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
@@ -8,10 +8,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
         
-        this._numCapturedEntities = 0;
         this._maxNumCaptureEntities = 4;
-        this._numSlicesNeeded = 4;
         this._numTimesSliced = 0;
+        this._delayCapturingTimer = new Timer();
+        this._TIME_DELAY_TO_CAPTURE = 2000;
+        this._canCapture = true;
         
         //first one represents top right tentacle, second one represents top left tentacle, etc. 0 = doesn't hold lg, 1 = holds lg
         this._listTentaclesHoldLg = [0, 0, 0, 0];
@@ -42,9 +43,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     TentacleEnemy.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
-        this._numCapturedEntities = 0;
         this._numTimesSliced = 0;
-        this._numSlicesNeeded = 4;
         this._hitBox.resetAlgorithm();
     } 
     
@@ -54,27 +53,28 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     } 
     
     TentacleEnemy.prototype.update = function(){
-        var allTargetObjs = MainTargetsPositions.getAllTargetObjs();
+        if(this._delayCapturingTimer.getTime() >= this._TIME_DELAY_TO_CAPTURE){
+            this._delayCapturingTimer.reset();
+            this._canCapture = true;
+        }
+        
+        if(this._canCapture){
+            var allTargetObjs = MainTargetsPositions.getAllTargetObjs();
 
-        for(var i = 0; i < allTargetObjs.length; i++){
-            if(this._numCapturedEntities >= this._maxNumCaptureEntities){
-                break;
-            }
+            for(var i = 0; i < allTargetObjs.length; i++){
+                if(this._position.distanceTo(allTargetObjs[i].position) <= (this._radius * 4)){
+                    var quadOfEntity = getQuadrant(allTargetObjs[i].position, this._position);
+                    if((this._listTentaclesHoldLg[quadOfEntity - 1] === 1) || this._listTentaclesAlive[quadOfEntity-1] === 0){
+                        break;
+                    }
 
-            if(this._position.distanceTo(allTargetObjs[i].position) <= (this._radius * 4)){
-                var quadOfEntity = getQuadrant(allTargetObjs[i].position, this._position);
-                if((this._listTentaclesHoldLg[quadOfEntity - 1] === 1) || this._listTentaclesAlive[quadOfEntity-1] == 0){
-                    break;
+                    this._listTentaclesHoldLg[quadOfEntity - 1] = 1;
+                    this._listEntitiesCaptured[quadOfEntity - 1] = allTargetObjs[i].target;
+                    this._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
+                    this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
+
+                    EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target, capture_type: "destroy"});
                 }
-
-                this._listTentaclesHoldLg[quadOfEntity - 1] = 1;
-                this._listEntitiesCaptured[quadOfEntity - 1] = allTargetObjs[i].target;
-                this._numCapturedEntities++;
-                this._numSlicesNeeded += 2;
-                this._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
-                this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
-
-                EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target, capture_type: "destroy"});
             }
         }
     }
@@ -84,21 +84,20 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             this._hitBox.resetAlgorithm();
             this._numTimesSliced++;
             
-            var indexOfFirstAliveTentacle = this._listTentaclesAlive.indexOf(1);
-            
-            if(this._listTentaclesHoldLg[indexOfFirstAliveTentacle] === 1){
+            var indexOfATentacleHoldingLg = this._listTentaclesHoldLg.indexOf(1);
+            if(indexOfATentacleHoldingLg != -1){
                 if(this._numTimesSliced === 2){
-                    this._listTentaclesHoldLg[indexOfFirstAliveTentacle] = 0;
-                    this._listTentaclesAlive[indexOfFirstAliveTentacle] = 0;
-                    this._handler.tentaclesToShowPrefs(this._listTentaclesAlive);
-                    this._numSlicesNeeded -= 2;
+                    this._listTentaclesHoldLg[indexOfATentacleHoldingLg] = 0;
+                    this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
                     this._numTimesSliced = 0;
-                    EventSystem.publishEventImmediately("captured_entity_destroyed", {entity: this._listEntitiesCaptured[indexOfFirstAliveTentacle]})
+                    this._delayCapturingTimer.start();
+                    this._canCapture = false;
+                    EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: this._listEntitiesCaptured[indexOfATentacleHoldingLg], position: this._position});
                 }
             }else{
+                var indexOfFirstAliveTentacle = this._listTentaclesAlive.indexOf(1);
                 this._listTentaclesAlive[indexOfFirstAliveTentacle] = 0;
                 this._handler.tentaclesToShowPrefs(this._listTentaclesAlive);
-                this._numSlicesNeeded -= 2;
                 this._numTimesSliced = 0;
             }
             

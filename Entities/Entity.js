@@ -41,9 +41,10 @@ define([], function(){
     
     Entity.prototype.destroyAndReset = function(callback){        
         this._handler.doDestroyEffect(this._position, function(){
-            this.reset();
             callback();
         }.bind(this));
+        
+        this.reset();
     }
     
     Entity.prototype.areCoordsInHitRegions = function(checkPosition){
