@@ -21,6 +21,7 @@ define(['Custom Utility/Timer'], function(Timer){
             if(automaticUpdatesObjs[i].timer.getTime() > automaticUpdatesObjs[i].timeToStopUpdates){
                 automaticUpdatesObjs[i].callback.call(automaticUpdatesObjs[i].obj);
                 automaticUpdatesObjs.splice(i, 1);
+                i--;
             }else{
                 automaticUpdatesObjs[i].updateFunc.call(automaticUpdatesObjs[i].obj, automaticUpdatesObjs[i].timer.getTime());  
             }
