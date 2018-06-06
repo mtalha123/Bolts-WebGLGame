@@ -40,10 +40,6 @@ float snoise(vec2 v){
   return 130.0 * dot(m, g);
 }
 
-vec2 getProjectedVector(vec2 a, vec2 b){
-    return (dot(a, b) / dot(b, b)) * b;
-}
-
 float getAngleBetweenVecs(vec2 a, vec2 b){
     return acos(dot(a, b) / (length(a) * length(b)));
 }

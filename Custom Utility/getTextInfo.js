@@ -2,7 +2,7 @@ define(['Custom Utility/getTextResource'], function(getTextResource){
     var fontInformation = {};
     var ASCIICodes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 120];
     
-    getTextResource("http://192.168.0.15:4000/Assets/arial.fnt", fontInfoLoaded);
+    getTextResource("http://192.168.0.19:4000/Assets/arial.fnt", fontInfoLoaded);
     
     function fontInfoLoaded(error, text){
         for(var i = 0; i < ASCIICodes.length; i++){

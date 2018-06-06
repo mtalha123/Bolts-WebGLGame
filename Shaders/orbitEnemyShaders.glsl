@@ -9,10 +9,6 @@ void main(){
 //FRAGMENT SHADER
 precision mediump float;
 
-vec2 getProjectedVector(vec2 a, vec2 bNorm){
-    return (dot(a, bNorm) / dot(bNorm, bNorm)) * bNorm;
-}
-
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform vec2 center;

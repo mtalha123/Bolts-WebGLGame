@@ -76,6 +76,11 @@ float getClosestMultiple(int number, int multiple){
     
 }
 
+// project a onto b
+vec2 getProjectedVector(vec2 a, vec2 b){
+    return (dot(a, b) / dot(b, b)) * b;
+}
+
 vec2 rotateCoord(vec2 point, float angle, vec2 center){
     mat2 rotationMatrix = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
     return ((point - center) * rotationMatrix) + center;
@@ -112,7 +117,7 @@ float genLightningAndGetDist(vec2 currentUV, vec2 lgStartUV, vec2 lgEndUV, float
     float yNoiseVal = map(0.0, 1.0, -1.0, 1.0, texture2D(noise, vec2(noiseXMultiplier * xClamped, iGlobalTime / 2048.0)).r) * (fluctuationUV * lightningCos(xClamped, lengthOfLightning));
     vec2 pointOnLightning;
     if(spikedLgBool == 1.0){
-        pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0), yNoiseVal + (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0)));
+        pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - (lineWidthUV * lightningCos(xClamped, lengthOfLightning) * 6.0), yNoiseVal + (lineWidthUV * lightningCos(xClamped, lengthOfLightning))));
     }else{
         pointOnLightning = vec2(xClamped, clamp(currentUV_t.y, yNoiseVal - lineWidthUV, yNoiseVal + lineWidthUV));    
     }

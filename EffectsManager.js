@@ -1,4 +1,4 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler){
     var allHandlers = [];
     var automaticUpdatesHandlerObjs = [];
     
@@ -186,6 +186,13 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
 
         addHandlers(handler.getAllHandlers());
         return handler;
+    }    
+    
+    function requestLightningStrikeHandler(shouldDraw, gl, zOrder, lightningStart, lightningEnd, opts){
+        var handler = new LightningStrikeHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, lightningStart, lightningEnd, opts, ShaderLibrary, {noiseTexture: simplexNoiseTextureFaster, sampler: 0});
+
+        addHandlers(handler.getAllHandlers());
+        return handler;
     }
     
     function getHandlers(){
@@ -221,7 +228,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestTentacleEnemyHandler: requestTentacleEnemyHandler,
         requestOrbitEnemy: requestOrbitEnemy,
         requestRingLightning: requestRingLightning,
-        requestTeleportationTargetHandler: requestTeleportationTargetHandler
+        requestTeleportationTargetHandler: requestTeleportationTargetHandler,
+        requestLightningStrikeHandler: requestLightningStrikeHandler
     };
     
 });

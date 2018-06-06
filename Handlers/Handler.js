@@ -22,6 +22,19 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
             }
         }
         
+        //clone uniforms
+        this._uniformsDefault = {};
+        for(var uniform in this._uniforms){
+            if(uniform === "noise"){
+                continue;
+            }
+            
+            this._uniformsDefault[uniform] = {value: []};
+            for(var i = 0; i < this._uniforms[uniform].value.length; i++){
+                this._uniformsDefault[uniform].value[i] = this._uniforms[uniform].value[i];
+            }
+        }
+        
         for(var uniform in this._uniforms){
             this._uniforms[uniform].location = gl.getUniformLocation(this._shaderProgram, uniform);
         }
@@ -65,6 +78,18 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
     Handler.prototype.update = function(gl){
         this._time++;
         this._uniforms.iGlobalTime.value[0] = this._time;
+    }
+    
+    Handler.prototype.resetProperties = function(opts){
+        this._setToDefaultUniforms(opts);
+    }
+    
+    Handler.prototype._setToDefaultUniforms = function(opts){
+        for(var uniform in this._uniformsDefault){
+            for(var i = 0; i < this._uniformsDefault[uniform].value.length; i++){
+                this._uniforms[uniform].value[i] = this._uniformsDefault[uniform].value[i];
+            }
+        }
     }
     
     Handler.prototype.setUpAttributes = function(gl){
