@@ -67,6 +67,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._uniformsDefault.lightningStart.value = [start.getX(), start.getY()];
         this._uniformsDefault.lightningEnd.value = [end.getX(), end.getY()];
         
+        this._particlesHandler.setPosition(end);
+        
         this._generateVerticesFromCoords();
     }
     
