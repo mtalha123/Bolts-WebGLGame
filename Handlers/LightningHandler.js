@@ -1,4 +1,4 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getGLTextureToPassInfoFromRGBData', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'addToAutomaticDrawing'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, getGLTextureToPassInfoFromRGBData, coordsToRGB, Vector, addToAutomaticDrawing){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getGLTextureToPassInfoFromRGBData', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'timingCallbacks'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, getGLTextureToPassInfoFromRGBData, coordsToRGB, Vector, timingCallbacks){
     
     function LightningHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, opts, coords, ShaderLibrary, noiseTextureData, coordsSamplerVal){
         var widthOfCoordsTexture = coordsToRGB(coords, canvasWidth, canvasHeight).length / 3;
@@ -164,7 +164,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     LightningHandler.prototype.doDisappearEffect = function(){
         this._shouldDraw = true;
         
-        addToAutomaticDrawing.addToAutomaticDrawing(this, 500, function(time){
+        timingCallbacks.addTimingEvent(this, 500, function(time){
             this._uniforms.completion.value[0] = time / 500;
         }, function(){
             this._shouldDraw = false; 
