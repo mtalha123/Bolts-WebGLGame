@@ -31,6 +31,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
         EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
         EventSystem.register(this.receiveEvent, "captured_entity_released_from_destruction_capture", this);
+        EventSystem.register(this.receiveEvent, "bonus_target_disintegrated", this);
     }
     
     EntityController.prototype.prepareForDrawing = function(interpolation){
@@ -86,6 +87,13 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             for(var i = 0; i < this._entitiesCaptured.length; i++){
                 if(this._entitiesCaptured[i] === eventInfo.eventData.entity){
                     this._entitiesActivated.push(this._entitiesCaptured.splice(i, 1)[0]);
+                    break;
+                }
+            }
+        }else if(eventInfo.eventType === "bonus_target_disintegrated"){
+            for(var i = 0; i < this._entitiesActivated.length; i++){
+                if(this._entitiesActivated[i] === eventInfo.eventData.entity){
+                    this._entitiesPool.push(this._entitiesActivated.splice(i, 1)[0]);
                     break;
                 }
             }

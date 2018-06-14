@@ -1,4 +1,4 @@
-define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector', 'SliceAlgorithm', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Border', 'Custom Utility/Random', 'EventSystem'], function(SynchronizedTimers, Entity, CircularHitBox, Vector, SliceAlgorithm, CircularHitBoxWithAlgorithm, Border, Random, EventSystem){
+define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector', 'SliceAlgorithm', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Border', 'Custom Utility/Random', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, Entity, CircularHitBox, Vector, SliceAlgorithm, CircularHitBoxWithAlgorithm, Border, Random, EventSystem, timingCallbacks){
 
     function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);     
@@ -10,7 +10,8 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._particlesDestDist = 0.1 * canvasHeight;
         this._currParticlesDirection = "LEFT";
         this._currentStage = 1;
-        this._nextOrbSpawnPosition = new Vector(0, 0);
+        this._nextOrbSpawnPosition = new Vector(0, 0); 
+        this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
     }
     
     //inherit from Entity
@@ -23,6 +24,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._particlesHandler.setPosition(newPosition);
         this._setNextOrbSpawnDirection();
         this.setParticlesDirection(this._currParticlesDirection);
+        this._disintegratingParticles.setPosition(newPosition);
     }
     
     BonusTargetOrb.prototype._setPositionWithInterpolation = function(newPosition){
@@ -31,15 +33,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._particlesHandler.setPosition(newPosition);
         this.setParticlesDirection(this._currParticlesDirection);
         this._setNextOrbSpawnDirection();
-    }
-   
-    BonusTargetOrb.prototype.destroyAndReset = function(callback){
-       this._handler.doDestroyEffect(this._position, function(){
-            callback();
-        });
-        this._hitBox.resetAlgorithm();
-        this._particlesHandler.reset();
-        this._handler.shouldDraw(false);
+        this._disintegratingParticles.setPosition(newPosition);
     }
     
     BonusTargetOrb.prototype.prepareForDrawing = function(interpolation){
@@ -52,6 +46,19 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._particlesHandler.shouldDraw(true);
         this._handler.turnOnLightning();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
+        timingCallbacks.addTimingEvent(this, 3000, function(){}, function(){
+            this._disintegratingParticles.doEffect();
+            this.reset();
+            EventSystem.publishEventImmediately("bonus_target_disintegrated", {entity: this});
+        });
+    }
+    
+    BonusTargetOrb.prototype.reset = function(){
+        Entity.Entity.prototype.reset.call(this);
+        this._hitBox.resetAlgorithm();
+        this._particlesHandler.reset();
+        this._currentStage = 1;
+        this._handler.shouldDraw(false);
     }
     
     BonusTargetOrb.prototype.setParticlesDirection = function(direction){
@@ -71,19 +78,25 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     BonusTargetOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(this._hitBox.processInput(mouseInputObj)){
             if(this._currentStage < 4){
-                this.destroyAndReset(function(){});
+               this._handler.doDestroyEffect(this._position, function(){
+                    callback();
+                });
+                this._hitBox.resetAlgorithm();
+                
+                
                 this.setPosition(this._nextOrbSpawnPosition);
-                this.spawn(function(){});
+                this._handler.doSpawnEffect(this._position);
                 if(this._currentStage === 3){
                     this._particlesHandler.shouldDraw(false);
                 }
                 this._currentStage++;
+                timingCallbacks.resetTimeOfAddedTimeEvent(this);
             }else if(this._currentStage === 4){
                 this.destroyAndReset(function(){
-                    this._currentStage = 1;
                     callback();
                 }.bind(this));
                 
+                timingCallbacks.removeTimingEvent(this);
                 return true;
             }
         }

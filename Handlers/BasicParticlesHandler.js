@@ -1,8 +1,9 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector', 'addToAutomaticDrawing'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector, addToAutomaticDrawing){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector', 'timingCallbacks'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector, timingCallbacks){
     
     // FXType 1: Explosion
     // FXType 2: Particles flowing toward destination
     // FXType 3: Particles flowing out of center randomly
+    // FXType 4: Particles flowing upward slowly
     
     function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary){        
         this._uniforms = {
@@ -30,7 +31,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "float",
                 value: [1500]
             },
-            radiusOfSource: { // Used for FXType 2
+            radiusOfSource: { // Used for FXType 2 and FXType 4
                 type: "float",
                 value: [50]
             },
@@ -56,12 +57,6 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         var randVals = [];
         var numVerticesPerParticle = 6;
         for(var i = 0; i < numParticles; i++){
-//            var randomVal = Math.random();  
-//            for(var a = 0; a < numVerticesPerParticle * 4; a++){
-//                randVals.push(randomVal);
-//            }
-            
-            //testing
             var fourRandVals = [Math.random(), Math.random(), Math.random(), Math.random()];
             for(var a = 0; a < numVerticesPerParticle; a++){
                 randVals = randVals.concat(fourRandVals);
@@ -79,24 +74,22 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     BasicParticlesHandler.prototype.constructor = BasicParticlesHandler;  
     
     BasicParticlesHandler.prototype.update = function(){
-        if(this._uniforms.FXType.value[0] === 2 || this._uniforms.FXType.value[0] === 3){
+        if(this._uniforms.FXType.value[0] === 2 || this._uniforms.FXType.value[0] === 3 || this._uniforms.FXType.value[0] === 4){
             this._uniforms.iGlobalTime.value[0]+=this._timeIncrementor;
         }
     }
     
     BasicParticlesHandler.prototype.doEffect = function(optCallback){
-        if(this._uniforms.FXType.value[0] === 1){
-            addToAutomaticDrawing.addToAutomaticDrawing(this, this._uniforms.maxLifetime.value[0], function(time){
-                this._uniforms.iGlobalTime.value[0] = time;
-            }, function(){
-                this._shouldDraw = false;
-                if(optCallback){
-                    optCallback();
-                }
-            });
+        timingCallbacks.addTimingEvent(this, this._uniforms.maxLifetime.value[0], function(time){
+            this._uniforms.iGlobalTime.value[0] = time;
+        }, function(){
+            this._shouldDraw = false;
+            if(optCallback){
+                optCallback();
+            }
+        });
 
-            this._shouldDraw = true;
-        }
+        this._shouldDraw = true;
     }
     
     BasicParticlesHandler.prototype.reset = function(){

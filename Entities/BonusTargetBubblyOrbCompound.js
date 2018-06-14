@@ -1,4 +1,4 @@
- define(['Entities/BonusTargetBubblyOrb', 'Custom Utility/Random', 'Custom Utility/Vector', 'EventSystem'], function(BonusTargetBubblyOrb, Random, Vector, EventSystem){
+ define(['Entities/BonusTargetBubblyOrb', 'Custom Utility/Random', 'Custom Utility/Vector', 'EventSystem', 'timingCallbacks'], function(BonusTargetBubblyOrb, Random, Vector, EventSystem, timingCallbacks){
     function getPositionsFor2Targets(canvasWidth, canvasHeight, posToSplitFrom){
         var splitDirection = Random.getRandomIntInclusive(1, 2); // 1 represents left and right split, 2 represents up and down split
         
@@ -46,6 +46,15 @@
     BonusTargetBubblyOrbCompound.prototype.spawn = function(callback){
         this._initialTargetObj.target.spawn(callback);
         this._currActivatedTargetObjs.push(this._initialTargetObj);
+        
+        timingCallbacks.addTimingEvent(this, 3000, function(){}, function(){
+            for(var i = 0; i < this._currActivatedTargetObjs.length; i++){
+                this._currActivatedTargetObjs[i].target.disintegrate();
+            }
+            this.reset();
+            EventSystem.publishEventImmediately("bonus_target_disintegrated", {entity: this});
+        });
+        
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
     }
 
@@ -86,6 +95,8 @@
             }.bind(this));
             
             if(isAchieved){
+                timingCallbacks.resetTimeOfAddedTimeEvent(this);
+                
                 this._transitioningTargetObjs.push(currActivatedTargetObj);
                 
                 if(currActivatedTargetObj.stage === 1 || currActivatedTargetObj.stage === 2){
@@ -117,6 +128,7 @@
                     this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
                     if(isLastTarget){
                         EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
+                        timingCallbacks.removeTimingEvent(this);
                         return true;
                     }
                 }
@@ -125,7 +137,20 @@
     }
     
     BonusTargetBubblyOrbCompound.prototype.reset = function(){
-        // FIX
+        while(this._currActivatedTargetObjs.length > 0){
+            var currActivatedTargetObj = this._currActivatedTargetObjs[0];
+            
+            if(currActivatedTargetObj.stage === 1){
+                this._currActivatedTargetObjs.shift();
+            }else if(currActivatedTargetObj.stage === 2){
+                this._targetObjsSecondStage.push(this._currActivatedTargetObjs.shift());
+            }else if(currActivatedTargetObj.stage === 3){
+                this._targetObjsThirdStage.push(this._currActivatedTargetObjs.shift());
+            }
+            
+            currActivatedTargetObj.target.reset();
+            this._transitioningTargetObjs = [];
+        }
     }
     
     return BonusTargetBubblyOrbCompound;

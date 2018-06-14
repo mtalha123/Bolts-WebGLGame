@@ -21,7 +21,8 @@ define([], function(){
         game_restart: [],
         game_level_up: [],
         lightning_stolen: [],
-        lightning_returned: []
+        lightning_returned: [],
+        bonus_target_disintegrated: []
     };
     
     

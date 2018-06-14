@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'timingCallbacks', 'EventSystem'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, timingCallbacks, EventSystem){
 
     function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
@@ -6,6 +6,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
+        this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
     }
     
     //inherit from Entity
@@ -16,16 +17,25 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         return this._radius;
     }
     
+    BonusTargetBubblyOrb.prototype.spawn = function(callback){
+        Entity.Entity.prototype.spawn.call(this, callback);
+    }
+    
     BonusTargetBubblyOrb.prototype.setPosition = function(newPosition){
-        Entity.Entity.prototype.setPosition.call(this, newPosition);
-        
+        Entity.Entity.prototype.setPosition.call(this, newPosition);        
         this._hitBox.setPosition(newPosition);
+        this._particlesHandler.setPosition(newPosition);
     }
     
     BonusTargetBubblyOrb.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        
         this._hitBox.setPosition(newPosition);
+        this._particlesHandler.setPosition(newPosition);
+    }
+    
+    BonusTargetBubblyOrb.prototype.disintegrate = function(){
+        this._particlesHandler.doEffect();
+        this.reset();
     }
     
     BonusTargetBubblyOrb.prototype.reset = function(){
