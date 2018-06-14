@@ -13,6 +13,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     var healthBarHandler;
     var appMetaData;
     var totalCharge, currentCharge;
+    var lightningStrikeHandler;
     
     function initialize(gl, p_appMetaData, p_totalCharge, AssetManager, EffectsManager){     
         appMetaData = p_appMetaData;
@@ -22,7 +23,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         borderWidth = 0.05 * appMetaData.getCanvasHeight();
         gapForScore = 0.15 * appMetaData.getCanvasWidth();
         scoreX = margin + (borderLength/2);
-        scoreY = margin + 0.08 * appMetaData.getCanvasHeight();
+        scoreY = appMetaData.getCanvasHeight() - (margin + 0.08 * appMetaData.getCanvasHeight());
         totalCharge = currentCharge = p_totalCharge;
         
         
@@ -39,6 +40,8 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         handler.setToBorderPath(gl, borderPath[0], borderPath[10]);
         scoreHandler = EffectsManager.requestTextEffect(false, gl, 4, {}, new Vector(100, 100), "0");
         healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, new Vector(borderPath[0], borderPath[1] - 50), new Vector(borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50), {});
+        lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(scoreX, scoreY + margin), new Vector(scoreX, 0), {lineWidth: [10], glowFactor: [20]});
+        lightningStrikeHandler.setDuration(4000);
         
         EventSystem.register(receiveEvent, "entity_spawned");
         EventSystem.register(receiveEvent, "entity_destroyed");
@@ -54,7 +57,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         
         scoreHandler.setText(score.toString());
         //FIX: SHOULD BE "scoreHandler.width / 2"
-        scoreHandler.setPosition(new Vector(scoreX - (scoreHandler.getWidth() / 3.5), appMetaData.getCanvasHeight() - scoreY));
+        scoreHandler.setPosition(new Vector(scoreX - (scoreHandler.getWidth() / 3.5), scoreY));
         handler.update();
         
     }
@@ -81,7 +84,9 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
                 currentCharge--;
                 healthBarHandler.setCompletion(currentCharge / totalCharge);
                 if(currentCharge === 0){
-                   // EventSystem.publishEventImmediately("game_lost", {score: score});
+                    lightningStrikeHandler.doStrikeEffect(function(){
+//                        EventSystem.publishEventImmediately("game_lost", {score: score});    
+                    });
                     healthBarHandler.shouldDraw(false);
                     scoreHandler.shouldDraw(false);
                     return;
