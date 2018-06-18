@@ -18,7 +18,6 @@
      function BonusTargetBubblyOrbCompound(gl, appMetaData, targetRadius, position, EffectsManager){
         this._appMetaData = appMetaData;
         this._currActivatedTargetObjs = [];
-        this._transitioningTargetObjs = [];
 
         this._initialTargetObj = {
             target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, position, EffectsManager),
@@ -66,19 +65,11 @@
         for(var a = 0; a < this._currActivatedTargetObjs.length; a++){
             this._currActivatedTargetObjs[a].target.update();
         }
-
-        for(var b = 0; b < this._transitioningTargetObjs.length; b++){
-            this._transitioningTargetObjs[b].target.update();
-        }
     }
 
     BonusTargetBubblyOrbCompound.prototype.prepareForDrawing = function(interpolation){
         for(var a = 0; a < this._currActivatedTargetObjs.length; a++){
             this._currActivatedTargetObjs[a].target.prepareForDrawing(interpolation);
-        }
-
-        for(var b = 0; b < this._transitioningTargetObjs.length; b++){
-            this._transitioningTargetObjs[b].target.prepareForDrawing(interpolation);
         }
     }
 
@@ -89,15 +80,12 @@
             var isLastTarget = (this._currActivatedTargetObjs.length === 1 && currActivatedTargetObj.stage === 3) ? true : false;
             var isAchieved = currActivatedTargetObj.target.runAchievementAlgorithmAndReturnStatus(mouseInputObj, function(){                
                 if(isLastTarget){
-                    this._transitioningTargetObjs = [];
                     callback();
                 }
             }.bind(this));
             
             if(isAchieved){
                 timingCallbacks.resetTimeOfAddedTimeEvent(this);
-                
-                this._transitioningTargetObjs.push(currActivatedTargetObj);
                 
                 if(currActivatedTargetObj.stage === 1 || currActivatedTargetObj.stage === 2){
                     var targetObj1, targetObj2;
@@ -149,7 +137,6 @@
             }
             
             currActivatedTargetObj.target.reset();
-            this._transitioningTargetObjs = [];
         }
     }
     
