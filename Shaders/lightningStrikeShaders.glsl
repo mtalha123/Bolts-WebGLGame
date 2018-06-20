@@ -40,7 +40,7 @@ void main(){
     lightningStart.x *= aspectRatio;
     lightningEnd.x *= aspectRatio;
     
-    vec3 glowColor = vec3(1.0, 1.0, 0.7);
+    vec3 glowColor = boltColor + vec3(0.7);
     finalColor = genLightningAndGetColor(uv, lightningStart, lightningEnd, lineWidth, fluctuation, jaggedFactor, noise, iGlobalTime, iResolution, boltColor, glowColor, glowFactor);
     
     vec2 projVec = getProjectedVector(uv - lightningStart, lightningEnd - lightningStart);
