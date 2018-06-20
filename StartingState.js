@@ -46,7 +46,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     function update(){
         var inputObj = InputEventsManager.getCurrentInputObj();
         
-        if(inputObj.mouseState.type === "mouse_down" || inputObj.mouseState.type === "mouse_held_down"){
+        if(inputObj.mouseState.type === "left_mouse_down" || inputObj.mouseState.type === "left_mouse_held_down"){
             if(hitRegions.isInAnyRegion(new Vector(inputObj.mouseState.x, inputObj.mouseState.y))){
                 startButtonHandler.shouldDraw(false);
                 context.clearRect(0, 0, context.canvas.width, context.canvas.height);

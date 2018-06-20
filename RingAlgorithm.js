@@ -17,7 +17,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
     }
     
     RingAlgorithm.prototype.processInput = function(mouseInputObj){
-        if(mouseInputObj.type === "mouse_down" || mouseInputObj.type === "mouse_held_down"){
+        if(mouseInputObj.type === "left_mouse_down" || mouseInputObj.type === "left_mouse_held_down"){
             var mousePos = new Vector(mouseInputObj.x, mouseInputObj.y);
             
             // Determine if inside region

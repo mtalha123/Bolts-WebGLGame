@@ -7,7 +7,8 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty', 'Custom Utility
             y: undefined
         }
     };
-    var mouseDown = false;
+    var leftMouseDown = false;
+    var rightMouseDown = false;
     
     var appMetaData;
     
@@ -21,6 +22,11 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty', 'Custom Utility
         canvas.addEventListener("mouseup", function(event){
            handleMouseEvent("mouseup", event);
         }, false);
+        
+        canvas.addEventListener("contextmenu", function(event){
+            event.preventDefault();
+            return false;
+        });
 //        document.addEventListener("keypress", function(event){
 //            handleKeyboardEvent("keypress", event);
 //        });
@@ -54,18 +60,27 @@ define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty', 'Custom Utility
     function handleMouseEvent(eventType, eventData){        
         switch(eventType){
             case "mousedown":
-                Cursor.press();
-                mouseDown = true;
-                inputObj.mouseState.type = "mouse_down";
+                if(event.button === 0){ // left click
+                    Cursor.press();
+                    inputObj.mouseState.type = "left_mouse_down";
+                    leftMouseDown = true;
+                }else if(event.button === 2){ // right click
+                    inputObj.mouseState.type = "right_mouse_down";
+                    rightMouseDown = true;
+                }
+                
                 break;
             case "mouseup":
                 Cursor.release();
-                mouseDown = false;
+                leftMouseDown = false;
+                rightMouseDown = false;
                 inputObj.mouseState.type = "mouse_up";
                 break;
             case "mousemove":
-                if(mouseDown){
-                    inputObj.mouseState.type = "mouse_held_down"; 
+                if(leftMouseDown){
+                    inputObj.mouseState.type = "left_mouse_held_down"; 
+                }else if(rightMouseDown){
+                    inputObj.mouseState.type = "right_mouse_held_down";
                 }else{
                     inputObj.mouseState.type = "mouse_move";
                 }
