@@ -33,9 +33,12 @@ define(['Custom Utility/Timer'], function(Timer){
         }
     }
     
-    function removeTimingEvent(obj){
+    function removeTimingEvent(obj, shouldCallCallbackOrNot){
         for(var i = 0; i < timingEventObjs.length; i++){
             if(timingEventObjs[i].obj === obj){
+                if(shouldCallCallbackOrNot){
+                    timingEventObjs[i].callback.call(timingEventObjs[i].obj);
+                }
                 timingEventObjs.splice(i, 1);
                 break;
             }
