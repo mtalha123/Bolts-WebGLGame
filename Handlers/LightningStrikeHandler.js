@@ -73,7 +73,14 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         this._generateVerticesFromCoords();
     }
     
+    LightningStrikeHandler.prototype.setLightningStrikeEndCoord = function(end){
+        this.setLightningStrikeCoords(new Vector(this._uniforms.lightningStart.value[0], this._uniforms.lightningStart.value[1]), end);
+    }
+    
     LightningStrikeHandler.prototype.doStrikeEffect = function(optCallback){
+        // in case a strike happened soon before
+        timingCallbacks.removeTimingEvent(this, true);
+        
         this._shouldDraw = true;
         var particlesEffectDone = false;
         this._uniforms.iGlobalTime.value[0] = Math.random() * 1000;
@@ -110,7 +117,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         var startCoord = new Vector(this._uniforms.lightningStart.value[0], this._uniforms.lightningStart.value[1]);
         var endCoord = new Vector(this._uniforms.lightningEnd.value[0], this._uniforms.lightningEnd.value[1]);
 
-        var padding = (0.06 * this._canvasHeight) + this._uniforms.lineWidth.value[0] + this._uniforms.glowFactor.value[0];
+        var padding = (0.06 * this._canvasHeight) + this._uniforms.lineWidth.value[0] + this._uniforms.glowFactor.value[0] + this._uniforms.fluctuation.value[0];
 
         var dirVec = (endCoord.subtract(startCoord)).getNormalized().multiplyWithScalar(padding);
         var negDirVec = dirVec.multiplyWithScalar(-1);
