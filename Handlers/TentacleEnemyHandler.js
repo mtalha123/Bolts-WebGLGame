@@ -62,11 +62,13 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     }
     
     TentacleEnemyHandler.prototype.setYellowColorPrefs = function(prefs){
-        this._uniforms.yellowColorPrefs.value = prefs;
+        // assign in this way to prevent pass by reference
+        this._uniforms.yellowColorPrefs.value = [prefs[0], prefs[1], prefs[2], prefs[3]];
     }    
     
     TentacleEnemyHandler.prototype.tentaclesToShowPrefs = function(prefs){
-        this._uniforms.tentaclesToShow.value = prefs;
+        // assign in this way to prevent pass by reference
+        this._uniforms.tentaclesToShow.value = [prefs[0], prefs[1], prefs[2], prefs[3]];
     }
     
     TentacleEnemyHandler.prototype.doTentacleGrab = function(point, quadOfPoint){
