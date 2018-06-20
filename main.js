@@ -9,14 +9,11 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.21:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.11:4000/socket.io/socket.io.js'
     },
     shim: {
-        'Third Party/Matrix': {
-            exports: 'Matrix' // what variable does the library export to the global scope?
-        },
         'socketio': {
-            exports: "io"
+            exports: "io" // what variable does the library export to the global scope?
         }
     }
 });

@@ -1,6 +1,5 @@
 define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResource, AssetManager){
     var LIGHTNING = "LIGHTNING";
-    var BACKGROUND_FIELD = "BACKGROUND_FIELD";
     var TARGET = "TARGET";
     var TEXT = "TEXT"; 
     var CURSOR = "CURSOR";
@@ -12,7 +11,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var FOUR_POINT_TARGET = "FOUR_POINT_TARGET";
     var ENEMY_SPIKE = "ENEMY_SPIKE";
     var PARTICLE = "PARTICLE";
-    var LINK = "LINK";
     var FULL_SCREEN_COLOR = "FULL_SCREEN_COLOR";
     var LIFEBAR = "LIFEBAR";
     var TENTACLE_ENEMY = "TENTACLE_ENEMY";
@@ -80,7 +78,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         initialize: initialize,
         requestProgram: requestProgram,
         LIGHTNING: LIGHTNING,
-        BACKGROUND_FIELD: BACKGROUND_FIELD,
         TARGET: TARGET,
         TEXT: TEXT,
         CURSOR: CURSOR,
@@ -92,7 +89,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         FOUR_POINT_TARGET: FOUR_POINT_TARGET,
         ENEMY_SPIKE: ENEMY_SPIKE,
         PARTICLE: PARTICLE,
-        LINK: LINK,
         FULL_SCREEN_COLOR: FULL_SCREEN_COLOR,
         LIFEBAR: LIFEBAR,
         TENTACLE_ENEMY: TENTACLE_ENEMY,

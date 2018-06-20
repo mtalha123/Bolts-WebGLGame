@@ -1,4 +1,4 @@
-define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture', 'Custom Utility/getWorleyNoiseTexture', 'Custom Utility/getGlTextureForImage', 'Custom Utility/getGLTextureForNoise'], function(getTextResource, getSimplexNoiseTexture, getWorleyNoiseTexture, getGLTextureForImage, getGLTextureForNoise){
+define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture', 'Custom Utility/getGlTextureForImage', 'Custom Utility/getGLTextureForNoise'], function(getTextResource, getSimplexNoiseTexture, getGLTextureForImage, getGLTextureForNoise){
     var numTotalAssets = 32;
     var numLoadedAssets = 0;
     var textures = {};
@@ -109,15 +109,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.11:4000/Shaders/backgroundFieldShaders.glsl", function(error, text){
-                    numLoadedAssets++;
-                    shaders.background_field = text;
-                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                    resolve("Background Field Shader Loaded");
-                });
-            }),
-            
-            new Promise(function(resolve, reject){
                 getTextResource("http://192.168.0.11:4000/Shaders/lightningOrbShaders.glsl", function(error, text){
                     numLoadedAssets++;
                     shaders.lightning_orb = text;
@@ -177,15 +168,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                     shaders.particle = text;
                     callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                     resolve("Particle Shader Loaded");
-                });
-            }),
-            
-            new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.11:4000/Shaders/linkShaders.glsl", function(error, text){
-                    numLoadedAssets++;
-                    shaders.link = text;
-                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                    resolve("Link Shader Loaded");
                 });
             }),
             
@@ -293,14 +275,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                 textures.simplexNoiseSlower = noiseTexture;
                 callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                 resolve("Slower Simplex Noise Data Loaded");
-            }),
-            
-            new Promise(function(resolve, reject){
-                numLoadedAssets++;
-                var noiseTexture = getWorleyNoiseTexture(gl, 512, 512);
-                textures.worleyNoise = noiseTexture;
-                callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                resolve("Worley Noise Data Loaded");
             })
         ]).then(function(){
             callbackWhenAllLoaded();

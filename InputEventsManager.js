@@ -1,4 +1,4 @@
-define(['Cursor', 'EventSystem', 'Custom Utility/isObjectEmpty', 'Custom Utility/Vector'], function(Cursor, EventSystem, isObjectEmpty, Vector){
+define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, EventSystem, Vector){
     
     var inputObj = {
         mouseState: {
