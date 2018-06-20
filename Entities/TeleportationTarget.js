@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'Custom Utility/Timer', 'Custom Utility/Random', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'Border'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, Timer, Random, SliceAlgorithm, MainTargetsPositions, EventSystem, Border){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'Custom Utility/Timer', 'Custom Utility/Random', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'Border', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, Timer, Random, SliceAlgorithm, MainTargetsPositions, EventSystem, Border, timingCallbacks){
 
     function TeleportationTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);
@@ -7,6 +7,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestTeleportationTargetHandler(false, gl, 2, position, {radius: [p_radius]});  
+        this._type = "main";
         
         this._timer = new Timer();
         this._timeForAppearanceOrDisappearance = 2000;
@@ -15,13 +16,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._appearanceRightBoundary = 0.7 * canvasWidth;
         this._appearanceTopBoundary = 0.6 * canvasHeight;
         this._appearanceBottomBoundary = 0.4 * canvasHeight;
-        this._captured = false;
         this._numSlicesNeededToDestroy = 3;
         
-        EventSystem.register(this.recieveEvent, "entity_captured", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released_from_orbit", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released_from_destruction_capture", this);
+        EventSystem.register(this.receiveEvent, "entity_captured", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_destruction_capture", this);
     }
     
     //inherit from MovingEntity
@@ -49,7 +49,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MainTargetsPositions.removeTargetObj(this);
         this._hitBox.resetAlgorithm();
         this._visible = false;
-        this._captured = false;
         this._timer.reset();
         this._numSlicesNeededToDestroy = 3;
         this._handler.setNumBolts(this._numSlicesNeededToDestroy);
@@ -87,7 +86,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     TeleportationTarget.prototype.update = function(){
         MovingEntity.MovingEntity.prototype.update.call(this);
         
-        if(!this._captured){
+        if(this._alive){
             if(this._timer.getTime() > this._timeForAppearanceOrDisappearance){
                 if(this._visible){
                     // get closest distance to a border edge
@@ -124,13 +123,15 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         }
     }
     
-    TeleportationTarget.prototype.recieveEvent = function(eventInfo){
+    TeleportationTarget.prototype.receiveEvent = function(eventInfo){
+        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){
-                this._captured = true;
+                this._alive = false;
                 MainTargetsPositions.removeTargetObj(this);
                 this._handler.deactivatePortal();
-                
+
                 if(eventInfo.eventData.capture_type === "destroy"){
                     this.destroyAndReset(function(){});
                 }else if(eventInfo.eventData.capture_type === "orbit"){
@@ -146,16 +147,17 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
                 MainTargetsPositions.addTargetObj(this, this._position);
-                this._captured = false;
                 this._physicsBody.setLinearVelocity(this._velocity);
                 this._handler.setCapturedToFalse();
                 this._timer.start();
+                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this.setPosition(eventInfo.eventData.position);
                 this._handler.shouldDraw(true);
                 this._timer.start();
                 this._visible = true;
+                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
         }        
     }

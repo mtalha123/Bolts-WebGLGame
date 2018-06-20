@@ -1,4 +1,4 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, SliceAlgorithm, MainTargetsPositions, EventSystem){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
     function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, movementangle, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);
@@ -7,11 +7,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});
         this._numSlicesToDestroy = 5;
+        this._type = "main";
         
-        EventSystem.register(this.recieveEvent, "entity_captured", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released_from_orbit", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released_from_destruction_capture", this);
+        EventSystem.register(this.receiveEvent, "entity_captured", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_destruction_capture", this);
     }
     
     //inherit from MovingEntity
@@ -66,9 +67,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MainTargetsPositions.removeTargetObj(this);
     }
     
-    BasicTarget.prototype.recieveEvent = function(eventInfo){
+    BasicTarget.prototype.receiveEvent = function(eventInfo){
+        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){
+                this._alive = false;
+
                 if(eventInfo.eventData.capture_type === "destroy"){
                     this.destroyAndReset(function(){});
                 }else if(eventInfo.eventData.capture_type === "orbit"){
@@ -83,14 +88,17 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             }else if(eventInfo.eventType === "captured_entity_released_from_orbit"){
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
+                this._physicsBody.setLinearVelocity(this._velocity);
                 this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
+                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this.setPosition(eventInfo.eventData.position);
                 this._handler.shouldDraw(true);
+                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
-        }        
+        }    
     }
     
     return BasicTarget;

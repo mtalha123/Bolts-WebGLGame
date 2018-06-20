@@ -1,10 +1,13 @@
-define([], function(){
+define(['EventSystem'], function(EventSystem){
     
     function Entity(canvasWidth, canvasHeight, gl, position){       
         this._position = this._prevPosition = position; 
         this._hitBoxRegions = null;
         
         this._handler = null;
+        this._alive = false;
+        this._type = undefined; // type of Entity this is. This will be overridden by specific entities.
+        EventSystem.register(this.receiveEvent, "lightning_strike", this);
     }
     
     Entity.prototype.prepareForDrawing = function(interpolation){
@@ -31,12 +34,14 @@ define([], function(){
     
     Entity.prototype.spawn = function(callback){
         this._handler.doSpawnEffect(this._position);
+        this._alive = true;
         callback();
     }
     
     Entity.prototype.reset = function(){
         this._handler.resetProperties();
         this._handler.shouldDraw(false);
+        this._alive = false;
     }
     
     Entity.prototype.destroyAndReset = function(callback){        
@@ -53,6 +58,20 @@ define([], function(){
     
     Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(){
         //override
+    } 
+    
+    Entity.prototype.receiveEvent = function(eventInfo){
+        if(this._alive && eventInfo.eventType === "lightning_strike"){
+            var startCoord = eventInfo.eventData.start;
+            var endCoord = eventInfo.eventData.end;
+            var closestPointOnLgStrike = startCoord.addTo(this._position.subtract(startCoord).projectOnto(endCoord.subtract(startCoord)));
+            var dist = this._position.distanceTo(closestPointOnLgStrike);
+
+            if(dist < eventInfo.eventData.width){
+                this.destroyAndReset(function(){});
+                EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: this._type});
+            }
+        }
     }
     
     return {

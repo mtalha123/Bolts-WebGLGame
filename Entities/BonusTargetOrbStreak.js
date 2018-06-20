@@ -4,6 +4,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._type = "bonus";
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         this._numSlicesNeededToDestroy = 2;
@@ -62,6 +63,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         });
         
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
+    }
+    
+    BonusTargetOrbStreak.prototype.receiveEvent = function(eventInfo){
+        if(this._alive){
+            timingCallbacks.removeTimingEvent(this);
+            Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        }
     }
     
     return BonusTargetOrbStreak;

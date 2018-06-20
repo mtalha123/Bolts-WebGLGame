@@ -48,6 +48,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         EventSystem.register(receiveEvent, "game_restart");
         EventSystem.register(receiveEvent, "lightning_stolen");
         EventSystem.register(receiveEvent, "lightning_returned");
+        EventSystem.register(receiveEvent, "entity_destroyed_by_lightning_strike");
     }
     
     function draw(interpolation){    
@@ -101,7 +102,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
             currentCharge--;
             healthBarHandler.setCompletion(currentCharge / totalCharge);
         }else if(eventInfo.eventType === "lightning_returned"){
-            currentCharge++;
+            currentCharge += eventInfo.eventData.amount;
             healthBarHandler.setCompletion(currentCharge / totalCharge);
         }else if(eventInfo.eventType === "game_restart"){
             healthBarHandler.shouldDraw(true);
@@ -109,6 +110,11 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
             currentCharge = totalCharge;
             healthBarHandler.setCompletion(1.0);
             score = 0;
+        }else if(eventInfo.eventType === "entity_destroyed_by_lightning_strike"){
+            if(eventInfo.eventData.type === "main"){
+                currentCharge++;
+                healthBarHandler.setCompletion(currentCharge / totalCharge);
+            }
         }
     }
     

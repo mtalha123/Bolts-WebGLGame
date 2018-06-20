@@ -5,6 +5,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
+        this._type = "enemy";
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
         this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 25, 30, position, {FXType: [2], maxLifetime: [100], radiusOfSource: [canvasHeight * 0.02], particlesColor: [1.0, 1.0, 0.7]});
@@ -91,7 +92,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             if(this._charge > 0){
                 this._charge--;
                 this._handler.setNumBolts(this._charge);
-                EventSystem.publishEventImmediately("lightning_returned");
+                EventSystem.publishEventImmediately("lightning_returned", {amount: 1});
             }else{
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "enemy"});
                 this.destroyAndReset(callback);
@@ -105,6 +106,17 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     SpikeEnemy.prototype.setDestination = function(destPosition){
         this._destination = destPosition;
         this._velocity = ((destPosition.subtract(this._position)).getNormalized()).multiplyWithScalar(this._speed);
+    }
+    
+        
+    SpikeEnemy.prototype.receiveEvent = function(eventInfo){
+        var chargeCopy = this._charge; // Need this because the following line of code may reset it
+        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        
+        // check to see if its been destroyed by lightning strike
+        if(!this._alive){
+            EventSystem.publishEventImmediately("lightning_returned", {amount: chargeCopy});
+        }
     }
     
     return SpikeEnemy;

@@ -1,4 +1,5 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler){
+define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/TargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/BackgroundFieldHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/LinkHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler'], function(getTextInfo, map, LightningHandler, TargetHandler, TextHandler, CursorHandler, ComboHandler, BackgroundFieldHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, LinkHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler){
+    
     var allHandlers = [];
     var automaticUpdatesHandlerObjs = [];
     
@@ -193,6 +194,27 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
 
         addHandlers(handler.getAllHandlers());
         return handler;
+    }    
+    
+    function requestGlowingRingHandler(shouldDraw, gl, zOrder, position, opts){
+        var handler = new GlowingRingHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, position, ShaderLibrary);
+
+        addHandlers(handler.getAllHandlers());
+        return handler;
+    }    
+    
+    function requestSpriteHandler(shouldDraw, gl, zOrder, position, widthAndHeight, opts, texture){
+        var handler = new SpriteHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, position, widthAndHeight, ShaderLibrary, {sampler: 0, texture: texture});
+
+        addHandlers(handler.getAllHandlers());
+        return handler;
+    }    
+    
+    function requestRectangleHandler(shouldDraw, gl, zOrder, startCoord, endCoord, width, opts){
+        var handler = new RectangleHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, startCoord, endCoord, width, ShaderLibrary);
+
+        addHandlers(handler.getAllHandlers());
+        return handler;
     }
     
     function getHandlers(){
@@ -229,7 +251,10 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         requestOrbitEnemy: requestOrbitEnemy,
         requestRingLightning: requestRingLightning,
         requestTeleportationTargetHandler: requestTeleportationTargetHandler,
-        requestLightningStrikeHandler: requestLightningStrikeHandler
+        requestLightningStrikeHandler: requestLightningStrikeHandler,
+        requestGlowingRingHandler: requestGlowingRingHandler,
+        requestSpriteHandler: requestSpriteHandler,
+        requestRectangleHandler: requestRectangleHandler
     };
     
 });

@@ -4,6 +4,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
+        this._type = "enemy";
         
         this._handler = EffectsManager.requestOrbitEnemy(false, gl, 20, position, {radius: [this._radius]});
         this._particlesEmanatingHandler = EffectsManager.requestBasicParticleEffect(false, gl, 7, 30, new Vector(0, 0), {FXType: [3], maxLifetime: [80], radiusOfParticlesEmanating: [p_radius * 1.5], particlesColor: [1.0, 0.0, 0.0]});
@@ -147,6 +148,25 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         Entity.Entity.prototype.spawn.call(this, callback);
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
         this._particlesEmanatingHandler.shouldDraw(true);
+    }
+    
+    OrbitEnemy.prototype.receiveEvent = function(eventInfo){
+        // duplicate this._capturedEntities because the line of code after the for loop may reset this orbit enemy, and access to the entities inside this._capturedEntities will be lost
+        var copyOfCapturedEntities = [];
+        for(var i = 0; i < this._capturedEntities.length; i++){
+            copyOfCapturedEntities[i] = this._capturedEntities[i];
+        }
+        
+        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        
+        // check to see if its been destroyed by lightning strike
+        if(!this._alive){
+            // release all captured entities
+            while(copyOfCapturedEntities.length > 0){
+                var entityToRelease = copyOfCapturedEntities.shift();
+                EventSystem.publishEventImmediately("captured_entity_released_from_orbit", {entity: entityToRelease});
+            }
+        }
     }
     
     return OrbitEnemy;

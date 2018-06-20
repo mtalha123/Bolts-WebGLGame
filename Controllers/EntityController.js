@@ -22,9 +22,9 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         this._canvasHeight = appMetaData.getCanvasHeight();
         
         EventSystem.register(this.receiveEvent, "mouse_move", this);
-        EventSystem.register(this.receiveEvent, "mouse_down", this);
+        EventSystem.register(this.receiveEvent, "left_mouse_down", this);
         EventSystem.register(this.receiveEvent, "mouse_up", this);
-        EventSystem.register(this.receiveEvent, "mouse_held_down", this); 
+        EventSystem.register(this.receiveEvent, "left_mouse_held_down", this); 
         EventSystem.register(this.receiveEvent, "game_restart", this);
         EventSystem.register(this.receiveEvent, "game_level_up", this);
         EventSystem.register(this.receiveEvent, "entity_captured", this);
@@ -32,6 +32,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
         EventSystem.register(this.receiveEvent, "captured_entity_released_from_destruction_capture", this);
         EventSystem.register(this.receiveEvent, "bonus_target_disintegrated", this);
+        EventSystem.register(this.receiveEvent, "entity_destroyed_by_lightning_strike", this);
     }
     
     EntityController.prototype.prepareForDrawing = function(interpolation){
@@ -90,7 +91,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                     break;
                 }
             }
-        }else if(eventInfo.eventType === "bonus_target_disintegrated"){
+        }else if(eventInfo.eventType === "bonus_target_disintegrated" || eventInfo.eventType === "entity_destroyed_by_lightning_strike"){
             for(var i = 0; i < this._entitiesActivated.length; i++){
                 if(this._entitiesActivated[i] === eventInfo.eventData.entity){
                     this._entitiesPool.push(this._entitiesActivated.splice(i, 1)[0]);

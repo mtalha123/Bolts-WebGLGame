@@ -9,6 +9,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 50, 30, new Vector(0, 0), {FXType: [2], maxLifetime: [100], radiusOfSource: [p_radius * 1.5]});
         this._particlesDestDist = 0.1 * canvasHeight;
         this._currParticlesDirection = "LEFT";
+        this._type = "bonus";        
         this._currentStage = 1;
         this._nextOrbSpawnPosition = new Vector(0, 0); 
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
@@ -97,6 +98,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
                 }.bind(this));
                 
                 timingCallbacks.removeTimingEvent(this);
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                 return true;
             }
         }
@@ -132,6 +134,15 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         }else if(randomWall === "DOWN"){
             this._nextOrbSpawnPosition = new Vector(position.getX(), position.getY() - this._particlesDestDist);
         } 
+    }
+    
+    BonusTargetOrb.prototype.receiveEvent = function(eventInfo){
+        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        
+        // check to see if its been destroyed by lightning strike
+        if(!this._alive){
+            timingCallbacks.removeTimingEvent(this);
+        }
     }
     
     return BonusTargetOrb;

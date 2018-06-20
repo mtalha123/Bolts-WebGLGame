@@ -1,9 +1,10 @@
-define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem){
+define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
     function FourPointTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);    
         
         this._radius = p_radius;
+        this._type = "main";
         this._hitBoxRegions = new CircularHitRegions(position);
         this._hitBoxRegions.addRegion(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2.5, 
                                       new SliceAlgorithm(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2, gl, canvasHeight, EffectsManager));
@@ -24,10 +25,10 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
         
-        EventSystem.register(this.recieveEvent, "entity_captured", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_destroyed", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released_from_orbit", this);
-        EventSystem.register(this.recieveEvent, "captured_entity_released_from_destruction_capture", this);
+        EventSystem.register(this.receiveEvent, "entity_captured", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
+        EventSystem.register(this.receiveEvent, "captured_entity_released_from_destruction_capture", this);
     }
     
     //inherit from MovingEntity
@@ -97,11 +98,14 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
     
-    FourPointTarget.prototype.recieveEvent = function(eventInfo){
+    FourPointTarget.prototype.receiveEvent = function(eventInfo){
+        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){
                 MainTargetsPositions.removeTargetObj(this);
-                
+                this._alive = false;
+
                 if(eventInfo.eventData.capture_type === "destroy"){
                     this.destroyAndReset(function(){});
                 }else if(eventInfo.eventData.capture_type === "orbit"){
@@ -117,13 +121,15 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 this._physicsBody.setPosition(this._position);
                 this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
+                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this.setPosition(eventInfo.eventData.position);
                 this._hitBoxRegions.activateAllRegions();
                 this._handler.shouldDraw(true);
+                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
-        }        
+        }  
     }
     
     return FourPointTarget;

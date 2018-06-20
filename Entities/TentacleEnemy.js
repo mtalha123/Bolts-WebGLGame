@@ -5,6 +5,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._radius = p_radius;
         this._currentMovementAngleInDeg = null;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._type = "enemy";
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
         
@@ -101,15 +102,37 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
                 this._numTimesSliced = 0;
             }
             
-            //check if last tentacle is alive. If so, destroy and reset
+            //check if last tentacle is dead. If not, destroy and reset
             if(this._listTentaclesAlive[3] === 0){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "enemy"});
+                this._listTentaclesHoldLg = [0, 0, 0, 0];
+                this._listEntitiesCaptured = [undefined, undefined, undefined, undefined]; 
+                this._listTentaclesAlive = [1, 1, 1, 1];
                 this.destroyAndReset(callback);
                 return true;
             }
         }
         
         return false;
+    }
+    
+    TentacleEnemy.prototype.receiveEvent = function(eventInfo){        
+        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        
+        // check to see if its been destroyed by lightning strike
+        if(!this._alive){
+            // release all captured entities
+            for(var i = 0; i < this._listTentaclesHoldLg.length; i++){
+                if(this._listTentaclesHoldLg[i] === 1){
+                    this._listTentaclesHoldLg[i] = 0;
+                    EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: this._listEntitiesCaptured[i], position: this._position});
+                }
+            }
+            
+            this._listTentaclesHoldLg = [0, 0, 0, 0];
+            this._listEntitiesCaptured = [undefined, undefined, undefined, undefined]; 
+            this._listTentaclesAlive = [1, 1, 1, 1];
+        }
     }
     
     return TentacleEnemy;

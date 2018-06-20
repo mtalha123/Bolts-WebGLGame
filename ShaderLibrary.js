@@ -20,6 +20,9 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var RING_LIGHTNING = "RING_LIGHTNING";
     var TELEPORTATION_TARGET = "TELEPORTATION_TARGET";
     var LIGHTNING_STRIKE = "LIGHTNING_STRIKE";
+    var GLOWING_RING = "GLOWING_RING";
+    var SPRITE = "SPRITE";
+    var RECTANGLE = "RECTANGLE";
     
     var allPrograms = {};    
     
@@ -96,6 +99,9 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         ENEMY_ORBIT: ENEMY_ORBIT,
         RING_LIGHTNING: RING_LIGHTNING,
         TELEPORTATION_TARGET: TELEPORTATION_TARGET,
-        LIGHTNING_STRIKE: LIGHTNING_STRIKE
+        LIGHTNING_STRIKE: LIGHTNING_STRIKE,
+        GLOWING_RING: GLOWING_RING,
+        SPRITE: SPRITE,
+        RECTANGLE: RECTANGLE
     };
 });

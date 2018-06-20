@@ -4,9 +4,11 @@ define([], function(){
     
     var subscribers = {
         mouse_move: [],
-        mouse_down: [],
+        left_mouse_down: [],
+        right_mouse_down: [],
         mouse_up: [],
-        mouse_held_down: [],
+        left_mouse_held_down: [],
+        right_mouse_held_down: [],
 
         S_initialize: [],    
         entity_spawned: [],
@@ -22,7 +24,9 @@ define([], function(){
         game_level_up: [],
         lightning_stolen: [],
         lightning_returned: [],
-        bonus_target_disintegrated: []
+        bonus_target_disintegrated: [],
+        lightning_strike: [],
+        entity_destroyed_by_lightning_strike: []
     };
     
     
