@@ -17,6 +17,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._appearanceTopBoundary = 0.6 * canvasHeight;
         this._appearanceBottomBoundary = 0.4 * canvasHeight;
         this._numSlicesNeededToDestroy = 3;
+        this._scoreWorth = 4;
         
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);

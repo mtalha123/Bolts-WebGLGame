@@ -20,6 +20,8 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0];
         
+        this._scoreWorth = 3;
+        
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
         EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);

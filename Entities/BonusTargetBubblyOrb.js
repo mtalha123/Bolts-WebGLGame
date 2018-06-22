@@ -47,6 +47,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
         if(this._hitBox.processInput(mouseInputObj)){
             this.destroyAndReset(callback);
+            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
             return true;
         };
         

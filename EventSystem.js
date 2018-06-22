@@ -17,8 +17,6 @@ define([], function(){
         captured_entity_released_from_orbit: [],
         captured_entity_released_from_destruction_capture: [],
         entity_captured: [],
-        combo_level_increased: [],
-        combo_level_reset: [],
         game_lost: [],
         game_restart: [],
         game_level_up: [],
@@ -26,7 +24,8 @@ define([], function(){
         lightning_returned: [],
         bonus_target_disintegrated: [],
         lightning_strike: [],
-        entity_destroyed_by_lightning_strike: []
+        entity_destroyed_by_lightning_strike: [],
+        score_achieved: []
     };
     
     

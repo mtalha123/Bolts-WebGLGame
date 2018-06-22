@@ -5,6 +5,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         this._type = "bonus";
+        this._scoreWorth = 2;
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         this._numSlicesNeededToDestroy = 2;

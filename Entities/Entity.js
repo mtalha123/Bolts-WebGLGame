@@ -7,6 +7,7 @@ define(['EventSystem'], function(EventSystem){
         this._handler = null;
         this._alive = false;
         this._type = undefined; // type of Entity this is. This will be overridden by specific entities.
+        this._scoreWorth = 1;
         EventSystem.register(this.receiveEvent, "lightning_strike", this);
     }
     
@@ -59,6 +60,10 @@ define(['EventSystem'], function(EventSystem){
     Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(){
         //override
     } 
+    
+    Entity.prototype.getScoreWorth = function(){
+        return this._scoreWorth;
+    }
     
     Entity.prototype.receiveEvent = function(eventInfo){
         if(this._alive && eventInfo.eventType === "lightning_strike"){

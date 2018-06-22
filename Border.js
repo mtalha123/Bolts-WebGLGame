@@ -49,6 +49,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         EventSystem.register(receiveEvent, "lightning_stolen");
         EventSystem.register(receiveEvent, "lightning_returned");
         EventSystem.register(receiveEvent, "entity_destroyed_by_lightning_strike");
+        EventSystem.register(receiveEvent, "score_achieved");
     }
     
     function draw(interpolation){    
@@ -115,6 +116,9 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
                 currentCharge++;
                 healthBarHandler.setCompletion(currentCharge / totalCharge);
             }
+        }else if(eventInfo.eventType === "score_achieved"){
+            score += eventInfo.eventData.amount;
+            healthBarHandler.setCompletion(currentCharge / totalCharge);
         }
     }
     

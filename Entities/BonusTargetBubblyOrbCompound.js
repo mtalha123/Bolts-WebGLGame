@@ -18,6 +18,7 @@
      function BonusTargetBubblyOrbCompound(gl, appMetaData, targetRadius, position, EffectsManager){
         this._appMetaData = appMetaData;
         this._currActivatedTargetObjs = [];
+        this._scoreWorth = 10;
 
         this._initialTargetObj = {
             target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, position, EffectsManager),
@@ -140,6 +141,10 @@
             
             currActivatedTargetObj.target.reset();
         }
+    }   
+    
+    BonusTargetBubblyOrbCompound.prototype.getScoreWorth = function(){
+        return this._scoreWorth;
     }    
     
     BonusTargetBubblyOrbCompound.prototype.receiveEvent = function(eventInfo){        
