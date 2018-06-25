@@ -1,13 +1,14 @@
-define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border'], function(Border, Vector, EventSystem, Border){
+define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallbacks'], function(Border, Vector, EventSystem, Border, timingCallbacks){
     var glowingRingHandler;
     var lgBoltIconHandler;
     var lgBoltCoverAreaHandler;
     var lgStrikeHandler;
-    var numChargesNeeded = 7;
-    var currNumCharges = 7;
+    var numChargesNeeded = 5;
+    var currNumCharges = 0;
     var readyToFire = false;
     var startCoord;
     var widthOfAreaCovered;
+    var canActivate = true;
     
     function initialize(gl, canvasHeight, AssetManager, EffectsManager, p_Cursor){
         var radius = canvasHeight * 0.05;
@@ -50,16 +51,22 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border'], function(Bo
                 lgStrikeHandler.setLightningStrikeEndCoord(Cursor.getPosition());
                 lgStrikeHandler.doStrikeEffect();
                 readyToFire = false;
-//                currNumCharges = 0;
+                currNumCharges = 0;
                 EventSystem.publishEventImmediately("lightning_strike", {start: startCoord, end: Cursor.getPosition(), width: widthOfAreaCovered});
             }
         }else if(eventInfo.eventType === "right_mouse_down" || eventInfo.eventType === "right_mouse_held_down"){
-            if(readyToFire){
-                readyToFire = false;
-                lgBoltCoverAreaHandler.shouldDraw(false);
-            }else if(currNumCharges === numChargesNeeded){
-                readyToFire = true;
-                lgBoltCoverAreaHandler.shouldDraw(true);
+            if(canActivate){
+                if(readyToFire){
+                    readyToFire = false;
+                    lgBoltCoverAreaHandler.shouldDraw(false);
+                }else if(currNumCharges === numChargesNeeded){
+                    readyToFire = true;
+                    lgBoltCoverAreaHandler.shouldDraw(true);
+                }
+                canActivate = false;
+                timingCallbacks.addTimingEvent(this, 200, function(){} , function(){
+                    canActivate = true;
+                });
             }
         }else if(eventInfo.eventType === "entity_destroyed" && eventInfo.eventData.type === "bonus"){
             if(currNumCharges < numChargesNeeded){
