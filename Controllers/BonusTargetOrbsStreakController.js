@@ -1,23 +1,21 @@
-define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
+define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityControllerThatSpawns', 'Custom Utility/Vector'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityControllerThatSpawns, Vector){
     
-    function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
+    function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager){
+        EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
-        this._spawnAttemptDelay = 5000;
+        this._spawnAttemptDelay = 4000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
             this._entitiesPool[i] = new BonusTargetOrbStreak(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
-        
-        this._spawnTimer.start();
     }
     
-    //inherit from EntityController
-    BonusTargetOrbsStreakController.prototype = Object.create(EntityController.prototype);
+    //inherit from EntityControllerThatSpawns
+    BonusTargetOrbsStreakController.prototype = Object.create(EntityControllerThatSpawns.prototype);
     BonusTargetOrbsStreakController.prototype.constructor = BonusTargetOrbsStreakController;
     
-    BonusTargetOrbsStreakController.prototype._spawn = function(){
+    BonusTargetOrbsStreakController.prototype.spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX = Random.getRandomInt(this._canvasWidth * 0.3, this._canvasWidth * 0.7);
         var spawnY = Random.getRandomInt(this._canvasHeight * 0.3, this._canvasHeight * 0.7);
@@ -32,18 +30,12 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
     } 
     
     BonusTargetOrbsStreakController.prototype.receiveEvent = function(eventInfo){
-        EntityController.prototype.receiveEvent.call(this, eventInfo);
+        EntityControllerThatSpawns.prototype.receiveEvent.call(this, eventInfo);
 
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 4:
-                    this._chanceOfSpawning = 20;
-                    break;
-                case 5:
-                    this._chanceOfSpawning = 35;
-                    break;
-                case 6:
-                    this._chanceOfSpawning = 45;
+                    this._chanceOfSpawning = 30;
                     break;
             }
         }

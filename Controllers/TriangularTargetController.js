@@ -1,23 +1,20 @@
 define(['Entities/TriangularTarget', 'Border', 'Custom Utility/Random', 'Controllers/EntityController', 'Custom Utility/Vector'], function(TriangularTarget, Border, Random, EntityController, Vector){
     
     function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
+        EntityController.call(this, appMetaData, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
         this._spawnAttemptDelay = 5000;
-        var speed = 0.01 * appMetaData.getCanvasHeight();
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 0, speed, EffectsManager);
+            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
-        
-        this._spawnTimer.start();
     }
     
     //inherit from EntityController
     TriangularTargetController.prototype = Object.create(EntityController.prototype);
     TriangularTargetController.prototype.constructor = TriangularTargetController;
     
-    TriangularTargetController.prototype._spawn = function(){
+    TriangularTargetController.prototype.spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         var movementAngle;
@@ -57,31 +54,6 @@ define(['Entities/TriangularTarget', 'Border', 'Custom Utility/Random', 'Control
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
     } 
-    
-    TriangularTargetController.prototype.receiveEvent = function(eventInfo){
-        EntityController.prototype.receiveEvent.call(this, eventInfo);
-        
-        if(eventInfo.eventType === "game_level_up"){
-            switch(eventInfo.eventData.level){
-                case 4:
-                    this._chanceOfSpawning = 20;
-                    break;
-                case 5:
-                    this._chanceOfSpawning = 40;
-                    break;
-                case 6:
-                    this._chanceOfSpawning = 50;
-                    break;
-                case 7:
-                    this._chanceOfSpawning = 70;
-                    break;
-                case 8:
-                    this._chanceOfSpawning = 50;
-                    break;
-                
-            }
-        }
-    }
     
     return TriangularTargetController;
 });

@@ -1,22 +1,19 @@
 define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(FourPointTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function FourPointTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
+        EntityController.call(this, appMetaData, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.1;
-        var speed = 0.01 * appMetaData.getCanvasHeight();
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new FourPointTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), 0, speed, EffectsManager);
+            this._entitiesPool[i] = new FourPointTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
         }
-        
-        this._spawnTimer.start();
     }
     
     //inherit from EntityController
     FourPointTargetController.prototype = Object.create(EntityController.prototype);
     FourPointTargetController.prototype.constructor = FourPointTargetController;
     
-    FourPointTargetController.prototype._spawn = function(){
+    FourPointTargetController.prototype.spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         var movementAngle;
@@ -56,24 +53,6 @@ define(['Entities/FourPointTarget', 'SynchronizedTimers', 'Border', 'Custom Util
             newlyActivatedTarget.setMovementAngle(movementAngle);
         }.bind(this));
     } 
-    
-    FourPointTargetController.prototype.receiveEvent = function(eventInfo){
-        EntityController.prototype.receiveEvent.call(this, eventInfo);
-        
-        if(eventInfo.eventType === "game_level_up"){
-            switch(eventInfo.eventData.level){
-                case 6:
-                    this._chanceOfSpawning = 10;
-                    break;
-                case 7:
-                    this._chanceOfSpawning = 20;
-                    break;
-                case 8:
-                    this._chanceOfSpawning = 50;
-                    break;
-            }
-        }
-    }
     
     return FourPointTargetController;
 });

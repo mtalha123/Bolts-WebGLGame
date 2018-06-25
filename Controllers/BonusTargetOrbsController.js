@@ -1,22 +1,20 @@
-define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
+define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityControllerThatSpawns', 'Custom Utility/Vector'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityControllerThatSpawns, Vector){
     
-    function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitiesToSpawn); 
+    function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager){
+        EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
-        this._spawnAttemptDelay = 2000;
+        this._spawnAttemptDelay = 4000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
             this._entitiesPool.push(new BonusTargetOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(400, 400), EffectsManager));
         }
-        
-        this._spawnTimer.start();
     }
     
-    //inherit from EntityController
-    BonusTargetOrbsController.prototype = Object.create(EntityController.prototype);
+    //inherit from EntityControllerThatSpawns
+    BonusTargetOrbsController.prototype = Object.create(EntityControllerThatSpawns.prototype);
     BonusTargetOrbsController.prototype.constructor = BonusTargetOrbsController;
     
-    BonusTargetOrbsController.prototype._spawn = function(){
+    BonusTargetOrbsController.prototype.spawn = function(){
         var spawnX = Random.getRandomInt(this._canvasWidth * 0.3, this._canvasWidth * 0.7);
         var spawnY = Random.getRandomInt(this._canvasHeight * 0.3, this._canvasHeight * 0.5);
         
@@ -29,28 +27,19 @@ define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utili
     } 
     
     BonusTargetOrbsController.prototype.receiveEvent = function(eventInfo){
-        EntityController.prototype.receiveEvent.call(this, eventInfo);
+        EntityControllerThatSpawns.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 2:
-                    this._chanceOfSpawning = 10;
-                    break;
-                case 3:
+                case 7:
                     this._chanceOfSpawning = 20;
-                    break;
-                case 5:
-                    this._chanceOfSpawning = 45;
-                    break;
-                case 6:
-                    this._chanceOfSpawning = 50;
                     break;                
             }
         }
     }
     
     BonusTargetOrbsController.prototype.prepareForDrawing = function(eventInfo){
-        EntityController.prototype.prepareForDrawing.call(this, eventInfo);
+        EntityControllerThatSpawns.prototype.prepareForDrawing.call(this, eventInfo);
     }
      
     return BonusTargetOrbsController;

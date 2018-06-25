@@ -1,11 +1,12 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'Custom Utility/Timer', 'Custom Utility/Random', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'Border', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, Timer, Random, SliceAlgorithm, MainTargetsPositions, EventSystem, Border, timingCallbacks){
 
-    function TeleportationTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);
+    function TeleportationTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         
-        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
+        this._physicsBody.setSpeed(0.02 * canvasHeight);
         this._handler = EffectsManager.requestTeleportationTargetHandler(false, gl, 2, position, {radius: [p_radius]});  
         this._type = "main";
         
@@ -18,6 +19,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._appearanceBottomBoundary = 0.4 * canvasHeight;
         this._numSlicesNeededToDestroy = 3;
         this._scoreWorth = 4;
+        this._speed = 0.02 * canvasHeight;
+        this.setSpeed(this._speed);
         
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
@@ -90,31 +93,30 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         if(this._alive){
             if(this._timer.getTime() > this._timeForAppearanceOrDisappearance){
                 if(this._visible){
-                    // get closest distance to a border edge
-                    var closestDist = Math.min( this._position.distanceTo(new Vector(Border.getLeftX(), this._position.getY())),
-                                                this._position.distanceTo(new Vector(this._position.getX(), Border.getTopY())),                                 
-                                                this._position.distanceTo(new Vector(Border.getRightX(), this._position.getY())),
-                                                this._position.distanceTo(new Vector(this._position.getX(), Border.getBottomY()))
-                                              );
-
-                    if(closestDist > this._radius * 4){
-                        this._handler.disappear(this._velocity.getNormalized());
+                    var posInFront = this._position.addTo(this._physicsBody.getVelocity().getNormalized().multiplyWithScalar(this._radius * 6));
+                    if(posInFront.getX() > Border.getLeftX() && posInFront.getX() < Border.getRightX() &&
+                       posInFront.getY() > Border.getBottomY() && posInFront.getY() < Border.getTopY()){
+                        
+                        this._handler.disappear(this._physicsBody.getVelocity().getNormalized());
                         this._visible = false;
                         this._timer.reset();
                         this._timer.start();
                         MainTargetsPositions.removeTargetObj(this);
                         this._numSlicesNeededToDestroy = 3;
                         this._handler.setNumBolts(this._numSlicesNeededToDestroy);
+                        
                     }
+                    
+                    
                 }else{
                     var newPosition = new Vector(Random.getRandomInt(this._appearanceLeftBoundary, this._appearanceRightBoundary),
                                                  Random.getRandomInt(this._appearanceBottomBoundary, this._appearanceTopBoundary));
                     this.setPosition(newPosition);
                     var randomAngle = Random.getRandomInt(0, 360);
-                    this._velocity = new Vector(Math.cos(randomAngle * (Math.PI / 180)) * this._speed, 
-                                                Math.sin(randomAngle * (Math.PI / 180)) * this._speed);
-                    this._physicsBody.setLinearVelocity(this._velocity);
-                    this._handler.appear(this._velocity.getNormalized());
+                    var velocity = new Vector(Math.cos(randomAngle * (Math.PI / 180)) * this._speed, 
+                                              Math.sin(randomAngle * (Math.PI / 180)) * this._speed);
+                    this._physicsBody.setVelocity(velocity);
+                    this._handler.appear(velocity.getNormalized());
                     this._visible = true;
                     this._timer.reset();
                     this._timer.start();
@@ -138,7 +140,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 }else if(eventInfo.eventData.capture_type === "orbit"){
                     this._timer.reset();
                     this._physicsBody.setPosition(eventInfo.eventData.capture_position);
-                    this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
+                    this._physicsBody.setSpeed(eventInfo.eventData.rotationSpeed);
                     this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
                     this._handler.setCapturedToTrue();
                 }
@@ -148,7 +150,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
                 MainTargetsPositions.addTargetObj(this, this._position);
-                this._physicsBody.setLinearVelocity(this._velocity);
+                this._physicsBody.setSpeed(this._speed);
                 this._handler.setCapturedToFalse();
                 this._timer.start();
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
@@ -160,7 +162,22 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 this._visible = true;
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
-        }        
+        }
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 11:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.03 * this._canvasHeight);
+                    }.bind(this));;
+                    break;  
+                case 12:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.035 * this._canvasHeight);
+                    }.bind(this));;
+                    break;
+            }
+        }
     }
     
     return TeleportationTarget;

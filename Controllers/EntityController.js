@@ -1,23 +1,10 @@
 define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'], function(SynchronizedTimers, Border, Random, EventSystem){ 
     
-    function returnTrueWithChance(chance){
-        var randomVal = Random.getRandomIntInclusive(1, 100);
-        if(randomVal <= chance){
-            return true;
-        }
-        
-        return false;
-    }
-    
-    function EntityController(appMetaData, spawnChance, maxEntitiesToSpawn){
+    function EntityController(appMetaData){
         this._entitiesPool = [];
         this._entitiesActivated = [];
         // entitesCaptured will be used for entities that in a "temporary" stage where they are not activated but not in the pool to be respawned. These entities will be updated.
         this._entitiesCaptured = []; 
-        this._spawnAttemptDelay = 1000;
-        this._chanceOfSpawning = spawnChance;
-        this._spawnTimer = SynchronizedTimers.getTimer();  
-        this._maxEntitiesToSpawn = this._totalPoolSize = maxEntitiesToSpawn;
         this._canvasWidth = appMetaData.getCanvasWidth();
         this._canvasHeight = appMetaData.getCanvasHeight();
         
@@ -26,7 +13,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         EventSystem.register(this.receiveEvent, "mouse_up", this);
         EventSystem.register(this.receiveEvent, "left_mouse_held_down", this); 
         EventSystem.register(this.receiveEvent, "game_restart", this);
-        EventSystem.register(this.receiveEvent, "game_level_up", this);
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
         EventSystem.register(this.receiveEvent, "captured_entity_released_from_orbit", this);
@@ -42,16 +28,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
     }
     
     EntityController.prototype.update = function(){
-        if(this._entitiesPool.length > (this._totalPoolSize - this._maxEntitiesToSpawn)){
-            this._spawnTimer.start();
-            if(this._spawnTimer.getTime() >= this._spawnAttemptDelay){
-                if(returnTrueWithChance(this._chanceOfSpawning)){
-                    this._spawn();   
-                }
-                this._spawnTimer.reset();
-            }
-        }
-
         for(var a = 0; a < this._entitiesActivated.length; a++){
             this._entitiesActivated[a].update();
         }
@@ -61,7 +37,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         }
     }
     
-    EntityController.prototype._spawn = function(entitySpawned){
+    EntityController.prototype.spawn = function(entitySpawned){
         // override
     } 
     
@@ -98,10 +74,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                     break;
                 }
             }
-        }else if(eventInfo.eventType === "game_level_up"){
-            // override. IMPORTANT: THIS IF STATEMENT IS NEEDED HERE BECAUSE OF THE FOLLOWING ELSE CLAUSE. IF THIS 'IF' STATEMENT IS REMOVED,
-            // THEN THE FOLLOWING ELSE CLAUSE WILL INTERPRET "game_level_up" EVENT TO BE A INPUT EVENT (I.E. MOUSEDOWN, MOUSEUP, ETC.)
-        }else{
+        }else if(eventInfo.eventType === "mouse_move" || eventInfo.eventType === "left_mouse_down" || eventInfo.eventType === "mouse_up" || eventInfo.eventType === "left_mouse_held_down"){
             var inputToBeProcessed = {};
             inputToBeProcessed.mouseState = eventInfo.eventData;
             inputToBeProcessed.mouseState.type = eventInfo.eventType;
@@ -115,18 +88,6 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                 }
             }
         }
-    }
-    
-    EntityController.prototype.setSpawnChance = function(spawnChance){
-        this._chanceOfSpawning = spawnChance;
-    }
-    
-    EntityController.prototype.setMaxEntitiesToSpawn = function(maxEntitiesToSpawn){
-        this._maxEntitiesToSpawn = maxEntitiesToSpawn;
-    }
-    
-    EntityController.prototype.setTimeToAttemptSpawn = function(attemptTime){
-        this._spawnAttemptDelay = attemptTime;
     }
     
     EntityController.prototype.reset = function(){
@@ -143,9 +104,10 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
             entity.reset();
             this._entitiesPool.push(entity);
         }
-        
-        this._spawnTimer.reset();
-        this._spawnAttemptDelay = 5000;
+    }
+    
+    EntityController.prototype.canSpawn = function(){
+        return this._entitiesPool.length;
     }
     
     return EntityController;

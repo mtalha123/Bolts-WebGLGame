@@ -1,9 +1,8 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm){
     
-    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, 0, speed);
+    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, 0);
         this._radius = p_radius;
-        this._currentMovementAngleInDeg = null;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
         this._type = "enemy";
         
@@ -12,12 +11,14 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._particlesHandler.setTimeIncrementor(6);
                 
         this._destination = new Vector(0, 0);
-        this._velocity = (position.multiplyWithScalar(-1).getNormalized()).multiplyWithScalar(speed);
+        this._speed = 0.005 * canvasHeight;
+        this._velocity = (position.multiplyWithScalar(-1).getNormalized()).multiplyWithScalar(this._speed);
         
         this._charge = 0;
         this._maxCharge = 5;
         
         this._lightningStealTimer = SynchronizedTimers.getTimer();
+        this._timeUntilStealLightning = 1500;
     }
     
     //inherit from MovingEntity
@@ -75,7 +76,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             this._particlesHandler.setPosition(this._destination);
             this._prevPosition = this._position;
             
-            if(this._lightningStealTimer.getTime() >= 2000){
+            if(this._lightningStealTimer.getTime() >= this._timeUntilStealLightning){
                 if(this._charge < this._maxCharge){
                     this._charge++;
                     EventSystem.publishEventImmediately("lightning_stolen");
@@ -108,14 +109,31 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._velocity = ((destPosition.subtract(this._position)).getNormalized()).multiplyWithScalar(this._speed);
     }
     
+    SpikeEnemy.prototype.setSpeed = function(newSpeed){
+        this._speed = newSpeed;
+        this._velocity = ((this._destination.subtract(this._position)).getNormalized()).multiplyWithScalar(this._speed);
+    }
+    
         
     SpikeEnemy.prototype.receiveEvent = function(eventInfo){
-        var chargeCopy = this._charge; // Need this because the following line of code may reset it
-        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
-        
-        // check to see if its been destroyed by lightning strike
-        if(!this._alive){
-            EventSystem.publishEventImmediately("lightning_returned", {amount: chargeCopy});
+        if(eventInfo.eventType === "lightning_strike"){
+            var chargeCopy = this._charge; // Need this because the following line of code may reset it
+            MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+
+            // check to see if its been destroyed by lightning strike
+            if(!this._alive){
+                EventSystem.publishEventImmediately("lightning_returned", {amount: chargeCopy});
+            }
+        }else if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 6:
+                    this.setSpeed(0.02 * this._canvasHeight);
+                    break;  
+                case 7:
+                    this.setSpeed(0.03 * this._canvasHeight);
+                    this._timeUntilStealLightning = 1000;
+                    break;
+            }
         }
     }
     

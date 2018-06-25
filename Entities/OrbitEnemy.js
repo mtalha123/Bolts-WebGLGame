@@ -21,7 +21,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         this._maxNumCaptureEntities = 4;
         this._captureArea = this._radius * 3.5;
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
-        this._rotationSpeed = 10;
+        this._rotationSpeed = 0.01 * canvasHeight;
         this._capturedEntities = [];
         this._delayCapturingTimer = new Timer();
         this._TIME_DELAY_TO_CAPTURE = 2000;

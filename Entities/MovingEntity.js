@@ -1,13 +1,12 @@
 define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
 
-    function MovingEntity(canvasWidth, canvasHeight, gl, position, movementangle, speed){
+    function MovingEntity(canvasWidth, canvasHeight, gl, position){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         
         this._physicsBody = null;
         
-        this._currentMovementAngleInDeg = movementangle;
-        this._speed = speed;
-        this._velocity = (new Vector(Math.cos(movementangle * (Math.PI / 180)), Math.sin(movementangle * (Math.PI / 180))).multiplyWithScalar(speed)); 
+        this._speed = 0.01 * canvasHeight;
+//        this._velocity = (new Vector(Math.cos(movementangle * (Math.PI / 180)), Math.sin(movementangle * (Math.PI / 180))).multiplyWithScalar(this._speed)); 
     }
     
     MovingEntity.prototype = Object.create(Entity.Entity.prototype);
@@ -19,14 +18,9 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
     }
     
     MovingEntity.prototype.setMovementAngle = function(newAngle){
-        this._currentMovementAngleInDeg = newAngle;
-        this._velocity = new Vector(Math.cos(newAngle * (Math.PI / 180)) * this._speed, 
-                                    Math.sin(newAngle * (Math.PI / 180)) * this._speed);
-        this._physicsBody.setLinearVelocity(this._velocity);
-    }
-    
-    MovingEntity.prototype.getMovementAngle = function(){
-        return this._currentMovementAngleInDeg;
+//        var velocity = new Vector(Math.cos(newAngle * (Math.PI / 180)) * this._speed, 
+//                                  Math.sin(newAngle * (Math.PI / 180)) * this._speed);
+        this._physicsBody.setMovementAngle(newAngle);
     }
     
     MovingEntity.prototype.areCoordsInHitRegions = function(checkX, checkY){
@@ -38,7 +32,9 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
     }
     
     MovingEntity.prototype.setSpeed = function(newSpeed){
-        this._velocity = (new Vector(Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)), Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180))).multiplyWithScalar(newSpeed)); 
+        this._speed = newSpeed;
+//        this._velocity = new Vector(Math.cos(this._currentMovementAngleInDeg * (Math.PI / 180)), Math.sin(this._currentMovementAngleInDeg * (Math.PI / 180))).multiplyWithScalar(newSpeed); 
+        this._physicsBody.setSpeed(newSpeed);
     }
     
     MovingEntity.prototype.prepareForDrawing = function(interpolation){
@@ -49,7 +45,7 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
     
     MovingEntity.prototype.update = function(){
         this._physicsBody.update();        
-        this._setPositionWithInterpolation(this._physicsBody.getPosition());      
+        this._setPositionWithInterpolation(this._physicsBody.getPosition());  
     }
     
     return {

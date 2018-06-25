@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
-    function FourPointTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);    
+    function FourPointTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);    
         
         this._radius = p_radius;
         this._type = "main";
@@ -18,10 +18,12 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._hitBoxRegions.addRegion(new Vector(position.getX(), position.getY() - p_radius), p_radius / 2.5, 
                                       new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
-        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
+        this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, position, {radius: [p_radius]});
         
         this._rotationAngle = 0;
+        this._rotationSpeed = 0.05;
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
         
@@ -62,9 +64,9 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     
     FourPointTarget.prototype.update = function(){
         MovingEntity.MovingEntity.prototype.update.call(this);
-        this._rotationAngle+=0.05;
+        this._rotationAngle += this._rotationSpeed;
         this._handler.setAngle(this._rotationAngle);
-        this._hitBoxRegions.rotateAllRegions(0.05);
+        this._hitBoxRegions.rotateAllRegions(this._rotationSpeed);
     }
     
     
@@ -112,7 +114,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                     this.destroyAndReset(function(){});
                 }else if(eventInfo.eventData.capture_type === "orbit"){
                     this._physicsBody.setPosition(eventInfo.eventData.capture_position);
-                    this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
+                    this._physicsBody.setSpeed(eventInfo.eventData.rotationSpeed);
                     this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
                     this._handler.setCapturedToTrue();
                 }
@@ -132,6 +134,23 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
         }  
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){  
+                case 9:                    
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.02 * this._canvasHeight);
+                        this._rotationSpeed = 0.1;
+                    }.bind(this));
+                    break;
+                case 12:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.022 * this._canvasHeight);
+                        this._rotationSpeed = 0.12;
+                    }.bind(this));
+                    break;
+            }
+        }
     }
     
     return FourPointTarget;

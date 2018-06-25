@@ -1,23 +1,20 @@
 define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
     function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
-        EntityController.call(this, appMetaData, 100, maxEntitesToSpawn); 
+        EntityController.call(this, appMetaData, maxEntitesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
-        var speed = 0.01 * appMetaData.getCanvasHeight();
-
-        for(var i = 0; i < maxEntitesToSpawn; i++){
-            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), 0, speed, EffectsManager);
-        }
         
-        this._spawnTimer.start();
+        for(var i = 0; i < maxEntitesToSpawn; i++){
+            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), EffectsManager);
+        }
     }
     
     //inherit from EntityController
     BasicTargetsController.prototype = Object.create(EntityController.prototype);
     BasicTargetsController.prototype.constructor = BasicTargetsController;
     
-    BasicTargetsController.prototype._spawn = function(){
+    BasicTargetsController.prototype.spawn = function(){
         var random = Random.getRandomIntInclusive(1, 4);
         var spawnX, spawnY;
         var movementAngle;
@@ -58,40 +55,8 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         }.bind(this));
     } 
     
-    BasicTargetsController.prototype.receiveEvent = function(eventInfo){
-        EntityController.prototype.receiveEvent.call(this, eventInfo);
-        
-        if(eventInfo.eventType === "game_level_up"){
-            switch(eventInfo.eventData.level){
-                case 2:
-                    this._spawnAttemptDelay = 1000;
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    this._chanceOfSpawning = 80;
-                    break;
-                case 5:
-                    this._chanceOfSpawning = 60;
-                    break;
-                case 6:
-                    this._chanceOfSpawning = 40;
-                    break;
-                case 7:
-                    this._chanceOfSpawning = 10;
-                    break;
-                case 8:
-                    this._chanceOfSpawning = 0;
-                    break;
-                
-            }
-        }
-    }
-    
     BasicTargetsController.prototype.reset = function(){
         EntityController.prototype.reset.call(this);
-        this._spawnAttemptDelay = 2000;
-        this._chanceOfSpawning = 100;
     }
     
     return BasicTargetsController;

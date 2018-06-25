@@ -1,6 +1,7 @@
-define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'Background', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, Background, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector){
+define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector', 'BigLightningStrike', 'Custom Utility/Random'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector, BigLightningStrike, Random){
+    var NUM_MILLISECONDS_IN_SECOND = 1000;
+    
     var Cursor;
-    var Background;
     var Border;
     
     var basicTargetsController;
@@ -18,30 +19,47 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var EffectsManager;
     
     var gameLevelTimer = SynchronizedTimers.getTimer();
+    var currentGameLevel = 1;
+    var timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);
     var fpsCounter = Object.create(FPSCounter);
     var fpsHandler;
     
     var canvasWidth, canvasHeight;
     var callbackToSwitchState;
     var RestartState;
+
+    var spawnTimer = SynchronizedTimers.getTimer();
+    var timeUntilNextMainTargetSpawns = 2500;
+    var mainTargetsChancesOfSpawning = [];
+    
+    
+    var testingHandler;
+    var TESTINGBOOL = true;
     
     function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_RestartState, callback){
         InputEventsManager = p_InputEventsManager;
         EffectsManager = p_EffectsManager;
         
-        Background.initialize(gl, EffectsManager);
-        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager);
+        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager)
         ComboSystem.initialize(gl, EffectsManager, Border);
-        basicTargetsController = new BasicTargetsController(gl, appMetaData, /*10*/ 0, EffectsManager); 
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, /*2*/ 0, EffectsManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, /*2*/ 0, EffectsManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, /*2*/ 0, EffectsManager);
-        triangularTargetController = new TriangularTargetController(gl, appMetaData, /*5*/ 0, EffectsManager);
-        fourPointTargetController = new FourPointTargetController(gl, appMetaData, /*2*/ 0, EffectsManager);
-        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, /*3*/ 0, EffectsManager);
-        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, /*2*/ 0, EffectsManager);
-        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, /*1*/ 0, EffectsManager);
-        teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 2, EffectsManager);
+        BigLightningStrike.initialize(gl, appMetaData.getCanvasHeight(), AssetManager, EffectsManager, p_Cursor);
+        
+        // Main target controllers
+        basicTargetsController = new BasicTargetsController(gl, appMetaData, 10, EffectsManager); 
+        triangularTargetController = new TriangularTargetController(gl, appMetaData, 7, EffectsManager);
+        fourPointTargetController = new FourPointTargetController(gl, appMetaData, 4, EffectsManager);
+        teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 6, EffectsManager);
+        
+        // Bonus target controllers
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager);
+        
+        // Enemy controllers
+        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager);
+        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, 0, EffectsManager);
+        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 2, 0, EffectsManager);
+        
         
         fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88), fpsCounter.getFPS().toString());
         
@@ -52,7 +70,11 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         callbackToSwitchState = callback;
         RestartState = p_RestartState;
         
+        mainTargetsChancesOfSpawning = [[0, triangularTargetController], [0, fourPointTargetController], [0, teleportationTargetsController], [100, basicTargetsController]];
+        
         EventSystem.register(receiveEvent, "game_lost");
+        
+        testingHandler = EffectsManager.requestLineSegmentHandler(true, gl, 500, new Vector(100, 100), new Vector(600, 600), {color: [1.0, 0.0, 0.4]});
     }
     
     function draw(gl, interpolation){
@@ -60,6 +82,8 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         fpsCounter.start();
         
         Border.draw(interpolation);
+        
+        BigLightningStrike.prepareForDrawing();
         
         basicTargetsController.prepareForDrawing(interpolation);
         bonusTargetOrbsController.prepareForDrawing(interpolation);
@@ -74,7 +98,6 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         Cursor.draw(interpolation);
 
         ComboSystem.draw();
-        Background.draw();
         
         gl.viewport(0, 0, canvasWidth, canvasHeight);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -86,11 +109,39 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         
         fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
         fpsCounter.end();
+        
+        
+        if(TESTINGBOOL){
+            testingHandler.doSliceEffect(500);
+            TESTINGBOOL = false;
+        }
     }
     
     function update(inputObj){
         gameLevelTimer.start();
         handleGameLeveling();
+        
+        spawnTimer.start();
+        if(spawnTimer.getTime() >= timeUntilNextMainTargetSpawns){            
+            var controllerToMakeSpawn = getWeightedRandomController();
+            if(!controllerToMakeSpawn.canSpawn()){                
+                // since random controller cannot spawn, find the next controller that can spawn starting from the beginning of mainTargetsChancesOfSpawning array
+                for(var j = 0; j < mainTargetsChancesOfSpawning.length; j++){
+                    if(mainTargetsChancesOfSpawning[j][1].canSpawn()){
+                        controllerToSpawn = mainTargetsChancesOfSpawning[j][1];
+                        break;
+                    }
+                }
+            }
+            
+            // if controller was found that can spawn, then it will spawn. Else, nothing will happen
+            if(controllerToMakeSpawn.canSpawn()){
+                controllerToMakeSpawn.spawn();
+            }
+            
+            spawnTimer.reset();
+            spawnTimer.start();
+        }
         
         InputEventsManager.notifyOfCurrentStateAndConsume();
         
@@ -110,43 +161,91 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     }
     
     function receiveEvent(eventInfo){
-        gameLevelTimer.reset();
-        RestartState.activate(eventInfo.eventData.score);
-        callbackToSwitchState(RestartState);
-    }
-    
-    function activate(){
-        
-    }
-    
-    function handleGameLeveling(){
-       // console.log("CURRENT TIME: " + gameLevelTimer.getTime());
-        
-        if(gameLevelTimer.getTime() >= 290000){
-//            EventSystem.publishEvent("game_level_up", {level: 8})
-//            console.log("LEVEL 8");
-        }else if(gameLevelTimer.getTime() >= 230000){
-//            EventSystem.publishEvent("game_level_up", {level: 7})
-//            console.log("LEVEL 7");
-        }else if(gameLevelTimer.getTime() >= 170000){
-//            EventSystem.publishEvent("game_level_up", {level: 6})
-//            console.log("LEVEL 6");
-        }else if(gameLevelTimer.getTime() >= 130000){
-//            EventSystem.publishEvent("game_level_up", {level: 5})
-//            console.log("LEVEL 5");
-        }else if(gameLevelTimer.getTime() >= 90000){
-//            EventSystem.publishEvent("game_level_up", {level: 4})
-//            console.log("LEVEL 4");
-        }else if(gameLevelTimer.getTime() >= 60000){
-//            EventSystem.publishEvent("game_level_up", {level: 3})
-//            console.log("LEVEL 3");
-        }else if(gameLevelTimer.getTime() >= 20000){
-//            EventSystem.publishEvent("game_level_up", {level: 2})
-//            console.log("LEVEL 2");
+        if(eventInfo.eventType === "game_lost"){
+            gameLevelTimer.reset();
+            RestartState.activate(eventInfo.eventData.score);
+            callbackToSwitchState(RestartState);
         }
     }
     
+    function getWeightedRandomController(){
+        var sum = 0;
+        var randVal = Random.getRandomIntInclusive(1, 100);
+        for(var i = 0; i < mainTargetsChancesOfSpawning.length; i++){
+            sum += mainTargetsChancesOfSpawning[i][0];
+            if(randVal <= sum){
+                return mainTargetsChancesOfSpawning[i][1];
+            }
+        }
+    }
     
+    function handleGameLeveling(){ 
+        if(gameLevelTimer.getTime() >= timeUntilNextLevel){
+            currentGameLevel++;
+            
+            if(currentGameLevel === 2){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);
+                
+            }else if(currentGameLevel === 3){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);  
+                timeUntilNextMainTargetSpawns = 2500;
+                
+            }else if(currentGameLevel === 4){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 25 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 2000;
+                
+            }else if(currentGameLevel === 5){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 1500;
+                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [10, triangularTargetController], [90, basicTargetsController]];
+                
+            }else if(currentGameLevel === 6){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(25 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 1000;
+                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [20, triangularTargetController], [80, basicTargetsController]];
+                
+            }else if(currentGameLevel === 7){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(25 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 700;
+                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [30, triangularTargetController], [70, basicTargetsController]];
+                
+            }else if(currentGameLevel === 8){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
+                mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [25, fourPointTargetController], [25, triangularTargetController], [50, basicTargetsController]];
+                
+            }else if(currentGameLevel === 9){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 300;
+                mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [30, basicTargetsController], [30, triangularTargetController], [40, fourPointTargetController]];
+                
+            }else if(currentGameLevel === 10){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(60 * NUM_MILLISECONDS_IN_SECOND, 70 * NUM_MILLISECONDS_IN_SECOND);
+                mainTargetsChancesOfSpawning = [[20, teleportationTargetsController], [20, basicTargetsController], [20, triangularTargetController], [40, fourPointTargetController]];
+                
+            }else if(currentGameLevel === 11){
+                
+                timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 200;
+                mainTargetsChancesOfSpawning = [[20, fourPointTargetController], [20, basicTargetsController], [20, triangularTargetController], [40, teleportationTargetsController]];
+                
+            }
+            
+            gameLevelTimer.reset();
+            gameLevelTimer.start();
+            
+            EventSystem.publishEvent("game_level_up", {level: currentGameLevel});
+            console.log("LEVEL: " + currentGameLevel);
+        }
+    }
     
     return {
         initialize: initialize,

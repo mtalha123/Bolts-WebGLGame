@@ -3,6 +3,7 @@ define(['Border', 'Custom Utility/Vector', 'Custom Utility/rotateCoord'], functi
     function CirclePhysicsBody(position, canvasHeight, radius, velocity){
         this._radius = radius;
         this._velocity = velocity;
+        this._speed = velocity.getMagnitude();
         this.setPosition(position);
         this._isInSimulation = false;
         
@@ -40,13 +41,14 @@ define(['Border', 'Custom Utility/Vector', 'Custom Utility/rotateCoord'], functi
 
             this._position = this._position.addTo(this._velocity);
         }else{
-            var angleIncrement = this._velocity.getMagnitude() / this._orbitRadius; // Get from Arc Length = radius * theta formula, where theta is angle in radians.
+            var angleIncrement = this._speed / this._orbitRadius; // Get from Arc Length = radius * theta formula, where theta is angle in radians.
             this._position = rotateCoord(this._position, angleIncrement, this._orbitCenter);  
         }
     }
     
-    CirclePhysicsBody.prototype.setLinearVelocity = function(velocity){
+    CirclePhysicsBody.prototype.setVelocity = function(velocity){
         this._velocity = velocity;
+        this._speed = velocity.getMagnitude();
     }
     
     CirclePhysicsBody.prototype.setToOrbit = function(orbitCenter, orbitRadius){
@@ -61,6 +63,20 @@ define(['Border', 'Custom Utility/Vector', 'Custom Utility/rotateCoord'], functi
     
     CirclePhysicsBody.prototype.getPosition = function(){
         return this._position;
+    }  
+    
+    CirclePhysicsBody.prototype.getVelocity = function(){
+        return this._velocity;
+    }
+    
+    CirclePhysicsBody.prototype.setMovementAngle = function(angleInDeg){
+        this._velocity = new Vector(Math.cos(angleInDeg * (Math.PI / 180)) * this._speed, 
+                                    Math.sin(angleInDeg * (Math.PI / 180)) * this._speed);
+    }
+    
+    CirclePhysicsBody.prototype.setSpeed = function(newSpeed){
+        this._speed = newSpeed;
+        this._velocity = this._velocity.getNormalized().multiplyWithScalar(newSpeed);
     }
     
     return CirclePhysicsBody;

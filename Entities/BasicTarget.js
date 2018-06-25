@@ -1,12 +1,14 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
-    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);
+    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
         this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
-        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
+        this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});
-        this._numSlicesToDestroy = 5;
+        this._numSlicesNeededToDestroy = 1;
+        this._currSlicesDone = 0;
         this._type = "main";
         
         EventSystem.register(this.receiveEvent, "entity_captured", this);
@@ -39,24 +41,26 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.reset.call(this);
         MainTargetsPositions.removeTargetObj(this);
         this._hitBox.resetAlgorithm();
-        this._numSlicesToDestroy = 5;
+        this._currSlicesDone = 0;
     }
     
     BasicTarget.prototype.spawn = function(callback){
         MainTargetsPositions.addTargetObj(this, this._position);
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
     }
     
     BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){       
         if(this._hitBox.processInput(mouseInputObj)){
-            if(this._numSlicesToDestroy === 1){
+            this._currSlicesDone++;
+            
+            if(this._currSlicesDone >= this._numSlicesNeededToDestroy){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "main"});
                 this.destroyAndReset(callback);
                 return true;
             }else{
-                this._numSlicesToDestroy--;
-                this._handler.setNumBolts(this._numSlicesToDestroy);
+                this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
                 this._hitBox.resetAlgorithm();
             }
         }
@@ -78,7 +82,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                     this.destroyAndReset(function(){});
                 }else if(eventInfo.eventData.capture_type === "orbit"){
                     this._physicsBody.setPosition(eventInfo.eventData.capture_position);
-                    this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
+                    this._physicsBody.setSpeed(eventInfo.eventData.rotationSpeed);
                     this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
                     this._handler.setCapturedToTrue();
                     MainTargetsPositions.removeTargetObj(this);
@@ -88,9 +92,9 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             }else if(eventInfo.eventType === "captured_entity_released_from_orbit"){
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
-                this._physicsBody.setLinearVelocity(this._velocity);
                 this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
+                this._physicsBody.setSpeed(this._speed);
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
@@ -98,7 +102,38 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 this._handler.shouldDraw(true);
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
-        }    
+        }
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 2:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.02 * this._canvasHeight);
+                        this._numSlicesNeededToDestroy = 2;  
+                        this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
+                    }.bind(this));
+                    break;
+                case 3:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this._numSlicesNeededToDestroy = 3;   
+                        this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
+                    }.bind(this));
+                    break;
+                case 7:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this._numSlicesNeededToDestroy = 4;    
+                        this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
+                    }.bind(this));
+                    break;
+                case 8:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.03 * this._canvasHeight);
+                        this._numSlicesNeededToDestroy = 5;   
+                        this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
+                    }.bind(this));
+                    break;
+            }
+        }
     }
     
     return BasicTarget;

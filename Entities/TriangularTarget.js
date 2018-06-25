@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
-    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, movementangle, speed, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, movementangle, speed);    
+    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);    
         
         this._radius = p_radius;
         this._hitBoxRegions = new CircularHitRegions(position);
@@ -13,7 +13,8 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._hitBoxRegions.addRegion(thirdRegion, p_radius / 3, new SliceAlgorithm(thirdRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
         this._type = "main";
         
-        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), [0, 0]);
+        this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
+        this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, position, {radius: [p_radius]});
         
         this._rotationAngle = 0;
@@ -21,6 +22,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         this._guardPrefs = [0, 0, 0];
         
         this._scoreWorth = 3;
+        this._rotationSpeed = 0.05;
         
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
@@ -57,9 +59,9 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     
     TriangularTarget.prototype.update = function(){
         MovingEntity.MovingEntity.prototype.update.call(this);
-        this._rotationAngle+=0.05;
+        this._rotationAngle += this._rotationSpeed;
         this._handler.setAngle(this._rotationAngle);
-        this._hitBoxRegions.rotateAllRegions(0.05);
+        this._hitBoxRegions.rotateAllRegions(this._rotationSpeed);
     }
     
     TriangularTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
@@ -105,7 +107,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                     this.destroyAndReset(function(){});
                 }else if(eventInfo.eventData.capture_type === "orbit"){
                     this._physicsBody.setPosition(eventInfo.eventData.capture_position);
-                    this._physicsBody.setLinearVelocity((this._velocity.getNormalized()).multiplyWithScalar(eventInfo.eventData.rotationSpeed))
+                    this._physicsBody.setSpeed(eventInfo.eventData.rotationSpeed);
                     this._physicsBody.setToOrbit(eventInfo.eventData.center, eventInfo.eventData.radius);
                     this._handler.setCapturedToTrue();
                 }
@@ -115,6 +117,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 // Will take it out of orbit
                 this._physicsBody.setPosition(this._position);
                 this._handler.setCapturedToFalse();
+                this._physicsBody.setSpeed(this._speed);
                 MainTargetsPositions.addTargetObj(this, this._position);
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
@@ -125,6 +128,23 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
         }    
+        
+        if(eventInfo.eventType === "game_level_up"){
+            switch(eventInfo.eventData.level){
+                case 7:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.02 * this._canvasHeight);
+                        this._rotationSpeed = 0.1;
+                    }.bind(this));
+                    break;  
+                case 8:
+                    this._changeFunctionsToApplyNextSpawn.push(function(){
+                        this.setSpeed(0.023 * this._canvasHeight);
+                        this._rotationSpeed = 0.15;
+                    }.bind(this));
+                    break;
+            }
+        }
     }
     
     return TriangularTarget;

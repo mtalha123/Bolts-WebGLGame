@@ -8,7 +8,11 @@ define(['EventSystem'], function(EventSystem){
         this._alive = false;
         this._type = undefined; // type of Entity this is. This will be overridden by specific entities.
         this._scoreWorth = 1;
+        this._canvasWidth = canvasWidth;
+        this._canvasHeight = canvasHeight;
+        this._changeFunctionsToApplyNextSpawn = [];
         EventSystem.register(this.receiveEvent, "lightning_strike", this);
+        EventSystem.register(this.receiveEvent, "game_level_up", this);
     }
     
     Entity.prototype.prepareForDrawing = function(interpolation){
@@ -36,6 +40,10 @@ define(['EventSystem'], function(EventSystem){
     Entity.prototype.spawn = function(callback){
         this._handler.doSpawnEffect(this._position);
         this._alive = true;
+        for(var i = 0; i < this._changeFunctionsToApplyNextSpawn.length; i++){
+            this._changeFunctionsToApplyNextSpawn[i]();
+        }
+        this._changeFunctionsToApplyNextSpawn = [];
         callback();
     }
     

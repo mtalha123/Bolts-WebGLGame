@@ -24,7 +24,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
             },
             numBolts:{
                 type: "float",
-                value: [5.0]
+                value: [1.0]
             },
             boltColor: {
                 type: "vec3",
