@@ -34,7 +34,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         
         if(shouldDrawText){
             context.fillStyle = "yellow";
-            context.font = '40px Arial';
+            context.font = '40px Comic Sans MS';
             context.textAlign = "center";
             context.textBaseline = "middle"; 
             context.shadowBlur = 2;
