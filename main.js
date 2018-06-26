@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'timingCallbacks'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, timingCallbacks){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -173,18 +173,18 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
         Cursor.initialize(gl, appMetaData, EffectsManager);
         
         InputEventsManager.initialize(canvas, appMetaData);
+        
+        var callbackForSwitchingStates = function(state){
+            currentState = state;
+        };
        
-        RestartState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, function(state){
-            currentState = state;
-        });
+        RestartState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, callbackForSwitchingStates);
         
-        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, Cursor, RestartState, function(state){
-            currentState = state;
-        });
+        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, Cursor, RestartState, PausedState, callbackForSwitchingStates);
         
-        StartingState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, function(state){
-            currentState = state;
-        });
+        StartingState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, callbackForSwitchingStates);
+        
+        PausedState.initialize(appMetaData, gl, PlayingState, context, EffectsManager, callbackForSwitchingStates, InputEventsManager)
         
         nextTick = Date.now();
     }

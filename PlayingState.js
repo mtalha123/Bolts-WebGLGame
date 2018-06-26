@@ -1,4 +1,4 @@
-define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector', 'BigLightningStrike', 'Custom Utility/Random'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector, BigLightningStrike, Random){
+define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector', 'BigLightningStrike', 'Custom Utility/Random', 'timingCallbacks'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector, BigLightningStrike, Random, timingCallbacks){
     var NUM_MILLISECONDS_IN_SECOND = 1000;
     
     var Cursor;
@@ -27,16 +27,15 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var canvasWidth, canvasHeight;
     var callbackToSwitchState;
     var RestartState;
+    var PausedState;
+    var canPause = true;
 
     var spawnTimer = SynchronizedTimers.getTimer();
     var timeUntilNextMainTargetSpawns = 2500;
     var mainTargetsChancesOfSpawning = [];
     
     
-    var testingHandler;
-    var TESTINGBOOL = true;
-    
-    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_RestartState, callback){
+    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_RestartState, p_PausedState, callback){
         InputEventsManager = p_InputEventsManager;
         EffectsManager = p_EffectsManager;
         
@@ -69,12 +68,12 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         canvasHeight = appMetaData.getCanvasHeight();
         callbackToSwitchState = callback;
         RestartState = p_RestartState;
+        PausedState = p_PausedState;
         
         mainTargetsChancesOfSpawning = [[0, triangularTargetController], [0, fourPointTargetController], [0, teleportationTargetsController], [100, basicTargetsController]];
         
         EventSystem.register(receiveEvent, "game_lost");
-        
-        testingHandler = EffectsManager.requestLineSegmentHandler(true, gl, 500, new Vector(100, 100), new Vector(600, 600), {color: [1.0, 0.0, 0.4]});
+        EventSystem.register(receiveEvent, "keydown");
     }
     
     function draw(gl, interpolation){
@@ -109,12 +108,6 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         
         fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
         fpsCounter.end();
-        
-        
-        if(TESTINGBOOL){
-            testingHandler.doSliceEffect(500);
-            TESTINGBOOL = false;
-        }
     }
     
     function update(inputObj){
@@ -165,6 +158,17 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             gameLevelTimer.reset();
             RestartState.activate(eventInfo.eventData.score);
             callbackToSwitchState(RestartState);
+        }else if(eventInfo.eventType === "keydown"){
+            if(eventInfo.eventData.key === "p" || eventInfo.eventData.key === "P"){
+                if(canPause){
+                    callbackToSwitchState(PausedState);
+                    canPause = false;
+                    timingCallbacks.addTimingEvent(this, 1000, function(){}, function(){
+                        canPause = true;
+                    });
+                    EventSystem.publishEventImmediately("game_pause");
+                }
+            }
         }
     }
     

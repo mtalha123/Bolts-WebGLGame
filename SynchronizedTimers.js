@@ -1,6 +1,8 @@
-define([''], function(){
+define(['EventSystem'], function(EventSystem){
     
     var allTimers = [];
+    EventSystem.register(receiveEvent, "game_pause");
+    EventSystem.register(receiveEvent, "game_resume");
     
     function getTimer(){
         var syncTimer = new SynchronizedTimer();
@@ -10,7 +12,7 @@ define([''], function(){
     
     function updateAllTimers(timeMillis){
         for(var i = 0; i < allTimers.length; i++){
-            if(allTimers[i].isStarted() === true){
+            if(allTimers[i].isStarted() === true && allTimers[i].isStopped() === false){
                 allTimers[i].setTime(allTimers[i].getTime() + timeMillis);   
             }
         }
@@ -18,11 +20,13 @@ define([''], function(){
     
     function SynchronizedTimer(){
         this._started = false;
+        this._stopped = false;
         this._currentTime = 0;
     }
     
     SynchronizedTimer.prototype.start = function(){
         this._started = true;
+        this._stopped = false;
     }
     
     SynchronizedTimer.prototype.getTime = function(){
@@ -34,16 +38,37 @@ define([''], function(){
     }
     
     SynchronizedTimer.prototype.stop = function(){
-        this._started = false;
+        this._stopped = true;
     }
     
     SynchronizedTimer.prototype.reset = function(){
         this._started = false;
+        this._stopped = false;
         this._currentTime = 0;
     }
     
     SynchronizedTimer.prototype.isStarted = function(){
         return this._started;
+    }    
+    
+    SynchronizedTimer.prototype.isStopped = function(){
+        return this._stopped;
+    }
+    
+    function receiveEvent(eventInfo){
+        if(eventInfo.eventType === "game_pause"){
+            for(var i = 0; i < allTimers.length; i++){
+                if(allTimers[i].isStarted()){
+                    allTimers[i].stop();   
+                }
+            }
+        }else if(eventInfo.eventType === "game_resume"){
+            for(var i = 0; i < allTimers.length; i++){
+                if(allTimers[i].isStarted()){
+                    allTimers[i].start();   
+                }   
+            }
+        }
     }
     
     return {

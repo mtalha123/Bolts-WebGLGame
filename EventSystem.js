@@ -9,6 +9,8 @@ define([], function(){
         mouse_up: [],
         left_mouse_held_down: [],
         right_mouse_held_down: [],
+        keydown: [],
+        keyup: [],
 
         S_initialize: [],    
         entity_spawned: [],
@@ -25,7 +27,9 @@ define([], function(){
         bonus_target_disintegrated: [],
         lightning_strike: [],
         entity_destroyed_by_lightning_strike: [],
-        score_achieved: []
+        score_achieved: [],
+        game_pause: [],
+        game_resume: []
     };
     
     

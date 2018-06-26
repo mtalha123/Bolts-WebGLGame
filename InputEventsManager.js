@@ -5,10 +5,16 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
             type: undefined,
             x: undefined,
             y: undefined
+        },
+        keyboardState: {
+            type: undefined,
+            key: undefined
         }
     };
     var leftMouseDown = false;
     var rightMouseDown = false;
+    
+    var keyHeldDown = false;
     
     var appMetaData;
     
@@ -27,33 +33,35 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
             event.preventDefault();
             return false;
         });
-//        document.addEventListener("keypress", function(event){
-//            handleKeyboardEvent("keypress", event);
-//        });
-//        document.addEventListener("keyup", function(event){
-//            handleKeyboardEvent("keyup", event);
-//        });
+        document.addEventListener("keydown", function(event){
+            handleKeyboardEvent("keydown", event);
+        });
+        document.addEventListener("keyup", function(event){
+            handleKeyboardEvent("keyup", event);
+        });
         
         appMetaData = p_appMetaData;
     }
     
     function notifyOfCurrentStateAndConsume(){
-        var returnObject = inputObj;
-
         if(inputObj.mouseState.type){
             EventSystem.publishEventImmediately(inputObj.mouseState.type, {x: inputObj.mouseState.x, y: inputObj.mouseState.y});
     
-            inputObj = {
-                mouseState: {
-                    type: undefined,
-                    x: undefined,
-                    y: undefined
-                }
+            inputObj.mouseState = {
+                type: undefined,
+                x: undefined,
+                y: undefined
             };  
-            
-            return returnObject;
-        }else{
-            return undefined;
+        }
+        
+        if(inputObj.keyboardState.type){
+            EventSystem.publishEventImmediately(inputObj.keyboardState.type, {key: inputObj.keyboardState.key});
+    
+            inputObj.keyboardState = {
+                type: undefined,
+                x: undefined,
+                y: undefined
+            };  
         }
     }
     
@@ -90,6 +98,23 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
         inputObj.mouseState.y = appMetaData.getCanvasHeight() - eventData.clientY;
         
         Cursor.changePosition(new Vector(eventData.clientX, appMetaData.getCanvasHeight() - eventData.clientY));
+    }
+    
+    function handleKeyboardEvent(eventType, eventData){
+        var key = String.fromCharCode(eventData.keyCode);
+        if(key === "P" || key === "p"){
+            if(eventType === "keydown"){
+                if(keyHeldDown === false){
+                    keyHeldDown = true;
+                    inputObj.keyboardState.type = eventType;
+                }
+            }else if(eventType === "keyup"){
+                keyHeldDown = false;
+                inputObj.keyboardState.type = eventType;
+            }
+            
+            inputObj.keyboardState.key = key;
+        }
     }
     
     function getCurrentInputObj(){
