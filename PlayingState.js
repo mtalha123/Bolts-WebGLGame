@@ -34,7 +34,6 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var timeUntilNextMainTargetSpawns = 2500;
     var mainTargetsChancesOfSpawning = [];
     
-    
     function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_RestartState, p_PausedState, callback){
         InputEventsManager = p_InputEventsManager;
         EffectsManager = p_EffectsManager;
@@ -111,6 +110,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     }
     
     function update(inputObj){
+        
         gameLevelTimer.start();
         handleGameLeveling();
         
@@ -150,6 +150,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         tentacleEnemyController.update();
         orbitEnemyController.update();
         teleportationTargetsController.update();
+        
         EventSystem.update();
     }
     
@@ -163,7 +164,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
                 if(canPause){
                     callbackToSwitchState(PausedState);
                     canPause = false;
-                    timingCallbacks.addTimingEvent(this, 1000, function(){}, function(){
+                    timingCallbacks.addTimingEvents(this, 1000, 1, function(){}, function(){
                         canPause = true;
                     });
                     EventSystem.publishEventImmediately("game_pause");

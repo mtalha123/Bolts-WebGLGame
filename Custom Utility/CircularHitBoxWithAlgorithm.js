@@ -32,5 +32,9 @@ define(['Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/C
         this._achievementAlgorithm.prepareForDrawing(interpolation);
     }
     
+    CircularHitBoxWithAlgorithm.prototype.doTutorial = function(){
+        this._achievementAlgorithm.doTutorial();
+    }
+    
     return CircularHitBoxWithAlgorithm;
 });

@@ -2,7 +2,7 @@ define(['EventSystem'], function(EventSystem){
     
     function Entity(canvasWidth, canvasHeight, gl, position){       
         this._position = this._prevPosition = position; 
-        this._hitBoxRegions = null;
+        this._hitbox = null;
         
         this._handler = null;
         this._alive = false;
@@ -44,6 +44,7 @@ define(['EventSystem'], function(EventSystem){
             this._changeFunctionsToApplyNextSpawn[i]();
         }
         this._changeFunctionsToApplyNextSpawn = [];
+        this._hitbox.doTutorial();
         callback();
     }
     
@@ -62,7 +63,7 @@ define(['EventSystem'], function(EventSystem){
     }
     
     Entity.prototype.areCoordsInHitRegions = function(checkPosition){
-        return this._hitBoxRegions.isInAnyRegion(checkPosition);
+        return this._hitbox.isInAnyRegion(checkPosition);
     }
     
     Entity.prototype.runAchievementAlgorithmAndReturnStatus = function(){

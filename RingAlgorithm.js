@@ -14,6 +14,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
         this._currRouteActive = undefined;
         this._currentActiveQuad = undefined;
         this._handler = EffectsManager.requestRingLightning(true, gl, 80, position, {radius: [radius]});
+        this._circleArrowHandler = EffectsManager.requestCircleArrowHandler(false, gl, 80, 300, {});
     }
     
     RingAlgorithm.prototype.processInput = function(mouseInputObj){
@@ -69,6 +70,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
     RingAlgorithm.prototype.setPosition = function(newPosition){
         this._position = newPosition;
         this._handler.setPosition(newPosition);
+        this._circleArrowHandler.setPosition(newPosition);
         this.reset();
     }
     
@@ -107,6 +109,10 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
     
     RingAlgorithm.prototype.prepareForDrawing = function(){
         this._handler.update();
+    }   
+    
+    RingAlgorithm.prototype.doTutorial = function(){
+        this._circleArrowHandler.doCirclingArrowEffect(800, 2);
     }
     
     return RingAlgorithm;

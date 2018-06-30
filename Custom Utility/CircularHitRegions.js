@@ -72,6 +72,12 @@ define(['Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/C
         for(var i = 0; i < this._regions.length; i++){
             this._regions[i].resetAlgorithm();
         }    
+    }   
+    
+    CircularHitRegions.prototype.doTutorial = function(){
+        for(var i = 0; i < this._regions.length; i++){
+            this._regions[i].doTutorial();
+        }    
     }
     
     
