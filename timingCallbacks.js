@@ -1,67 +1,73 @@
 define(['Custom Utility/Timer'], function(Timer){
-    var timingEventObjs = [];
+    var timingEventsObjs = [];
     
-    function addTimingEvent(obj, timeToStopUpdates, updateFunc, callback){
+    function addTimingEvents(obj, timePerEvent, numTimesToRepeatEvent, updateFunc, callback){
         var timer = new Timer();
         timer.start();
         
         var timingEventObj = {
             obj: obj,
-            timeToStopUpdates: timeToStopUpdates,
+            timePerEvent: timePerEvent,
             timer: timer,
             updateFunc: updateFunc,
-            callback: callback
+            callback: callback,
+            numTimesToRepeatEvent: numTimesToRepeatEvent
         };
         
-        timingEventObjs.push(timingEventObj);
+        timingEventsObjs.push(timingEventObj);
     }
     
-    function modifyStopTimeOfAddedTimingEvent(obj, newTime){
-        for(var i = 0; i < timingEventObjs.length; i++){
-            if(timingEventObjs.obj === obj){
-                timingEventObjs.timeToStopUpdates = newTime;
+    function modifyTimePerEvent(obj, newTime){
+        for(var i = 0; i < timingEventsObjs.length; i++){
+            if(timingEventsObjs.obj === obj){
+                timingEventsObjs.timePerEvent = newTime;
             }
         }
     }    
     
-    function resetTimeOfAddedTimeEvent(obj){
-        for(var i = 0; i < timingEventObjs.length; i++){
-            if(timingEventObjs[i].obj === obj){
-                timingEventObjs[i].timer.reset();
-                timingEventObjs[i].timer.start();
+    function resetTimeOfAddedTimeEvents(obj){
+        for(var i = 0; i < timingEventsObjs.length; i++){
+            if(timingEventsObjs[i].obj === obj){
+                timingEventsObjs[i].timer.reset();
+                timingEventsObjs[i].timer.start();
             }
         }
     }
     
-    function removeTimingEvent(obj, shouldCallCallbackOrNot){
-        for(var i = 0; i < timingEventObjs.length; i++){
-            if(timingEventObjs[i].obj === obj){
+    function removeTimingEvents(obj, shouldCallCallbackOrNot){
+        for(var i = 0; i < timingEventsObjs.length; i++){
+            if(timingEventsObjs[i].obj === obj){
                 if(shouldCallCallbackOrNot){
-                    timingEventObjs[i].callback.call(timingEventObjs[i].obj);
+                    timingEventsObjs[i].callback.call(timingEventsObjs[i].obj);
                 }
-                timingEventObjs.splice(i, 1);
+                timingEventsObjs.splice(i, 1);
                 break;
             }
         }
     }
     
     function update(){
-        for(var i = 0; i < timingEventObjs.length; i++){
-            if(timingEventObjs[i].timer.getTime() > timingEventObjs[i].timeToStopUpdates){
-                timingEventObjs[i].callback.call(timingEventObjs[i].obj);
-                timingEventObjs.splice(i, 1);
-                i--;
+        for(var i = 0; i < timingEventsObjs.length; i++){
+            if(timingEventsObjs[i].timer.getTime() > timingEventsObjs[i].timePerEvent){
+                timingEventsObjs[i].numTimesToRepeatEvent--;
+                timingEventsObjs[i].timer.reset();
+                timingEventsObjs[i].timer.start();
+                if(timingEventsObjs[i].numTimesToRepeatEvent <= 0){
+                    timingEventsObjs[i].callback.call(timingEventsObjs[i].obj);
+                    timingEventsObjs.splice(i, 1);
+                    i--;
+                }
             }else{
-                timingEventObjs[i].updateFunc.call(timingEventObjs[i].obj, timingEventObjs[i].timer.getTime());  
+                timingEventsObjs[i].updateFunc.call(timingEventsObjs[i].obj, timingEventsObjs[i].timer.getTime());  
             }
         }
     }
     
     return {
-        addTimingEvent: addTimingEvent,
+        addTimingEvents: addTimingEvents,
         update: update,
-        modifyStopTimeOfAddedTimingEvent: modifyStopTimeOfAddedTimingEvent,
-        resetTimeOfAddedTimeEvent: resetTimeOfAddedTimeEvent,
-        removeTimingEvent: removeTimingEvent
+        modifyTimePerEvent: modifyTimePerEvent,
+        resetTimeOfAddedTimeEvents: resetTimeOfAddedTimeEvents,
+        removeTimingEvents: removeTimingEvents
     };
 });

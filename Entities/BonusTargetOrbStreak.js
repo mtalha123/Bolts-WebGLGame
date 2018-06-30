@@ -3,7 +3,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         this._type = "bonus";
         this._scoreWorth = 2;
         
@@ -22,13 +22,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     BonusTargetOrbStreak.prototype.setPosition = function(newPosition){
         Entity.Entity.prototype.setPosition.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._disintegratingParticles.setPosition(newPosition);
     }
     
     BonusTargetOrbStreak.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._disintegratingParticles.setPosition(newPosition);
     }
     
@@ -38,15 +38,15 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     BonusTargetOrbStreak.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(this._hitBox.processInput(mouseInputObj)){
+        if(this._hitbox.processInput(mouseInputObj)){
             if(this._numSlicesNeededToDestroy === 1){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                 this.destroyAndReset(callback);
-                timingCallbacks.removeTimingEvent(this);
+                timingCallbacks.removeTimingEvents(this);
                 return true;
             }else{
                 this._numSlicesNeededToDestroy--;
-                this._hitBox.resetAlgorithm();
+                this._hitbox.resetAlgorithm();
                 this._handler.setLightningState(false);
             }
         }
@@ -57,7 +57,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreak.prototype.spawn = function(callback){
         Entity.Entity.prototype.spawn.call(this, callback);
         this._handler.setLightningState(true);
-        timingCallbacks.addTimingEvent(this, 3000, function(){}, function(){
+        timingCallbacks.addTimingEvents(this, 3000, 1, function(){}, function(){
             this._disintegratingParticles.doEffect();
             this.reset();
             EventSystem.publishEventImmediately("bonus_target_disintegrated", {entity: this});
@@ -68,7 +68,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     BonusTargetOrbStreak.prototype.receiveEvent = function(eventInfo){
         if(this._alive){
-            timingCallbacks.removeTimingEvent(this);
+            timingCallbacks.removeTimingEvents(this);
             Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
         }
     }

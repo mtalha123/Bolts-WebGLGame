@@ -4,7 +4,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);     
         
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [p_radius]});
         this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 50, 30, new Vector(0, 0), {FXType: [2], maxLifetime: [100], radiusOfSource: [p_radius * 1.5]});
         this._particlesDestDist = 0.1 * canvasHeight;
@@ -22,7 +22,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     
     BonusTargetOrb.prototype.setPosition = function(newPosition){
         Entity.Entity.prototype.setPosition.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
         this._setNextOrbSpawnDirection();
         this.setParticlesDirection(this._currParticlesDirection);
@@ -31,7 +31,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     
     BonusTargetOrb.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
         this.setParticlesDirection(this._currParticlesDirection);
         this._setNextOrbSpawnDirection();
@@ -48,7 +48,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._particlesHandler.shouldDraw(true);
         this._handler.turnOnLightning();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
-        timingCallbacks.addTimingEvent(this, 3000, function(){}, function(){
+        timingCallbacks.addTimingEvents(this, 3000, 1, function(){}, function(){
             this._disintegratingParticles.doEffect();
             this.reset();
             EventSystem.publishEventImmediately("bonus_target_disintegrated", {entity: this});
@@ -57,7 +57,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     
     BonusTargetOrb.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
-        this._hitBox.resetAlgorithm();
+        this._hitbox.resetAlgorithm();
         this._particlesHandler.reset();
         this._currentStage = 1;
         this._handler.shouldDraw(false);
@@ -78,12 +78,12 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     }
     
     BonusTargetOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        if(this._hitBox.processInput(mouseInputObj)){
+        if(this._hitbox.processInput(mouseInputObj)){
             if(this._currentStage < 4){
                this._handler.doDestroyEffect(this._position, function(){
                     callback();
                 });
-                this._hitBox.resetAlgorithm();
+                this._hitbox.resetAlgorithm();
                 
                 
                 this.setPosition(this._nextOrbSpawnPosition);
@@ -92,13 +92,13 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
                     this._particlesHandler.shouldDraw(false);
                 }
                 this._currentStage++;
-                timingCallbacks.resetTimeOfAddedTimeEvent(this);
+                timingCallbacks.resetTimeOfAddedTimeEvents(this);
             }else if(this._currentStage === 4){
                 this.destroyAndReset(function(){
                     callback();
                 }.bind(this));
                 
-                timingCallbacks.removeTimingEvent(this);
+                timingCallbacks.removeTimingEvents(this);
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                 return true;
             }
@@ -142,7 +142,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         
         // check to see if its been destroyed by lightning strike
         if(!this._alive){
-            timingCallbacks.removeTimingEvent(this);
+            timingCallbacks.removeTimingEvents(this);
         }
     }
     

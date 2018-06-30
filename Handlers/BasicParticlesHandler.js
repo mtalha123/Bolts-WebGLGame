@@ -80,7 +80,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     }
     
     BasicParticlesHandler.prototype.doEffect = function(optCallback){
-        timingCallbacks.addTimingEvent(this, this._uniforms.maxLifetime.value[0], function(time){
+        timingCallbacks.addTimingEvents(this, this._uniforms.maxLifetime.value[0], 1, function(time){
             this._uniforms.iGlobalTime.value[0] = time;
         }, function(){
             this._shouldDraw = false;

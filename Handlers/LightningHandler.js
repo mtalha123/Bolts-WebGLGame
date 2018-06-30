@@ -164,7 +164,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
     LightningHandler.prototype.doDisappearEffect = function(){
         this._shouldDraw = true;
         
-        timingCallbacks.addTimingEvent(this, 500, function(time){
+        timingCallbacks.addTimingEvents(this, 500, 1, function(time){
             this._uniforms.completion.value[0] = time / 500;
         }, function(){
             this._shouldDraw = false; 

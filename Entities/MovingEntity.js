@@ -24,7 +24,7 @@ define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
     }
     
     MovingEntity.prototype.areCoordsInHitRegions = function(checkX, checkY){
-        return this._hitBoxRegions.isInAnyRegion(checkX, checkY);
+        return this._hitbox.isInAnyRegion(checkX, checkY);
     }
     
     MovingEntity.prototype.runAchievementAlgorithmAndReturnStatus = function(){

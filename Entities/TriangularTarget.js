@@ -4,13 +4,13 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);    
         
         this._radius = p_radius;
-        this._hitBoxRegions = new CircularHitRegions(position);
+        this._hitbox = new CircularHitRegions(position);
         var firstRegion = new Vector(position.getX() + p_radius, position.getY());
         var secondRegion = rotateCoord(new Vector(position.getX() + p_radius, position.getY()), Math.PI - (Math.PI/3), position);
         var thirdRegion = rotateCoord(new Vector(position.getX() + p_radius, position.getY()), Math.PI + (Math.PI/3), position);
-        this._hitBoxRegions.addRegion(firstRegion, p_radius / 3, new SliceAlgorithm(firstRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
-        this._hitBoxRegions.addRegion(secondRegion, p_radius / 3, new SliceAlgorithm(secondRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
-        this._hitBoxRegions.addRegion(thirdRegion, p_radius / 3, new SliceAlgorithm(thirdRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
+        this._hitbox.addRegion(firstRegion, p_radius / 3, new SliceAlgorithm(firstRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
+        this._hitbox.addRegion(secondRegion, p_radius / 3, new SliceAlgorithm(secondRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
+        this._hitbox.addRegion(thirdRegion, p_radius / 3, new SliceAlgorithm(thirdRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
         this._type = "main";
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
@@ -37,7 +37,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     TriangularTarget.prototype.setPosition = function(newPosition){
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
         
-        this._hitBoxRegions.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
@@ -45,7 +45,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     TriangularTarget.prototype._setPositionWithInterpolation = function(newPosition){
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBoxRegions.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
@@ -61,11 +61,11 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MovingEntity.MovingEntity.prototype.update.call(this);
         this._rotationAngle += this._rotationSpeed;
         this._handler.setAngle(this._rotationAngle);
-        this._hitBoxRegions.rotateAllRegions(this._rotationSpeed);
+        this._hitbox.rotateAllRegions(this._rotationSpeed);
     }
     
     TriangularTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        var possibleHitBox = this._hitBoxRegions.processInput(mouseInputObj);
+        var possibleHitBox = this._hitbox.processInput(mouseInputObj);
         if(possibleHitBox){
             this._numGuardsActivated++;
             if(this._numGuardsActivated === 3){
@@ -80,7 +80,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
             this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
             this._handler.setGuardPrefs(this._guardPrefs);
             this._handler.increaseLgGlowFactor(1.5);
-            this._hitBoxRegions.resetAllRegions();
+            this._hitbox.resetAllRegions();
             possibleHitBox.activated = false;
         }
         
@@ -88,7 +88,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     TriangularTarget.prototype.spawn = function(callback){        
-        this._hitBoxRegions.activateAllRegions();
+        this._hitbox.activateAllRegions();
         MainTargetsPositions.addTargetObj(this, this._position);
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);    
@@ -119,13 +119,13 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 this._handler.setCapturedToFalse();
                 this._physicsBody.setSpeed(this._speed);
                 MainTargetsPositions.addTargetObj(this, this._position);
-                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this.setPosition(eventInfo.eventData.position);
-                this._hitBoxRegions.activateAllRegions();
+                this._hitbox.activateAllRegions();
                 this._handler.shouldDraw(true);
-                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
         }    
         

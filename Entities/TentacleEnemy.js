@@ -3,7 +3,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
@@ -32,19 +32,19 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     TentacleEnemy.prototype.setPosition = function(newPosition){
         Entity.Entity.prototype.setPosition.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
     }
     
     TentacleEnemy.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
     }
     
     TentacleEnemy.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
         this._numTimesSliced = 0;
-        this._hitBox.resetAlgorithm();
+        this._hitbox.resetAlgorithm();
     } 
     
     TentacleEnemy.prototype.spawn = function(callback){
@@ -80,8 +80,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     TentacleEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
-        if(this._hitBox.processInput(mouseInputObj)){
-            this._hitBox.resetAlgorithm();
+        if(this._hitbox.processInput(mouseInputObj)){
+            this._hitbox.resetAlgorithm();
             this._numTimesSliced++;
             
             var indexOfATentacleHoldingLg = this._listTentaclesHoldLg.indexOf(1);

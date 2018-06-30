@@ -3,7 +3,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, 0);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
@@ -32,13 +32,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     SpikeEnemy.prototype.setPosition = function(newPosition){
         this._position = this._prevPosition = newPosition; 
         this._handler.setPosition(newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
     }
     
     SpikeEnemy.prototype._setPositionWithInterpolation = function(newPosition){
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
     }
     
@@ -51,7 +51,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MovingEntity.MovingEntity.prototype.reset.call(this);
         this._lightningStealTimer.reset();
         this._charge = 0;
-        this._hitBox.resetAlgorithm();
+        this._hitbox.resetAlgorithm();
     } 
     
     SpikeEnemy.prototype.spawn = function(callback){
@@ -62,7 +62,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     SpikeEnemy.prototype.prepareForDrawing = function(interpolation){
         MovingEntity.MovingEntity.prototype.prepareForDrawing.call(this, interpolation);
-        this._hitBox.prepareForDrawing();
+        this._hitbox.prepareForDrawing();
         this._particlesHandler.update();
     }
     
@@ -89,7 +89,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     SpikeEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
-        if(this._hitBox.processInput(mouseInputObj)){
+        if(this._hitbox.processInput(mouseInputObj)){
             if(this._charge > 0){
                 this._charge--;
                 this._handler.setNumBolts(this._charge);

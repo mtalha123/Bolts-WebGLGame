@@ -5,17 +5,17 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         
         this._radius = p_radius;
         this._type = "main";
-        this._hitBoxRegions = new CircularHitRegions(position);
-        this._hitBoxRegions.addRegion(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2.5, 
+        this._hitbox = new CircularHitRegions(position);
+        this._hitbox.addRegion(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2.5, 
                                       new SliceAlgorithm(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2, gl, canvasHeight, EffectsManager));
         
-        this._hitBoxRegions.addRegion(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, 
+        this._hitbox.addRegion(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, 
                                       new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
-        this._hitBoxRegions.addRegion(new Vector(position.getX() - p_radius, position.getY()), p_radius / 2.5, 
+        this._hitbox.addRegion(new Vector(position.getX() - p_radius, position.getY()), p_radius / 2.5, 
                                       new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
-        this._hitBoxRegions.addRegion(new Vector(position.getX(), position.getY() - p_radius), p_radius / 2.5, 
+        this._hitbox.addRegion(new Vector(position.getX(), position.getY() - p_radius), p_radius / 2.5, 
                                       new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
@@ -42,7 +42,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     FourPointTarget.prototype.setPosition = function(newPosition){
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
         
-        this._hitBoxRegions.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
@@ -50,7 +50,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     FourPointTarget.prototype._setPositionWithInterpolation = function(newPosition){
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
-        this._hitBoxRegions.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
@@ -66,12 +66,12 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MovingEntity.MovingEntity.prototype.update.call(this);
         this._rotationAngle += this._rotationSpeed;
         this._handler.setAngle(this._rotationAngle);
-        this._hitBoxRegions.rotateAllRegions(this._rotationSpeed);
+        this._hitbox.rotateAllRegions(this._rotationSpeed);
     }
     
     
     FourPointTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
-        var possibleHitBox = this._hitBoxRegions.processInput(mouseInputObj);
+        var possibleHitBox = this._hitbox.processInput(mouseInputObj);
         
         if(possibleHitBox){
             this._numGuardsActivated++;
@@ -84,7 +84,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 return true;   
             }
 
-            this._hitBoxRegions.resetAllRegions();
+            this._hitbox.resetAllRegions();
             this._guardPrefs[possibleHitBox.getLabel() - 1] = 1.0;
             this._handler.setGuardPrefs(this._guardPrefs);
             this._handler.increaseLgGlowFactor(1.5);
@@ -97,7 +97,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     
     FourPointTarget.prototype.spawn = function(callback){
         MainTargetsPositions.addTargetObj(this, this._position);
-        this._hitBoxRegions.activateAllRegions();
+        this._hitbox.activateAllRegions();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
     }
@@ -125,13 +125,13 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                 this._physicsBody.setPosition(this._position);
                 this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
-                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this.setPosition(eventInfo.eventData.position);
-                this._hitBoxRegions.activateAllRegions();
+                this._hitbox.activateAllRegions();
                 this._handler.shouldDraw(true);
-                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
         }  
         

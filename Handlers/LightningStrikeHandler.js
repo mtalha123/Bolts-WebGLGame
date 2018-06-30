@@ -79,13 +79,13 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     
     LightningStrikeHandler.prototype.doStrikeEffect = function(optCallback){
         // in case a strike happened soon before
-        timingCallbacks.removeTimingEvent(this, true);
+        timingCallbacks.removeTimingEvents(this, true);
         
         this._shouldDraw = true;
         var particlesEffectDone = false;
         this._uniforms.iGlobalTime.value[0] = Math.random() * 1000;
         
-        timingCallbacks.addTimingEvent(this, this._duration, function(time){            
+        timingCallbacks.addTimingEvents(this, this._duration, 1, function(time){            
             if(time <= 100){
                 this._uniforms.completion.value[0] = time / 70;
             }else{

@@ -3,7 +3,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     function OrbitEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestOrbitEnemy(false, gl, 20, position, {radius: [this._radius]});
@@ -39,7 +39,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     OrbitEnemy.prototype.setPosition = function(newPosition){
         this._position = this._prevPosition = newPosition; 
         this._handler.setPosition(newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
         this._particlesEmanatingHandler.setPosition(newPosition);
         for(var i = 0; i < this._particlesDirectedHandlersActive.length; i++){
@@ -50,7 +50,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     OrbitEnemy.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesEmanatingHandler.setPosition(newPosition);
         for(var i = 0; i < this._particlesDirectedHandlersActive.length; i++){
             this._particlesDirectedHandlersActive[i].setPosition(newPosition);
@@ -69,7 +69,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     OrbitEnemy.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
         this._numCapturedEntities = 0;
-        this._hitBox.resetAlgorithm();
+        this._hitbox.resetAlgorithm();
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
         this._capturedEntities = [];
     } 
@@ -116,12 +116,12 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     
     OrbitEnemy.prototype.prepareForDrawing = function(interpolation){
         Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
-        this._hitBox.prepareForDrawing(interpolation);
+        this._hitbox.prepareForDrawing(interpolation);
         this._particlesEmanatingHandler.update();
     }
     
     OrbitEnemy.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
-        if(this._hitBox.processInput(mouseInputObj)){            
+        if(this._hitbox.processInput(mouseInputObj)){            
             if(this._numCapturedEntities > 0){
                 var entityToRelease = this._capturedEntities.shift();
                 if(this._numCapturedEntities == 4){ // Else, there is already a vacant nextCapturePosition (no target captured in that position), 

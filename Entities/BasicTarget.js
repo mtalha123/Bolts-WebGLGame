@@ -3,7 +3,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, EffectsManager){
         MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
         this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});
@@ -27,20 +27,20 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     BasicTarget.prototype.setPosition = function(newPosition){
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     BasicTarget.prototype._setPositionWithInterpolation = function(newPosition){                
         MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     BasicTarget.prototype.reset = function(){
         MovingEntity.MovingEntity.prototype.reset.call(this);
         MainTargetsPositions.removeTargetObj(this);
-        this._hitBox.resetAlgorithm();
+        this._hitbox.resetAlgorithm();
         this._currSlicesDone = 0;
     }
     
@@ -52,7 +52,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){       
-        if(this._hitBox.processInput(mouseInputObj)){
+        if(this._hitbox.processInput(mouseInputObj)){
             this._currSlicesDone++;
             
             if(this._currSlicesDone >= this._numSlicesNeededToDestroy){
@@ -61,7 +61,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 return true;
             }else{
                 this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
-                this._hitBox.resetAlgorithm();
+                this._hitbox.resetAlgorithm();
             }
         }
     }
@@ -95,12 +95,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 this._handler.setCapturedToFalse();
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this._physicsBody.setSpeed(this._speed);
-                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }else if(eventInfo.eventType === "captured_entity_released_from_destruction_capture"){
                 MainTargetsPositions.addTargetObj(this, this._position);
                 this.setPosition(eventInfo.eventData.position);
                 this._handler.shouldDraw(true);
-                timingCallbacks.addTimingEvent(this, 200, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){}, function(){this._alive = true;}); // Need this so that lightning strike doesn't directly affect immediately released targets
             }
         }
         

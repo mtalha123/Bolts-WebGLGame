@@ -77,7 +77,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         if(quadOfPoint === 1){
             this._uniforms.tentaclesGrabPositions.value[0] = point.getX();
             this._uniforms.tentaclesGrabPositions.value[1] = point.getY();
-            timingCallbacks.addTimingEvent(this, totalTimeForGrab, function(time){
+            timingCallbacks.addTimingEvents(this, totalTimeForGrab, 1, function(time){
                 this._uniforms.completionsForTentacleGrabs.value[0] = 1.0;
             }, function(){
                 this._uniforms.completionsForTentacleGrabs.value[0] = 0.0;
@@ -85,7 +85,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         }else if(quadOfPoint == 2){
             this._uniforms.tentaclesGrabPositions.value[2] = point.getX();
             this._uniforms.tentaclesGrabPositions.value[3] = point.getY();
-            timingCallbacks.addTimingEvent(this, totalTimeForGrab, function(time){
+            timingCallbacks.addTimingEvents(this, totalTimeForGrab, 1, function(time){
                 this._uniforms.completionsForTentacleGrabs.value[1] = 1.0;
             }, function(){
                 this._uniforms.completionsForTentacleGrabs.value[1] = 0.0;
@@ -93,7 +93,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         }else if(quadOfPoint == 3){
             this._uniforms.tentaclesGrabPositions.value[4] = point.getX();
             this._uniforms.tentaclesGrabPositions.value[5] = point.getY();
-            timingCallbacks.addTimingEvent(this, totalTimeForGrab, function(time){
+            timingCallbacks.addTimingEvents(this, totalTimeForGrab, 1, function(time){
                 this._uniforms.completionsForTentacleGrabs.value[2] = 1.0;
             }, function(){
                 this._uniforms.completionsForTentacleGrabs.value[2] = 0.0;
@@ -101,7 +101,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         }else if(quadOfPoint == 4){
             this._uniforms.tentaclesGrabPositions.value[6] = point.getX();
             this._uniforms.tentaclesGrabPositions.value[7] = point.getY();
-            timingCallbacks.addTimingEvent(this, totalTimeForGrab, function(time){
+            timingCallbacks.addTimingEvents(this, totalTimeForGrab, 1, function(time){
                 this._uniforms.completionsForTentacleGrabs.value[3] = 1.0;
             }, function(){
                 this._uniforms.completionsForTentacleGrabs.value[3] = 0.0;

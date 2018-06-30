@@ -3,7 +3,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
         this._radius = p_radius;
-        this._hitBox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
         this._type = "bonus";
         
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
@@ -24,13 +24,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     BonusTargetBubblyOrb.prototype.setPosition = function(newPosition){
         Entity.Entity.prototype.setPosition.call(this, newPosition);        
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
     }
     
     BonusTargetBubblyOrb.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
-        this._hitBox.setPosition(newPosition);
+        this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
     }
     
@@ -41,11 +41,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     
     BonusTargetBubblyOrb.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
-        this._hitBox.resetAlgorithm();
+        this._hitbox.resetAlgorithm();
     }
     
     BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
-        if(this._hitBox.processInput(mouseInputObj)){
+        if(this._hitbox.processInput(mouseInputObj)){
             this.destroyAndReset(callback);
             EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
             return true;

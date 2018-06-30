@@ -49,7 +49,7 @@
         this._initialTargetObj.target.spawn(callback);
         this._currActivatedTargetObjs.push(this._initialTargetObj);
         
-        timingCallbacks.addTimingEvent(this, 3000, function(){}, function(){
+        timingCallbacks.addTimingEvents(this, 3000, 1, function(){}, function(){
             for(var i = 0; i < this._currActivatedTargetObjs.length; i++){
                 this._currActivatedTargetObjs[i].target.disintegrate();
             }
@@ -88,7 +88,7 @@
             }.bind(this));
             
             if(isAchieved){
-                timingCallbacks.resetTimeOfAddedTimeEvent(this);
+                timingCallbacks.resetTimeOfAddedTimeEvents(this);
                 
                 if(currActivatedTargetObj.stage === 1 || currActivatedTargetObj.stage === 2){
                     var targetObj1, targetObj2;
@@ -119,7 +119,7 @@
                     this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
                     if(isLastTarget){
                         EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
-                        timingCallbacks.removeTimingEvent(this);
+                        timingCallbacks.removeTimingEvents(this);
                         return true;
                     }
                 }
@@ -154,7 +154,7 @@
             if(eventInfo.eventData.entity === this._currActivatedTargetObjs[i].target){
                 if(isLastTarget){
                     EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: "bonus"});
-                    timingCallbacks.removeTimingEvent(this);
+                    timingCallbacks.removeTimingEvents(this);
                 }
                 
                 if(this._currActivatedTargetObjs[i].stage === 1){

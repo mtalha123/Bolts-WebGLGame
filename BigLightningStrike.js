@@ -64,7 +64,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
                     lgBoltCoverAreaHandler.shouldDraw(true);
                 }
                 canActivate = false;
-                timingCallbacks.addTimingEvent(this, 200, function(){} , function(){
+                timingCallbacks.addTimingEvents(this, 200, 1, function(){} , function(){
                     canActivate = true;
                 });
             }
