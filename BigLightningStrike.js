@@ -19,7 +19,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
         lgBoltIconHandler = EffectsManager.requestSpriteHandler(false, gl, 100, startCoord, lgBoltIconWidthAndHeight, {color: [0.3, 0.3, 0.3]}, AssetManager.getTextureAsset("lightningBolt"));
         lgBoltCoverAreaHandler = EffectsManager.requestRectangleHandler(false, gl, 100, startCoord, new Vector(100, 100), widthOfAreaCovered, {color: [1.0, 0.0, 0.4, 0.3]});
         Cursor = p_Cursor;
-        lgStrikeHandler = EffectsManager.requestLightningStrikeHandler(true, gl, 100, startCoord, new Vector(100, 100), {lineWidth: [6], glowFactor: [40], jaggedFactor: [1], fluctuation: [80], boltColor: [1.0, 0.0, 0.4]});
+        lgStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, startCoord, new Vector(100, 100), {lineWidth: [6], glowFactor: [40], jaggedFactor: [1], fluctuation: [80], boltColor: [1.0, 0.0, 0.4]});
         lgStrikeHandler.setDuration(6000);
         EventSystem.register(receiveEvent, "right_mouse_down");
         EventSystem.register(receiveEvent, "left_mouse_down");
