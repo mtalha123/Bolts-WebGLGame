@@ -55,9 +55,5 @@ define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/
         }.bind(this));
     } 
     
-    BasicTargetsController.prototype.reset = function(){
-        EntityController.prototype.reset.call(this);
-    }
-    
     return BasicTargetsController;
 });
