@@ -42,6 +42,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         if(this._hitbox.processInput(mouseInputObj)){
             if(this._numSlicesNeededToDestroy === 1){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
+                timingCallbacks.removeTimingEvents(this);
                 this.destroyAndReset(callback);
                 return true;
             }else{
