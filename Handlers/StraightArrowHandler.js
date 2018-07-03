@@ -52,6 +52,10 @@ define(['Handlers/Handler', 'Custom Utility/getGLCoordsFromNormalizedShaderCoord
         });
     }
     
+    StraightArrowHandler.prototype.cancelSliceEffect = function(){        
+        timingCallbacks.removeTimingEvents(this, true);
+    }
+    
     StraightArrowHandler.prototype.setPosition = function(newPosition){
         this._uniforms.center.value[0] = newPosition.getX();
         this._uniforms.center.value[1] = newPosition.getY();

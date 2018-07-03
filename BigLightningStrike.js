@@ -3,7 +3,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
     var lgBoltIconHandler;
     var lgBoltCoverAreaHandler;
     var lgStrikeHandler;
-    var numChargesNeeded = 5;
+    var numChargesNeeded = 10;
     var currNumCharges = 0;
     var readyToFire = false;
     var startCoord;
@@ -26,6 +26,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
         EventSystem.register(receiveEvent, "right_mouse_held_down");
         EventSystem.register(receiveEvent, "left_mouse_held_down");
         EventSystem.register(receiveEvent, "entity_destroyed");
+        EventSystem.register(receiveEvent, "game_restart");
     }
     
     function prepareForDrawing(){ 
@@ -77,6 +78,14 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
                     lgBoltIconHandler.setColor(1.0, 0.0, 0.4);
                 }
             }
+        }else if(eventInfo.eventType === "game_restart"){
+            currNumCharges = 0;
+            readyToFire = false;
+            canActivate = true;
+            lgBoltCoverAreaHandler.shouldDraw(false);
+            lgBoltIconHandler.setColor(0.3, 0.3, 0.3);
+            lgBoltIconHandler.resetTime();
+            glowingRingHandler.setCompletion(0.0);
         }
     }
     

@@ -45,6 +45,9 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         Entity.Entity.prototype.reset.call(this);
         this._numTimesSliced = 0;
         this._hitbox.resetAlgorithm();
+        this._listTentaclesHoldLg = [0, 0, 0, 0];
+        this._listEntitiesCaptured = [undefined, undefined, undefined, undefined]; 
+        this._listTentaclesAlive = [1, 1, 1, 1];
     } 
     
     TentacleEnemy.prototype.spawn = function(callback){
@@ -104,9 +107,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             //check if last tentacle is dead. If not, destroy and reset
             if(this._listTentaclesAlive[3] === 0){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "enemy"});
-                this._listTentaclesHoldLg = [0, 0, 0, 0];
-                this._listEntitiesCaptured = [undefined, undefined, undefined, undefined]; 
-                this._listTentaclesAlive = [1, 1, 1, 1];
                 this.destroyAndReset(callback);
                 return true;
             }
@@ -118,19 +118,17 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     TentacleEnemy.prototype.receiveEvent = function(eventInfo){        
         Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
         
-        // check to see if its been destroyed by lightning strike
-        if(!this._alive){
-            // release all captured entities
-            for(var i = 0; i < this._listTentaclesHoldLg.length; i++){
-                if(this._listTentaclesHoldLg[i] === 1){
-                    this._listTentaclesHoldLg[i] = 0;
-                    EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: this._listEntitiesCaptured[i], position: this._position});
+        if(eventInfo.eventType === "lightning_strike"){
+            // check to see if its been destroyed by lightning strike
+            if(!this._alive){
+                // release all captured entities
+                for(var i = 0; i < this._listTentaclesHoldLg.length; i++){
+                    if(this._listTentaclesHoldLg[i] === 1){
+                        this._listTentaclesHoldLg[i] = 0;
+                        EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: this._listEntitiesCaptured[i], position: this._position});
+                    }
                 }
             }
-            
-            this._listTentaclesHoldLg = [0, 0, 0, 0];
-            this._listEntitiesCaptured = [undefined, undefined, undefined, undefined]; 
-            this._listTentaclesAlive = [1, 1, 1, 1];
         }
     }
     

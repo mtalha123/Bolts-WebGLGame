@@ -8,6 +8,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
         this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        
+        EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
     //inherit from Entity
@@ -52,13 +54,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         };
         
         return false;
-    }   
+    }       
     
     BonusTargetBubblyOrb.prototype.receiveEvent = function(eventInfo){        
-        if(this._alive){
-            Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        if(eventInfo.eventType === "game_lost"){
+            this._particlesHandler.reset();
         }
-    }
+    }   
     
     return BonusTargetBubblyOrb;
     

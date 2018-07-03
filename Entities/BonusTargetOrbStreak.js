@@ -10,6 +10,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         this._numSlicesNeededToDestroy = 2;
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
     //inherit from Entity
@@ -42,7 +43,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             if(this._numSlicesNeededToDestroy === 1){
                 EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                 this.destroyAndReset(callback);
-                timingCallbacks.removeTimingEvents(this);
                 return true;
             }else{
                 this._numSlicesNeededToDestroy--;
@@ -67,9 +67,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     BonusTargetOrbStreak.prototype.receiveEvent = function(eventInfo){
-        if(this._alive){
+        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        
+        if(eventInfo.eventType === "game_lost"){
             timingCallbacks.removeTimingEvents(this);
-            Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+            this._disintegratingParticles.reset();
         }
     }
     

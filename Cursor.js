@@ -8,7 +8,7 @@ define(['Custom Utility/Timer', 'EventSystem', 'Custom Utility/Vector'], functio
     
     function initialize(gl, p_appMetaData, EffectsManager){
         appMetaData = p_appMetaData;
-        handler = EffectsManager.requestCursorEffect(false, 100, {}, gl, new Vector(100, 100));
+        handler = EffectsManager.requestCursorEffect(false, 400, {}, gl, new Vector(100, 100));
         radius = 0.02 * p_appMetaData.getCanvasHeight();
     }
     

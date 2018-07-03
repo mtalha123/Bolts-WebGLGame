@@ -36,5 +36,9 @@ define(['Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/C
         this._achievementAlgorithm.doTutorial();
     }
     
+    CircularHitBoxWithAlgorithm.prototype.cancelTutorial = function(){
+        this._achievementAlgorithm.cancelTutorial();
+    }
+    
     return CircularHitBoxWithAlgorithm;
 });

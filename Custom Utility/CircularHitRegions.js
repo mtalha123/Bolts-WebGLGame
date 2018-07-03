@@ -80,6 +80,12 @@ define(['Custom Utility/rotateCoord', 'Custom Utility/Vector', 'Custom Utility/C
         }    
     }
     
+    CircularHitRegions.prototype.cancelTutorial = function(){
+        for(var i = 0; i < this._regions.length; i++){
+            this._regions[i].cancelTutorial();
+        }    
+    }
+    
     
     return CircularHitRegions;
 });

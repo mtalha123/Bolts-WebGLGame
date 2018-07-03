@@ -102,6 +102,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
             if(eventInfo.eventType === "entity_captured"){
                 MainTargetsPositions.removeTargetObj(this);
                 this._alive = false;
+                this._hitbox.cancelTutorial();
 
                 if(eventInfo.eventData.capture_type === "destroy"){
                     this.destroyAndReset(function(){});
@@ -144,6 +145,11 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
                     }.bind(this));
                     break;
             }
+        }
+        
+        if(eventInfo.eventType === "game_restart"){
+            this.setSpeed(0.01 * this._canvasHeight);
+            this._rotationSpeed = 0.05;
         }
     }
     

@@ -49,9 +49,9 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 6, EffectsManager);
         
         // Bonus target controllers
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager);
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 100, EffectsManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 100, EffectsManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 100, EffectsManager);
         
         // Enemy controllers
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager);
@@ -102,6 +102,8 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.BLEND);
        // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        // Additive blending
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
         
         doGLDrawingFromHandlers(gl, EffectsManager);
         
@@ -157,6 +159,9 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     function receiveEvent(eventInfo){
         if(eventInfo.eventType === "game_lost"){
             gameLevelTimer.reset();
+            mainTargetsChancesOfSpawning = [[0, triangularTargetController], [0, fourPointTargetController], [0, teleportationTargetsController], [100, basicTargetsController]];
+            currentGameLevel = 1;
+            timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);
             RestartState.activate(eventInfo.eventData.score);
             callbackToSwitchState(RestartState);
         }else if(eventInfo.eventType === "keydown"){

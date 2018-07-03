@@ -43,6 +43,8 @@
         }
          
         EventSystem.register(this.receiveEvent, "entity_destroyed_by_lightning_strike", this);
+        EventSystem.register(this.receiveEvent, "game_restart", this);
+        EventSystem.register(this.receiveEvent, "game_lost", this);
     }
 
     BonusTargetBubblyOrbCompound.prototype.spawn = function(callback){
@@ -147,24 +149,30 @@
         return this._scoreWorth;
     }    
     
-    BonusTargetBubblyOrbCompound.prototype.receiveEvent = function(eventInfo){        
-        for(var i = 0; i < this._currActivatedTargetObjs.length; i++){
-            var isLastTarget = (this._currActivatedTargetObjs.length === 1 && this._currActivatedTargetObjs[i].stage === 3) ? true : false;
+    BonusTargetBubblyOrbCompound.prototype.receiveEvent = function(eventInfo){  
+        if(eventInfo.eventType === "entity_destroyed_by_lightning_strike"){
+            for(var i = 0; i < this._currActivatedTargetObjs.length; i++){
+                var isLastTarget = (this._currActivatedTargetObjs.length === 1 && this._currActivatedTargetObjs[i].stage === 3) ? true : false;
 
-            if(eventInfo.eventData.entity === this._currActivatedTargetObjs[i].target){
-                if(isLastTarget){
-                    EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: "bonus"});
-                    timingCallbacks.removeTimingEvents(this);
-                }
-                
-                if(this._currActivatedTargetObjs[i].stage === 1){
-                    this._currActivatedTargetObjs.shift();
-                }else if(this._currActivatedTargetObjs[i].stage === 2){
-                    this._targetObjsSecondStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
-                }else{
-                    this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
+                if(eventInfo.eventData.entity === this._currActivatedTargetObjs[i].target){
+                    if(isLastTarget){
+                        EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: "bonus"});
+                        timingCallbacks.removeTimingEvents(this);
+                    }
+
+                    if(this._currActivatedTargetObjs[i].stage === 1){
+                        this._currActivatedTargetObjs.shift();
+                    }else if(this._currActivatedTargetObjs[i].stage === 2){
+                        this._targetObjsSecondStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
+                    }else{
+                        this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
+                    }
                 }
             }
+        }else if(eventInfo.eventType === "game_lost"){
+            timingCallbacks.removeTimingEvents(this);
+        }else if(eventInfo.eventType === "game_restart"){
+            this.reset();
         }
     }
     

@@ -56,6 +56,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._timer.reset();
         this._numSlicesNeededToDestroy = 3;
         this._handler.setNumBolts(this._numSlicesNeededToDestroy);
+        this._handler.setCapturedToFalse();
     }
     
     TeleportationTarget.prototype.spawn = function(callback){
@@ -80,11 +81,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 }
             }
         }
-    }
-    
-    TeleportationTarget.prototype.destroyAndReset = function(callback){
-        MovingEntity.MovingEntity.prototype.destroyAndReset.call(this, callback);
-        MainTargetsPositions.removeTargetObj(this);
     }
     
     TeleportationTarget.prototype.update = function(){
@@ -134,6 +130,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                 this._alive = false;
                 MainTargetsPositions.removeTargetObj(this);
                 this._handler.deactivatePortal();
+                this._hitbox.cancelTutorial();
 
                 if(eventInfo.eventData.capture_type === "destroy"){
                     this.destroyAndReset(function(){});
@@ -177,6 +174,10 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                     }.bind(this));;
                     break;
             }
+        }
+        
+        if(eventInfo.eventType === "game_restart"){
+            this.setSpeed(0.02 * this._canvasHeight);  
         }
     }
     

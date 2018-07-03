@@ -42,6 +42,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         MainTargetsPositions.removeTargetObj(this);
         this._hitbox.resetAlgorithm();
         this._currSlicesDone = 0;
+        this._handler.setCapturedToFalse();
     }
     
     BasicTarget.prototype.spawn = function(callback){
@@ -77,6 +78,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){
                 this._alive = false;
+                this._hitbox.cancelTutorial();
 
                 if(eventInfo.eventData.capture_type === "destroy"){
                     this.destroyAndReset(function(){});
@@ -133,6 +135,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
                     }.bind(this));
                     break;
             }
+        }
+        
+        if(eventInfo.eventType === "game_restart"){
+            this._numSlicesNeededToDestroy = 1;
+            this.setSpeed(0.01 * this._canvasHeight);
         }
     }
     

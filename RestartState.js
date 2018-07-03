@@ -51,16 +51,16 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         
         var cWidth = appMetaData.getCanvasWidth(), cHeight = appMetaData.getCanvasHeight(); 
         
-        restartButtonHandler = EffectsManager.requestBubblyOrbEffect(false, gl, 70, new Vector(0, 0), {radius: [radiusOfIndicators], particlesBool: [0.0]});
+        restartButtonHandler = EffectsManager.requestBubblyOrbEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], particlesBool: [0.0]});
         restartButtonBody = new SimpleMovingBody( restartButtonHandler, cWidth, cHeight, new Vector(cWidth / 2, cHeight + (cHeight / 3.3)), new Vector(cWidth / 2, (cHeight / 3.3)) );
         
-        bestScoreHandler = EffectsManager.requestTriangularTargetEffect(false, gl, 70, new Vector(0, 0), {radius: [radiusOfIndicators], lgBool: [0.0], autoRotationBool: [1.0]});
+        bestScoreHandler = EffectsManager.requestTriangularTargetEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], lgBool: [0.0], autoRotationBool: [1.0]});
         bestScoreBody = new SimpleMovingBody( bestScoreHandler, cWidth, cHeight, new Vector(cWidth / 3, cHeight + (cHeight / 1.5)), new Vector(cWidth / 3, (cHeight / 1.5)) );
         
-        scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 70, new Vector(0, 0), {radius: [radiusOfIndicators], numBolts: [0.0]});
+        scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], numBolts: [0.0]});
         scoreBody = new SimpleMovingBody( scoreHandler, cWidth, cHeight, new Vector(cWidth / 1.3, cHeight + (cHeight / 2)), new Vector(cWidth / 1.3, (cHeight / 2)) );
         
-        darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 60, gl);
+        darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 360, gl);
         callbackToSwitchState = callback;
         hitRegions = new CircularHitRegions(new Vector(cWidth / 2, cHeight / 3.3));
         hitRegions.addRegion(new Vector(cWidth / 2, cHeight / 3.3), radiusOfIndicators);
@@ -80,11 +80,14 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         bestScoreBody.update();
         scoreHandler.update();
         scoreBody.update();
-        darkerScreenHandler.update();
         Cursor.draw();
         
         gl.enable(gl.BLEND);
+        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
         doGLDrawingFromHandlers(gl, EffectsManager);    
         
         if(!isDestroying){
@@ -127,8 +130,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         restartButtonHandler.shouldDraw(true);
         bestScoreHandler.shouldDraw(true);
         scoreHandler.shouldDraw(true);
-        darkerScreenHandler.startEffect();
-        darkerScreenHandler._shouldDraw = true;
+        darkerScreenHandler.doEffect();
         isDestroying = false;
         isActivating = true;
         score = p_score;

@@ -57,21 +57,17 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         }  
     }
     
-    OrbitEnemy.prototype.destroyAndReset = function(callback){
-        Entity.Entity.prototype.destroyAndReset.call(this, callback);
-        this._particlesEmanatingHandler.reset();
-        while(this._particlesDirectedHandlersActive.length > 0){
-            this._particlesDirectedHandlersActive[0].reset();
-            this._particlesDirectedHandlersPool.push(this._particlesDirectedHandlersActive.shift());
-        }       
-    }
-    
     OrbitEnemy.prototype.reset = function(){
         Entity.Entity.prototype.reset.call(this);
         this._numCapturedEntities = 0;
         this._hitbox.resetAlgorithm();
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
         this._capturedEntities = [];
+        this._particlesEmanatingHandler.reset();
+        while(this._particlesDirectedHandlersActive.length > 0){
+            this._particlesDirectedHandlersActive[0].reset();
+            this._particlesDirectedHandlersPool.push(this._particlesDirectedHandlersActive.shift());
+        }
     } 
     
     OrbitEnemy.prototype.update = function(){
@@ -159,12 +155,14 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         
         Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
         
-        // check to see if its been destroyed by lightning strike
-        if(!this._alive){
-            // release all captured entities
-            while(copyOfCapturedEntities.length > 0){
-                var entityToRelease = copyOfCapturedEntities.shift();
-                EventSystem.publishEventImmediately("captured_entity_released_from_orbit", {entity: entityToRelease});
+        if(eventInfo.eventType === "lightning_strike"){
+            // check to see if its been destroyed by lightning strike
+            if(!this._alive){
+                // release all captured entities
+                while(copyOfCapturedEntities.length > 0){
+                    var entityToRelease = copyOfCapturedEntities.shift();
+                    EventSystem.publishEventImmediately("captured_entity_released_from_orbit", {entity: entityToRelease});
+                }
             }
         }
     }

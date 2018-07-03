@@ -63,5 +63,9 @@ define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector,
         this._straightArrowHandler.doSliceEffect(700, 2);
     }
     
+    SliceAlgorithm.prototype.cancelTutorial = function(){   
+        this._straightArrowHandler.cancelSliceEffect();
+    }
+    
     return SliceAlgorithm;
 });

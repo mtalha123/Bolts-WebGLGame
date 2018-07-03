@@ -14,6 +14,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._currentStage = 1;
         this._nextOrbSpawnPosition = new Vector(0, 0); 
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
     //inherit from Entity
@@ -140,9 +141,14 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     BonusTargetOrb.prototype.receiveEvent = function(eventInfo){
         Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
         
-        // check to see if its been destroyed by lightning strike
-        if(!this._alive){
+        if(eventInfo.eventType === "lightning_strike"){
+            // check to see if its been destroyed by lightning strike
+            if(!this._alive){
+                timingCallbacks.removeTimingEvents(this);
+            }
+        }else if(eventInfo.eventType === "game_lost"){
             timingCallbacks.removeTimingEvents(this);
+            this._disintegratingParticles.reset();
         }
     }
     

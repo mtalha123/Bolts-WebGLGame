@@ -42,16 +42,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._particlesHandler.setPosition(newPosition);
     }
     
-    SpikeEnemy.prototype.destroyAndReset = function(callback){
-        MovingEntity.MovingEntity.prototype.destroyAndReset.call(this, callback);
-        this._particlesHandler.reset();
-    }
-    
     SpikeEnemy.prototype.reset = function(){
         MovingEntity.MovingEntity.prototype.reset.call(this);
         this._lightningStealTimer.reset();
         this._charge = 0;
         this._hitbox.resetAlgorithm();
+        this._particlesHandler.reset();
     } 
     
     SpikeEnemy.prototype.spawn = function(callback){
@@ -116,10 +112,10 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
         
     SpikeEnemy.prototype.receiveEvent = function(eventInfo){
+        var chargeCopy = this._charge; // Need this because the following line of code may reset it
+        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        
         if(eventInfo.eventType === "lightning_strike"){
-            var chargeCopy = this._charge; // Need this because the following line of code may reset it
-            MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
-
             // check to see if its been destroyed by lightning strike
             if(!this._alive){
                 EventSystem.publishEventImmediately("lightning_returned", {amount: chargeCopy});

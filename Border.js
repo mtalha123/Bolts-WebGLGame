@@ -85,14 +85,6 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
             if(eventInfo.eventData.type === "main"){
                 currentCharge--;
                 healthBarHandler.setCompletion(currentCharge / totalCharge);
-                if(currentCharge === 0){
-                    lightningStrikeHandler.doStrikeEffect(function(){
-//                        EventSystem.publishEventImmediately("game_lost", {score: score});    
-                    });
-                    healthBarHandler.shouldDraw(false);
-                    scoreHandler.shouldDraw(false);
-                    return;
-                }
             }
         }else if(eventInfo.eventType === "entity_destroyed"){
             if(eventInfo.eventData.type === "main"){
@@ -120,6 +112,17 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
             score += eventInfo.eventData.amount;
             healthBarHandler.setCompletion(currentCharge / totalCharge);
         }
+        
+        processGameLosing();
+    }
+    
+    function processGameLosing(){
+        if(currentCharge === 0){
+            lightningStrikeHandler.doStrikeEffect(function(){});
+            EventSystem.publishEventImmediately("game_lost", {score: score});
+            healthBarHandler.shouldDraw(false);
+            scoreHandler.shouldDraw(false);
+        }                  
     }
     
     return {

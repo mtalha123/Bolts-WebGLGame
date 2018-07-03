@@ -13,6 +13,7 @@ define(['EventSystem'], function(EventSystem){
         this._changeFunctionsToApplyNextSpawn = [];
         EventSystem.register(this.receiveEvent, "lightning_strike", this);
         EventSystem.register(this.receiveEvent, "game_level_up", this);
+        EventSystem.register(this.receiveEvent, "game_restart", this);
     }
     
     Entity.prototype.prepareForDrawing = function(interpolation){
@@ -75,16 +76,21 @@ define(['EventSystem'], function(EventSystem){
     }
     
     Entity.prototype.receiveEvent = function(eventInfo){
-        if(this._alive && eventInfo.eventType === "lightning_strike"){
-            var startCoord = eventInfo.eventData.start;
-            var endCoord = eventInfo.eventData.end;
-            var closestPointOnLgStrike = startCoord.addTo(this._position.subtract(startCoord).projectOnto(endCoord.subtract(startCoord)));
-            var dist = this._position.distanceTo(closestPointOnLgStrike);
+        if(eventInfo.eventType === "lightning_strike"){
+            if(this._alive){
+                var startCoord = eventInfo.eventData.start;
+                var endCoord = eventInfo.eventData.end;
+                var closestPointOnLgStrike = startCoord.addTo(this._position.subtract(startCoord).projectOnto(endCoord.subtract(startCoord)));
+                var dist = this._position.distanceTo(closestPointOnLgStrike);
 
-            if(dist < eventInfo.eventData.width){
-                this.destroyAndReset(function(){});
-                EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: this._type});
+                if(dist < eventInfo.eventData.width){
+                    this.destroyAndReset(function(){});
+                    EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: this._type});
+                }
             }
+        }else if(eventInfo.eventType === "game_restart"){
+            this.reset();
+            this._changeFunctionsToApplyNextSpawn = [];
         }
     }
     
