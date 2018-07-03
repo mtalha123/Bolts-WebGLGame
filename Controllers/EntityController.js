@@ -91,18 +91,12 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
     }
     
     EntityController.prototype.reset = function(){
-        var len = this._entitiesActivated.length;
-        for(var i = 0; i < len; i++){
-            var entity = this._entitiesActivated.shift();
-            entity.reset();
-            this._entitiesPool.push(entity);
+        while(this._entitiesActivated.length > 0){
+            this._entitiesPool.push(this._entitiesActivated.shift());
         }
         
-        len = this._entitiesHolding.length;
-        for(var i = 0; i < len; i++){
-            var entity = this._entitiesHolding.shift();
-            entity.reset();
-            this._entitiesPool.push(entity);
+        while(this._entitiesCaptured.length > 0){
+            this._entitiesPool.push(this._entitiesCaptured.shift());
         }
     }
     
