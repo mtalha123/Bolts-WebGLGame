@@ -53,9 +53,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     }
     
     function draw(interpolation){    
-        scoreHandler.shouldDraw(true);
         handler.shouldDraw(true);
-        healthBarHandler.shouldDraw(true);
         
         scoreHandler.setText(score.toString());
         //FIX: SHOULD BE "scoreHandler.width / 2"
@@ -78,6 +76,18 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     }
     function getBottomY(){
         return margin + borderWidth;
+    }
+    
+    function getScorePosition(){
+        return new Vector(scoreX, scoreY + margin);
+    }
+    
+    function showHealthBar(){
+        healthBarHandler.shouldDraw(true);
+    }
+    
+    function showScore(){
+        scoreHandler.shouldDraw(true);
     }
     
     function receiveEvent(eventInfo){  
@@ -133,5 +143,8 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         getTopY: getTopY,
         getRightX: getRightX,
         getBottomY: getBottomY,
+        getScorePosition: getScorePosition,
+        showHealthBar: showHealthBar,
+        showScore: showScore
     }
 });

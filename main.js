@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.11:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.13:4000/socket.io/socket.io.js'
     },
     shim: {
         'socketio': {
@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -171,6 +171,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
         ShaderLibrary.initialize(gl);
         EffectsManager.initialize(ShaderLibrary, appMetaData, AssetManager);
         Cursor.initialize(gl, appMetaData, EffectsManager);
+        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager);
         
         InputEventsManager.initialize(canvas, appMetaData);
         
@@ -178,11 +179,11 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
             currentState = state;
         };
        
-        RestartState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, callbackForSwitchingStates);
+        RestartState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
         
-        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, Cursor, RestartState, PausedState, callbackForSwitchingStates);
+        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, Cursor, Border, RestartState, PausedState, callbackForSwitchingStates);
         
-        StartingState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, callbackForSwitchingStates);
+        StartingState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
         
         PausedState.initialize(appMetaData, gl, PlayingState, context, EffectsManager, callbackForSwitchingStates, InputEventsManager)
         

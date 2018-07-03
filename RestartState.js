@@ -44,21 +44,27 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var isActivating = true;
     var score;
     var radiusOfIndicators = 100;
+    var lightningStrikeHandler;
+    var Border;
     
-    function initialize(p_PlayingState, p_EffectsManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, callback){
+    function initialize(p_PlayingState, p_EffectsManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
         EffectsManager = p_EffectsManager;
         PlayingState = p_PlayingState;
+        Border = p_Border;
         
         var cWidth = appMetaData.getCanvasWidth(), cHeight = appMetaData.getCanvasHeight(); 
         
         restartButtonHandler = EffectsManager.requestBubblyOrbEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], particlesBool: [0.0]});
-        restartButtonBody = new SimpleMovingBody( restartButtonHandler, cWidth, cHeight, new Vector(cWidth / 2, cHeight + (cHeight / 3.3)), new Vector(cWidth / 2, (cHeight / 3.3)) );
+        restartButtonBody = new SimpleMovingBody( restartButtonHandler, cWidth, cHeight, new Vector(cWidth / 2, cHeight + (cHeight / 3.3)), new Vector(cWidth / 2, cHeight / 3.3) );
         
         bestScoreHandler = EffectsManager.requestTriangularTargetEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], lgBool: [0.0], autoRotationBool: [1.0]});
         bestScoreBody = new SimpleMovingBody( bestScoreHandler, cWidth, cHeight, new Vector(cWidth / 3, cHeight + (cHeight / 1.5)), new Vector(cWidth / 3, (cHeight / 1.5)) );
         
         scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], numBolts: [0.0]});
         scoreBody = new SimpleMovingBody( scoreHandler, cWidth, cHeight, new Vector(cWidth / 1.3, cHeight + (cHeight / 2)), new Vector(cWidth / 1.3, (cHeight / 2)) );
+        
+        lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(cWidth / 2, cHeight / 3.3), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
+        lightningStrikeHandler.setDuration(2000);
         
         darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 360, gl);
         callbackToSwitchState = callback;
@@ -115,12 +121,12 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
                     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
                     isDestroying = true;
                     darkerScreenHandler.shouldDraw(false);
-                    restartButtonHandler.doDestroyEffect(new Vector(context.canvas.width / 2, context.canvas.height / 3.3), function(){
-                        EventSystem.publishEventImmediately("game_restart", {});
-                        callbackToSwitchState(PlayingState);
-                    });                
+                    restartButtonHandler.doDestroyEffect(new Vector(context.canvas.width / 2, context.canvas.height / 3.3), function(){});
                     bestScoreHandler.doDestroyEffect(new Vector(context.canvas.width / 3, context.canvas.height / 1.5), function(){});                
                     scoreHandler.doDestroyEffect(new Vector(context.canvas.width / 1.3, context.canvas.height / 2), function(){});
+                    lightningStrikeHandler.doStrikeEffect();
+                    EventSystem.publishEventImmediately("game_restart", {});
+                    callbackToSwitchState(PlayingState);
                 }
             }
         }

@@ -1,4 +1,4 @@
-define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'Border', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector', 'BigLightningStrike', 'Custom Utility/Random', 'timingCallbacks'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, Border, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector, BigLightningStrike, Random, timingCallbacks){
+define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'EventSystem', 'NetworkManager', 'ComboSystem', 'Controllers/BonusTargetOrbsController', 'Controllers/BonusTargetOrbsStreakController', 'Controllers/BonusTargetBubblyOrbsController', 'Controllers/TriangularTargetController', 'Controllers/FourPointTargetController', 'Controllers/SpikeEnemyController', 'Controllers/TentacleEnemyController', 'Controllers/OrbitEnemyController', 'Controllers/TeleportationTargetsController', 'LoadingState', 'StartingState', 'SynchronizedTimers', 'doGLDrawingFromHandlers', 'Custom Utility/Vector', 'BigLightningStrike', 'Custom Utility/Random', 'timingCallbacks'], function(FPSCounter, BasicTargetsController, EventSystem, NetworkManager, ComboSystem, BonusTargetOrbsController, BonusTargetOrbsStreakController, BonusTargetBubblyOrbsController, TriangularTargetController, FourPointTargetController, SpikeEnemyController, TentacleEnemyController, OrbitEnemyController, TeleportationTargetsController, LoadingState, StartingState, SynchronizedTimers, doGLDrawingFromHandlers, Vector, BigLightningStrike, Random, timingCallbacks){
     var NUM_MILLISECONDS_IN_SECOND = 1000;
     
     var Cursor;
@@ -34,11 +34,11 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var timeUntilNextMainTargetSpawns = 2500;
     var mainTargetsChancesOfSpawning = [];
     
-    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_RestartState, p_PausedState, callback){
+    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_Border, p_RestartState, p_PausedState, callback){
         InputEventsManager = p_InputEventsManager;
         EffectsManager = p_EffectsManager;
-        
-        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager)
+        Border = p_Border;
+
         ComboSystem.initialize(gl, EffectsManager, Border);
         BigLightningStrike.initialize(gl, appMetaData.getCanvasHeight(), AssetManager, EffectsManager, p_Cursor);
         
@@ -49,9 +49,9 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 6, EffectsManager);
         
         // Bonus target controllers
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 100, EffectsManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 100, EffectsManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 100, EffectsManager);
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager);
         
         // Enemy controllers
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager);
