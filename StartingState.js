@@ -4,29 +4,32 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var callbackToSwitchState;
     var hitRegions;
     var EffectsManager;
-    var context;
+    var canvasWidth;
+    var canvasHeight;
     var Cursor;
     var InputEventsManager;
-    var shouldDrawText = true;
     var lightningStrikeHandler;
     var lightningStrikeSoundEffect;
     var Border; 
+    var textHandler;
     
-    function initialize(p_PlayingState, p_EffectsManager, AudioManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
+    function initialize(p_PlayingState, p_EffectsManager, AudioManager, appMetaData, gl, p_Cursor, p_InputEventsManager, p_Border, TextManager, callback){
         EffectsManager = p_EffectsManager;
         PlayingState = p_PlayingState;
-        context = p_context;
         Cursor = p_Cursor;
         InputEventsManager = p_InputEventsManager;
         Border = p_Border;
+        canvasWidth = appMetaData.getCanvasWidth();
+        canvasHeight = appMetaData.getCanvasHeight();
         
-        startButtonHandler = EffectsManager.requestBasicTargetEffect(true, gl, 10, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), {radius: [100], numBolts: [10], lgGlowFactor: [1], circleGlowFactor: [4], circleLineWidth: [4], lgLineWidth: [1], rotationBool: [1.0], spaceInCenterBool: [1.0]});
+        startButtonHandler = EffectsManager.requestBasicTargetEffect(true, gl, 10, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), {radius: [appMetaData.getCanvasHeight() * 0.15], numBolts: [10], lgGlowFactor: [1], circleGlowFactor: [4], circleLineWidth: [4], lgLineWidth: [1], rotationBool: [1.0], spaceInCenterBool: [1.0]});
         callbackToSwitchState = callback;
         hitRegions = new CircularHitRegions(new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2));
         hitRegions.addRegion(new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), 100);
         lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(2000);
         lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
+        textHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.05, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), "Start", false);
     }
     
     function draw(gl, interpolation){
@@ -40,15 +43,8 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         
         doGLDrawingFromHandlers(gl, EffectsManager);
         
-        if(shouldDrawText){
-            context.fillStyle = "yellow";
-            context.font = '40px Comic Sans MS';
-            context.textAlign = "center";
-            context.textBaseline = "middle"; 
-            context.shadowBlur = 2;
-            context.shadowColor = "white";
-            context.fillText("Start", (canvas.width / 2), canvas.height / 2);
-        }
+        textHandler.shouldDraw(true);
+        textHandler.draw();
     }
     
     function update(){
@@ -57,9 +53,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         if(inputObj.mouseState.type === "left_mouse_down" || inputObj.mouseState.type === "left_mouse_held_down"){
             if(hitRegions.isInAnyRegion(new Vector(inputObj.mouseState.x, inputObj.mouseState.y))){
                 startButtonHandler.shouldDraw(false);
-                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-                shouldDrawText = false;
-                startButtonHandler.doDestroyEffect(new Vector(context.canvas.width / 2, context.canvas.height / 2), function(){ });
+                startButtonHandler.doDestroyEffect(new Vector(canvasWidth / 2, canvasHeight / 2), function(){ });
                 lightningStrikeHandler.doStrikeEffect();
                 Border.showScore();
                 Border.showHealthBar();

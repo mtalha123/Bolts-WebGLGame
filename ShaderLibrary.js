@@ -1,7 +1,6 @@
 define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResource, AssetManager){
     var LIGHTNING = "LIGHTNING";
     var TARGET = "TARGET";
-    var TEXT = "TEXT"; 
     var CURSOR = "CURSOR";
     var COMBO = "COMBO";
     var LIGHTNING_ORB = "LIGHTNING_ORB";
@@ -82,7 +81,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         requestProgram: requestProgram,
         LIGHTNING: LIGHTNING,
         TARGET: TARGET,
-        TEXT: TEXT,
         CURSOR: CURSOR,
         COMBO: COMBO,
         LIGHTNING_ORB: LIGHTNING_ORB,

@@ -3,15 +3,14 @@ define(['EventSystem', 'Custom Utility/Vector'], function(EventSystem, Vector){
     var pausedTextHandler;
     var callbackToSwitchState;
     var InputEventsManager;
-    var context;
     var appMetaData;
     
-    function initialize(p_appMetaData, gl, p_PlayingState, p_context, EffectsManager, p_callbackToSwitchState, p_InputEventsManager){
+    function initialize(p_appMetaData, gl, p_PlayingState, EffectsManager, p_callbackToSwitchState, p_InputEventsManager, TextManager){
         PlayingState = p_PlayingState;
         callbackToSwitchState = p_callbackToSwitchState;
         InputEventsManager = p_InputEventsManager;
-        context = p_context;
         appMetaData = p_appMetaData;
+        pausedTextHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.04, new Vector(100, 100), "", false);
     }
     
     function update(){
@@ -19,7 +18,6 @@ define(['EventSystem', 'Custom Utility/Vector'], function(EventSystem, Vector){
         
         if(inputObj.keyboardState.type === "keydown"){
             if(inputObj.keyboardState.key === "p" || inputObj.keyboardState.key === "P"){
-                context.clearRect(0, 0, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight());
                 EventSystem.publishEventImmediately("game_resume");
                 callbackToSwitchState(PlayingState);
             }
@@ -27,14 +25,17 @@ define(['EventSystem', 'Custom Utility/Vector'], function(EventSystem, Vector){
     }
     
     function draw(){
-        context.fillStyle = "yellow";
-        context.font = '40px Comic Sans MS';
-        context.textAlign = "center";
-        context.textBaseline = "middle"; 
-        context.shadowBlur = 2;
-        context.shadowColor = "white";
-        context.fillText("PAUSED", (canvas.width / 2), canvas.height / 2);
-        context.fillText("PRESS P TO RESUME GAME", (canvas.width / 2), (canvas.height / 2) + (appMetaData.getCanvasHeight() * 0.07));
+        pausedTextHandler.shouldDraw(true);
+        
+        var gapBetweenLinesOfText = appMetaData.getCanvasHeight() * 0.07;
+        
+        pausedTextHandler.setText("PAUSED");
+        pausedTextHandler.setPosition(new Vector(appMetaData.getCanvasWidth() / 2, (appMetaData.getCanvasHeight() / 2) + (gapBetweenLinesOfText / 2)));
+        pausedTextHandler.draw();
+        
+        pausedTextHandler.setText("PRESS P TO RESUME GAME");
+        pausedTextHandler.setPosition(new Vector(appMetaData.getCanvasWidth() / 2, (appMetaData.getCanvasHeight() / 2) - (gapBetweenLinesOfText / 2)));
+        pausedTextHandler.draw();
     }
     
     return {

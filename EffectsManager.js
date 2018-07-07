@@ -1,10 +1,9 @@
-define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTargetHandler', 'Handlers/TextHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler', 'Handlers/LineSegmentHandler', 'Handlers/StraightArrowHandler', 'Handlers/CircleArrowHandler'], function(getTextInfo, map, LightningHandler, BasicTargetHandler, TextHandler, CursorHandler, ComboHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler, LineSegmentHandler, StraightArrowHandler, CircleArrowHandler){
+define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTargetHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler', 'Handlers/LineSegmentHandler', 'Handlers/StraightArrowHandler', 'Handlers/CircleArrowHandler'], function(map, LightningHandler, BasicTargetHandler, CursorHandler, ComboHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler, LineSegmentHandler, StraightArrowHandler, CircleArrowHandler){
     
     var allHandlers = [];
     var automaticUpdatesHandlerObjs = [];
     
     var ShaderLibrary;
-    var fontTexture;
     var spiderWebTexture;
     var simplexNoiseTextureFaster, simplexNoiseTextureSlower;
     var appMetaData;
@@ -15,8 +14,7 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         ShaderLibrary = p_ShaderLibrary;
         appMetaData = p_appMetaData;
         AssetManager = p_AssetManager;
-        
-        fontTexture = AssetManager.getTextureAsset("arial");
+
         spiderWebTexture = AssetManager.getTextureAsset("spiderWeb");
         simplexNoiseTextureFaster = AssetManager.getTextureAsset("simplexNoiseFaster");
         simplexNoiseTextureSlower = AssetManager.getTextureAsset("simplexNoiseSlower");
@@ -63,13 +61,6 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
 
-    function requestTextEffect(shouldDraw, gl, zOrder, opts, position, text){
-        var handler = new TextHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 0}, position, text);
-        
-        addHandlers(handler);
-        return handler;
-    }
-
     function requestCursorEffect(shouldDraw, zOrder, opts, gl, position){
         var handler = new CursorHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, opts, ShaderLibrary, position);
         
@@ -77,8 +68,8 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         return handler;
     }
     
-    function requestComboEffect(shouldDraw, gl, zOrder, position, opts, text){
-        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary, {fontTexture: fontTexture, width: 512, height: 512, sampler: 0}, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 1}, text);
+    function requestComboEffect(shouldDraw, gl, zOrder, position, opts){
+        var handler = new ComboHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary, {effectTexture: spiderWebTexture, width: 1024, height: 1024, sampler: 1});
         
         addHandlers(handler);
         return handler;
@@ -240,7 +231,6 @@ define(['Custom Utility/getTextInfo', 'Custom Utility/map', 'Handlers/LightningH
         getHandlers: getHandlers,
         requestLightningEffect: requestLightningEffect,
         requestBasicTargetEffect: requestBasicTargetEffect,
-        requestTextEffect: requestTextEffect,
         requestCursorEffect: requestCursorEffect,
         requestComboEffect: requestComboEffect,
         requestLightningOrbEffect: requestLightningOrbEffect,

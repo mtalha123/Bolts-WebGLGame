@@ -6,12 +6,17 @@ define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(
     var maxComboLevel = 10;
     var numTargetsAchievedSinceLastCombo = 0;
     var comboHandler;
+    var comboTextHandler;
     EventSystem.register(receiveEvent, "entity_destroyed");
     EventSystem.register(receiveEvent, "game_restart");
     EventSystem.register(receiveEvent, "entity_destroyed_by_lightning_strike");
     
-    function initialize(gl, EffectsManager, Border){
-        comboHandler = EffectsManager.requestComboEffect(false, gl, 0, new Vector(Border.getLeftX(), Border.getTopY()), {}, "1x");
+    function initialize(gl, canvasHeight, EffectsManager, Border, TextManager){
+        var radius = canvasHeight * 0.06;   
+        var center = new Vector(Border.getLeftX() + (radius * 1.5), Border.getTopY() - (radius * 1.5));
+        comboHandler = EffectsManager.requestComboEffect(false, gl, 0, center, {radius: [radius], spreadOfEdgeEffect: [canvasHeight * 0.015]});
+        comboTextHandler = TextManager.requestTextHandler("Comic Sans MS", "red", canvasHeight * 0.05, center, "", false);
+        comboTextHandler.setShadowColor("red");
     }
     
     function update(){
@@ -41,6 +46,7 @@ define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(
         }
         
         comboHandler.shouldDraw(true);
+        comboTextHandler.shouldDraw(true);
         comboTimer.reset();
         comboTimer.start();
     }
@@ -52,14 +58,16 @@ define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(
         numTargetsNeededHigherCombo = 1;
         
         comboHandler.shouldDraw(false);
+        comboTextHandler.shouldDraw(false);
     }
     
     function draw(){        
         var comboTxt = currentComboLevel.toString();
         comboTxt = comboTxt.concat("x");
-        comboHandler.setComboText(comboTxt);
+        comboTextHandler.setText(comboTxt);
         comboHandler.setCompletion(comboTimer.getTime() / timeUntilComboOver);   
         comboHandler.update();
+        comboTextHandler.draw();
     }
     
     function receiveEvent(eventInfo){

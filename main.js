@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border', 'AudioManager'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border, AudioManager){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border', 'AudioManager', 'TextManager'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border, AudioManager, TextManager){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -74,7 +74,9 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     
     var updateCounter = 0;
     
-    LoadingState.initialize(context);
+    TextManager.initialize(context, canvasWidth, canvasHeight);
+    
+    LoadingState.initialize(context, canvasWidth, canvasHeight, TextManager);
     var currentState = LoadingState;
     currentState.draw();
     
@@ -143,6 +145,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     
 
     function draw(interpolation){
+        context.clearRect(0, 0, canvasWidth, canvasHeight);
         timingCallbacks.update();
         currentState.draw(gl, interpolation);
     }
@@ -161,7 +164,6 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
                 AudioManager.initialize(AssetManager, function(){
                     console.log("All audio decoded.");
                     initialize();
-                    LoadingState.clear();
                     backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
                     backgroundMusicHandler.play();
                     backgroundMusicHandler.setVolume(0.3);
@@ -176,7 +178,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
         ShaderLibrary.initialize(gl);
         EffectsManager.initialize(ShaderLibrary, appMetaData, AssetManager);
         Cursor.initialize(gl, appMetaData, EffectsManager);
-        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager, AudioManager);
+        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager, AudioManager, TextManager);
         
         InputEventsManager.initialize(canvas, appMetaData);
         
@@ -184,13 +186,13 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
             currentState = state;
         };
        
-        RestartState.initialize(PlayingState, EffectsManager, AudioManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
+        RestartState.initialize(PlayingState, EffectsManager, AudioManager, appMetaData, gl, Cursor, InputEventsManager, Border, TextManager, callbackForSwitchingStates);
         
-        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, AudioManager, Cursor, Border, RestartState, PausedState, callbackForSwitchingStates);
+        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, AudioManager, Cursor, Border, RestartState, PausedState, TextManager, callbackForSwitchingStates);
         
-        StartingState.initialize(PlayingState, EffectsManager, AudioManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
+        StartingState.initialize(PlayingState, EffectsManager, AudioManager, appMetaData, gl, Cursor, InputEventsManager, Border, TextManager, callbackForSwitchingStates);
         
-        PausedState.initialize(appMetaData, gl, PlayingState, context, EffectsManager, callbackForSwitchingStates, InputEventsManager)
+        PausedState.initialize(appMetaData, gl, PlayingState, EffectsManager, callbackForSwitchingStates, InputEventsManager, TextManager)
         
         nextTick = Date.now();
     }

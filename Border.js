@@ -16,7 +16,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     var lightningStrikeHandler;
     var lightningStrikeSoundEffect;
     
-    function initialize(gl, p_appMetaData, p_totalCharge, AssetManager, EffectsManager, AudioManager){     
+    function initialize(gl, p_appMetaData, p_totalCharge, AssetManager, EffectsManager, AudioManager, TextManager){     
         appMetaData = p_appMetaData;
         
         margin = 0.05 * appMetaData.getCanvasHeight();
@@ -24,7 +24,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         borderWidth = 0.05 * appMetaData.getCanvasHeight();
         gapForScore = 0.15 * appMetaData.getCanvasWidth();
         scoreX = margin + (borderLength/2);
-        scoreY = appMetaData.getCanvasHeight() - (margin + 0.08 * appMetaData.getCanvasHeight());
+        scoreY = appMetaData.getCanvasHeight() - margin;
         totalCharge = currentCharge = p_totalCharge;
         
         
@@ -39,9 +39,9 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         
         handler = EffectsManager.requestLightningEffect(false, gl, 3, {}, borderPath);
         handler.setToBorderPath(gl, borderPath[0], borderPath[10]);
-        scoreHandler = EffectsManager.requestTextEffect(false, gl, 4, {}, new Vector(100, 100), "0");
+        scoreHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.05, new Vector(scoreX, scoreY), "0", false);
         healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, new Vector(borderPath[0], borderPath[1] - 50), new Vector(borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50), {});
-        lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(scoreX, scoreY + margin), new Vector(scoreX, 0), {lineWidth: [10], glowFactor: [20]});
+        lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(scoreX, scoreY), new Vector(scoreX, 0), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(4000);
         lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
         
@@ -56,13 +56,10 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     }
     
     function draw(interpolation){    
-        handler.shouldDraw(true);
-        
+        handler.shouldDraw(true);        
         scoreHandler.setText(score.toString());
-        //FIX: SHOULD BE "scoreHandler.width / 2"
-        scoreHandler.setPosition(new Vector(scoreX - (scoreHandler.getWidth() / 3.5), scoreY));
+        scoreHandler.draw();
         handler.update();
-        
     }
     
     function update(){        
@@ -82,7 +79,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     }
     
     function getScorePosition(){
-        return new Vector(scoreX, scoreY + margin);
+        return new Vector(scoreX, scoreY);
     }
     
     function showHealthBar(){

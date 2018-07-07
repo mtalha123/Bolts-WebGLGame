@@ -3,24 +3,10 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
     var numLoadedAssets = 0;
     var textures = {};
     var shaders = {};
-    var otherTextAssets = {};
     var sounds = {};
     
     function loadAllAssets(gl, callbackForEachLoaded, callbackWhenAllLoaded){        
-        var promises = [
-            new Promise(function(resolve, reject){
-                var arialPng = new Image();
-                arialPng.src = "Assets/arial.png";
-                
-                arialPng.onload = function(){
-                    numLoadedAssets++;
-                    var arialTexture = getGLTextureForImage(gl, arialPng);
-                    textures.arial = arialTexture;
-                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                    resolve("Arial Texture Loaded");
-                }
-            }),
-            
+        var promises = [            
             new Promise(function(resolve, reject){
                 var spiderWebPng = new Image();
                 spiderWebPng.src = "Assets/spiderweb.png";
@@ -172,15 +158,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.13:4000/Assets/arial.fnt", function(error, text){
-                    numLoadedAssets++;
-                    otherTextAssets.arial = text;
-                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                    resolve("Arial Font Loaded");
-                });
-            }),
-            
-            new Promise(function(resolve, reject){
                getTextResource("http://192.168.0.13:4000/Shaders/commonFunctions.glsl", function(error, text){
                    numLoadedAssets++;
                     shaders.commonFunctions = text;
@@ -204,15 +181,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                     shaders.target = text;
                     callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                     resolve("Target Shader Loaded");
-                });
-            }),
-            
-            new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.13:4000/Shaders/textShaders.glsl", function(error, text){
-                    numLoadedAssets++;
-                    shaders.text = text;
-                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                    resolve("Text Shader Loaded");
                 });
             }),
             
@@ -449,13 +417,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
         return shaders[resourceString];
     }
     
-    function getTextAsset(resourceString, optReturnAll){
-        if(optReturnAll){
-            return otherTextAssets;
-        }
-        return otherTextAssets[resourceString];
-    } 
-    
     function getAudioAsset(resourceString, optReturnAll){
         if(optReturnAll){
             return sounds;
@@ -471,7 +432,6 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
         loadAllAssets: loadAllAssets,
         getTextureAsset: getTextureAsset,
         getShaderAsset: getShaderAsset,
-        getTextAsset: getTextAsset,
         getAudioAsset: getAudioAsset,
         getNumTotalAssets: getNumTotalAssets,
     };

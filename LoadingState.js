@@ -1,9 +1,13 @@
-define([''], function(){
+define(['Custom Utility/Vector'], function(Vector){
     var context;
     var completion = 0.05;
+    var textHandler;
+    var radius;
     
-    function initialize(p_context){
+    function initialize(p_context, canvasWidth, canvasHeight, TextManager){
         context = p_context;
+        textHandler = TextManager.requestTextHandler("Comic Sans MS", "white", canvasHeight * 0.05, new Vector(canvasWidth / 2, canvasHeight / 2), "LOADING", false);
+        radius = canvasHeight * 0.15;
     }
     
     function draw(){
@@ -17,22 +21,18 @@ define([''], function(){
         context.shadowColor = "rgb(90, 150, 255)";
         context.shadowBlur = 20;
         context.beginPath();
-        context.arc(canvas.width / 2, canvas.height / 2, 120, 0, Math.PI * 2);
+        context.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
         context.stroke();
         
         context.strokeStyle = "yellow";
         context.shadowColor = "rgb(255, 255, 100)";
         context.shadowBlur = 20;
         context.beginPath();
-        context.arc(canvas.width / 2, canvas.height / 2, 120, -(Math.PI/2), endAngle);
+        context.arc(canvas.width / 2, canvas.height / 2, radius, -(Math.PI/2), endAngle);
         context.stroke();
 
-        context.fillStyle = "white";
-        context.font = '40px Comic Sans MS';
-        context.textAlign = "center";
-        context.textBaseline = "middle"; 
-        context.shadowBlur = 0;
-        context.fillText("LOADING", (canvas.width / 2), canvas.height / 2);
+        textHandler.shouldDraw(true);
+        textHandler.draw();
     }
     
     function update(){
@@ -43,15 +43,10 @@ define([''], function(){
         completion = p_completion;
     }
     
-    function clear(){
-        context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    
     return {
         setCompletion: setCompletion,
         initialize: initialize,
         draw: draw,
         update: update,
-        clear: clear
     }
 });

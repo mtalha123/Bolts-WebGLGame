@@ -1,9 +1,6 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage', 'Custom Utility/getTextInfo'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage, getTextInfo){
+define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForImage'], function(Handler, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForImage){
     
-    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary, fontTextureData, effectTextureData, comboText){        
-        var comboTextInfo = getTextInfo(comboText);
-        var firstCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[0]], fontTextureData.width, fontTextureData.height);
-        var secondCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[1]], fontTextureData.width, fontTextureData.height);
+    function ComboHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary, effectTextureData){        
         this._uniforms = {
             iResolution: {
                 type: "vec2",
@@ -21,63 +18,24 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
                 type: "vec2",
                 value: [300, 500]
             },
-            radiusFromText: {
+            radius: {
                 type: "float",
                 value: [50]
             },
-            radiusOfEdgeEffect: {
-                type: "float",
-                value: [40]
-            },
             spreadOfEdgeEffect: {
                 type: "float",
-                value: [20]
-            },
-            fontTexture: {
-                type: "sampler2D",
-                value: fontTextureData.sampler,
-                texture: fontTextureData.fontTexture
+                value: [10]
             },
             effectTexture: {
                 type: "sampler2D",
                 value: effectTextureData.sampler,
                 texture: effectTextureData.effectTexture
             },
-            firstTextCoords: {
-                type: "vec4",
-                value: [firstCharTextureCoords]
-            },
-            firstCharCoords:{
-                type: "vec4",
-                value: [280, 480, 300, 520]
-            },
-            secondTextCoords: {
-                type: "vec4",
-                value: [secondCharTextureCoords]
-            },
-            secondCharCoords:{
-                type: "vec4",
-                value: [310, 480, 330, 500]
-            },
-            thirdTextCoords: {
-                type: "vec4",
-                value: [-1, -1, -1, -1]
-            },
-            thirdCharCoords: {
-                type: "vec4",
-                value: [-1, -1, -1, -1]
-            },
         };
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.COMBO);
 
         Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
-        
-        this._fontTextureWidth = fontTextureData.width;
-        this._fontTextureHeight = fontTextureData.height;
-        this._charWidth = 0.025 * canvasHeight;
-        this._gapBetweenChars = 0.004 * canvasHeight;
-        this.setComboText(comboText);
         this.setPosition(position);
     }
     
@@ -85,71 +43,21 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
     ComboHandler.prototype = Object.create(Handler.prototype);
     ComboHandler.prototype.constructor = ComboHandler; 
     
-    ComboHandler.prototype.setPosition = function(newPosition){
-        var distanceToEdgeOfEffect = (this._uniforms.radiusFromText.value[0] + this._uniforms.radiusOfEdgeEffect.value[0] + this._uniforms.spreadOfEdgeEffect.value[0]);
-        this._uniforms.center.value[0] = newPosition.getX() + distanceToEdgeOfEffect;
-        this._uniforms.center.value[1] = newPosition.getY() - distanceToEdgeOfEffect;
-
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(newPosition.getX(), newPosition.getY() - (distanceToEdgeOfEffect * 2), distanceToEdgeOfEffect * 2, distanceToEdgeOfEffect * 2, this._canvasWidth, this._canvasHeight) );
-        
-        //make sure text appears in right spot
-        this._setPositionOfChars();
+    ComboHandler.prototype.setPosition = function(newPosition){        
+        this._uniforms.center.value = [newPosition.getX(), newPosition.getY()];
+        this._generateVerticesFromCurrentState();
     }
     
     ComboHandler.prototype.setCompletion = function(completionVal){
         this._uniforms.completion.value = [completionVal];
     }
     
-    ComboHandler.prototype.setComboText = function(comboText){
-        var comboTextInfo = getTextInfo(comboText);
-        var firstCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[0]], this._fontTextureWidth, this._fontTextureHeight);
-        var secondCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[1]], this._fontTextureWidth, this._fontTextureHeight);
-        if(comboText[2] != undefined){
-            var thirdCharTextureCoords = this._getCharCoordsFromTextInfo(comboTextInfo[comboText[2]], this._fontTextureWidth, this._fontTextureHeight);
-        }else{
-            var thirdCharTextureCoords = [-1, -1, -1, -1];
-        }       
-        
-        this._uniforms.firstTextCoords.value = firstCharTextureCoords;
-        this._uniforms.secondTextCoords.value = secondCharTextureCoords;
-        this._uniforms.thirdTextCoords.value = thirdCharTextureCoords;
-        
-        this._setPositionOfChars();
-    }
-    
-    ComboHandler.prototype._setPositionOfChars = function(){
-        var radiusFromText = this._uniforms.radiusFromText.value[0];
-        var centerX = this._uniforms.center.value[0], centerY = this._uniforms.center.value[1];
+    ComboHandler.prototype._generateVerticesFromCurrentState = function(){
+        var radius_t = (this._uniforms.radius.value[0] + this._uniforms.spreadOfEdgeEffect.value[0]) * 1.3;
+        var centerX = this._uniforms.center.value[0];
+        var centerY = this._uniforms.center.value[1];
 
-        if(this._uniforms.thirdTextCoords.value[0] != (-1)){
-            var firstCharStart = [centerX - (radiusFromText / 1.5), centerY - (radiusFromText / 2)]; 
-            var firstCharEnd = [firstCharStart[0] + this._charWidth, centerY + (radiusFromText / 2)];
-            var secondCharStart = [firstCharEnd[0] + this._gapBetweenChars, centerY - (radiusFromText / 2)]; 
-            var secondCharEnd = [secondCharStart[0] + this._charWidth, centerY + (radiusFromText / 2)]; 
-            var thirdCharStart = [secondCharEnd[0] + this._gapBetweenChars, centerY - (radiusFromText / 2)];
-            var thirdCharEnd = [thirdCharStart[0] + this._charWidth, centerY + (radiusFromText / 3)];
-
-            this._uniforms.firstCharCoords.value = [firstCharStart[0], firstCharStart[1], firstCharEnd[0], firstCharEnd[1]];
-            this._uniforms.secondCharCoords.value = [secondCharStart[0], secondCharStart[1], secondCharEnd[0], secondCharEnd[1]];
-            this._uniforms.thirdCharCoords.value = [thirdCharStart[0], thirdCharStart[1], thirdCharEnd[0], thirdCharEnd[1]];
-        }else{
-            var firstCharStart = [centerX - (radiusFromText / 2), centerY - (radiusFromText / 2)]; 
-            var firstCharEnd = [firstCharStart[0] + this._charWidth, centerY + (radiusFromText / 2)];
-            var secondCharStart = [firstCharEnd[0] + this._gapBetweenChars, centerY - (radiusFromText / 2)]; 
-            var secondCharEnd = [secondCharStart[0] + this._charWidth, centerY + (radiusFromText / 2)]; 
-
-            this._uniforms.firstCharCoords.value = [firstCharStart[0], firstCharStart[1], firstCharEnd[0], firstCharEnd[1]];
-            this._uniforms.secondCharCoords.value = [secondCharStart[0], secondCharStart[1], secondCharEnd[0], secondCharEnd[1]];
-        }
-    }
-    
-    ComboHandler.prototype._getCharCoordsFromTextInfo = function(textInfoForSingleChar, fontTextureWidth, fontTextureHeight){
-        var charXNormalized = textInfoForSingleChar.x / fontTextureWidth;
-        var charYNormalized = (fontTextureHeight - textInfoForSingleChar.y) / fontTextureHeight;
-        var charWidthNormalized = textInfoForSingleChar.width / fontTextureWidth;
-        var charHeightNormalized = textInfoForSingleChar.height / fontTextureHeight;
-
-        return [charXNormalized, charYNormalized - charHeightNormalized, charXNormalized + charWidthNormalized, charYNormalized];
+        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight));
     }
 
     return ComboHandler;

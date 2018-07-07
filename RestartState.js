@@ -37,7 +37,8 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var callbackToSwitchState;
     var hitRegions;
     var EffectsManager;
-    var context;
+    var canvasWidth;
+    var canvasHeight;
     var Cursor;
     var InputEventsManager;
     var isDestroying = false;
@@ -47,33 +48,36 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var lightningStrikeHandler;
     var lightningStrikeSoundEffect;
     var Border;
+    var textHandler;
     
-    function initialize(p_PlayingState, p_EffectsManager, AudioManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
+    function initialize(p_PlayingState, p_EffectsManager, AudioManager, appMetaData, gl, p_Cursor, p_InputEventsManager, p_Border, TextManager, callback){
         EffectsManager = p_EffectsManager;
         PlayingState = p_PlayingState;
         Border = p_Border;
         
-        var cWidth = appMetaData.getCanvasWidth(), cHeight = appMetaData.getCanvasHeight(); 
+        canvasWidth = appMetaData.getCanvasWidth()
+        canvasHeight = appMetaData.getCanvasHeight(); 
         
         restartButtonHandler = EffectsManager.requestBubblyOrbEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], particlesBool: [0.0]});
-        restartButtonBody = new SimpleMovingBody( restartButtonHandler, cWidth, cHeight, new Vector(cWidth / 2, cHeight + (cHeight / 3.3)), new Vector(cWidth / 2, cHeight / 3.3) );
+        restartButtonBody = new SimpleMovingBody( restartButtonHandler, canvasWidth, canvasHeight, new Vector(canvasWidth / 2, canvasHeight + (canvasHeight / 3.3)), new Vector(canvasWidth / 2, canvasHeight / 3.3) );
         
         bestScoreHandler = EffectsManager.requestTriangularTargetEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], lgBool: [0.0], autoRotationBool: [1.0]});
-        bestScoreBody = new SimpleMovingBody( bestScoreHandler, cWidth, cHeight, new Vector(cWidth / 3, cHeight + (cHeight / 1.5)), new Vector(cWidth / 3, (cHeight / 1.5)) );
+        bestScoreBody = new SimpleMovingBody( bestScoreHandler, canvasWidth, canvasHeight, new Vector(canvasWidth / 3, canvasHeight + (canvasHeight / 1.5)), new Vector(canvasWidth / 3, (canvasHeight / 1.5)) );
         
         scoreHandler = EffectsManager.requestBasicTargetEffect(false, gl, 370, new Vector(0, 0), {radius: [radiusOfIndicators], numBolts: [0.0]});
-        scoreBody = new SimpleMovingBody( scoreHandler, cWidth, cHeight, new Vector(cWidth / 1.3, cHeight + (cHeight / 2)), new Vector(cWidth / 1.3, (cHeight / 2)) );
+        scoreBody = new SimpleMovingBody( scoreHandler, canvasWidth, canvasHeight, new Vector(canvasWidth / 1.3, canvasHeight + (canvasHeight / 2)), new Vector(canvasWidth / 1.3, (canvasHeight / 2)) );
         
-        lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(cWidth / 2, cHeight / 3.3), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
+        lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(canvasWidth / 2, canvasHeight / 3.3), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(2000);
         lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
         
         darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 360, gl);
         callbackToSwitchState = callback;
-        hitRegions = new CircularHitRegions(new Vector(cWidth / 2, cHeight / 3.3));
-        hitRegions.addRegion(new Vector(cWidth / 2, cHeight / 3.3), radiusOfIndicators);
+        hitRegions = new CircularHitRegions(new Vector(canvasWidth / 2, canvasHeight / 3.3));
+        hitRegions.addRegion(new Vector(canvasWidth / 2, canvasHeight / 3.3), radiusOfIndicators);
         
-        context = p_context;
+        textHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.04, new Vector(100, 100), "", false);
+        
         Cursor = p_Cursor;
         InputEventsManager = p_InputEventsManager;
     }
@@ -99,18 +103,27 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         doGLDrawingFromHandlers(gl, EffectsManager);    
         
         if(!isDestroying){
-            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-            context.fillStyle = "yellow";
-            context.font = '40px Arial';
-            context.textAlign = "center";
-            context.textBaseline = "middle"; 
-            context.shadowBlur = 2;
-            context.shadowColor = "white";
-            context.fillText("Restart", restartButtonBody.getPosition().getX(), canvas.height - (restartButtonBody.getPosition().getY()));
-            context.fillText("Best:", bestScoreBody.getPosition().getX(), (canvas.height - (bestScoreBody.getPosition().getY())) - (radiusOfIndicators / 3) );
-            context.fillText("--", bestScoreBody.getPosition().getX(), (canvas.height - (bestScoreBody.getPosition().getY())) + (radiusOfIndicators / 3) );
-            context.fillText("Score:", scoreBody.getPosition().getX(), (canvas.height - (scoreBody.getPosition().getY())) - (radiusOfIndicators / 3) );
-            context.fillText(score.toString(), scoreBody.getPosition().getX(), (canvas.height - (scoreBody.getPosition().getY())) + (radiusOfIndicators / 3) );
+            textHandler.shouldDraw(true);
+            
+            textHandler.setText("Restart");
+            textHandler.setPosition(restartButtonBody.getPosition());
+            textHandler.draw();
+            
+            textHandler.setText("Best:");
+            textHandler.setPosition(bestScoreBody.getPosition().addTo(new Vector(0, radiusOfIndicators / 3)));
+            textHandler.draw();
+            
+            textHandler.setText("--");
+            textHandler.setPosition(bestScoreBody.getPosition().subtract(new Vector(0, radiusOfIndicators / 3)));
+            textHandler.draw();
+            
+            textHandler.setText("Score:");
+            textHandler.setPosition(scoreBody.getPosition().addTo(new Vector(0, radiusOfIndicators / 3)));
+            textHandler.draw();
+            
+            textHandler.setText(score.toString());
+            textHandler.setPosition(scoreBody.getPosition().subtract(new Vector(0, radiusOfIndicators / 3)));
+            textHandler.draw();
         }
     }
     
@@ -120,12 +133,11 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
 
             if(inputObj.mouseState.type === "left_mouse_down" || inputObj.mouseState.type === "left_mouse_held_down"){
                 if(hitRegions.isInAnyRegion(new Vector(inputObj.mouseState.x, inputObj.mouseState.y))){
-                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
                     isDestroying = true;
                     darkerScreenHandler.shouldDraw(false);
-                    restartButtonHandler.doDestroyEffect(new Vector(context.canvas.width / 2, context.canvas.height / 3.3), function(){});
-                    bestScoreHandler.doDestroyEffect(new Vector(context.canvas.width / 3, context.canvas.height / 1.5), function(){});                
-                    scoreHandler.doDestroyEffect(new Vector(context.canvas.width / 1.3, context.canvas.height / 2), function(){});
+                    restartButtonHandler.doDestroyEffect(new Vector(canvasWidth / 2, canvasHeight / 3.3), function(){});
+                    bestScoreHandler.doDestroyEffect(new Vector(canvasWidth / 3, canvasHeight / 1.5), function(){});                
+                    scoreHandler.doDestroyEffect(new Vector(canvasWidth / 1.3, canvasHeight / 2), function(){});
                     lightningStrikeHandler.doStrikeEffect();
                     lightningStrikeSoundEffect.play();
                     EventSystem.publishEventImmediately("game_restart", {});
@@ -144,9 +156,9 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         isActivating = true;
         score = p_score;
         
-        restartButtonBody.setPosition(new Vector(context.canvas.width / 2, context.canvas.height + (context.canvas.height / 3.3)));
-        bestScoreBody.setPosition(new Vector(context.canvas.width / 3, context.canvas.height + (context.canvas.height / 1.5)));
-        scoreBody.setPosition(new Vector(context.canvas.width / 1.3, context.canvas.height + (context.canvas.height / 2)));
+        restartButtonBody.setPosition(new Vector(canvasWidth / 2, canvasHeight + (canvasHeight / 3.3)));
+        bestScoreBody.setPosition(new Vector(canvasWidth / 3, canvasHeight + (canvasHeight / 1.5)));
+        scoreBody.setPosition(new Vector(canvasWidth / 1.3, canvasHeight + (canvasHeight / 2)));
     }
     
     return {

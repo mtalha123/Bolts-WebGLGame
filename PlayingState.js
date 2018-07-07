@@ -22,7 +22,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var currentGameLevel = 1;
     var timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);
     var fpsCounter = Object.create(FPSCounter);
-    var fpsHandler;
+    var fpsTextHandler;
     
     var canvasWidth, canvasHeight;
     var callbackToSwitchState;
@@ -34,12 +34,12 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var timeUntilNextMainTargetSpawns = 2500;
     var mainTargetsChancesOfSpawning = [];
     
-    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, AudioManager, p_Cursor, p_Border, p_RestartState, p_PausedState, callback){
+    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, AudioManager, p_Cursor, p_Border, p_RestartState, p_PausedState, TextManager, callback){
         InputEventsManager = p_InputEventsManager;
         EffectsManager = p_EffectsManager;
         Border = p_Border;
 
-        ComboSystem.initialize(gl, EffectsManager, Border);
+        ComboSystem.initialize(gl, appMetaData.getCanvasHeight(), EffectsManager, Border, TextManager);
         BigLightningStrike.initialize(gl, appMetaData.getCanvasHeight(), AssetManager, EffectsManager, AudioManager, p_Cursor);
         
         // Main target controllers
@@ -58,8 +58,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
         orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
         
-        
-        fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88), fpsCounter.getFPS().toString());
+        fpsTextHandler = TextManager.requestTextHandler("Comic Sans MS", "blue", appMetaData.getCanvasHeight() * 0.05, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.95), fpsCounter.getFPS().toString(), false);
         
         Cursor = p_Cursor;
         
@@ -76,7 +75,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     }
     
     function draw(gl, interpolation){
-        fpsHandler.shouldDraw(true);
+        fpsTextHandler.shouldDraw(true);
         fpsCounter.start();
         
         Border.draw(interpolation);
@@ -107,7 +106,8 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         
         doGLDrawingFromHandlers(gl, EffectsManager);
         
-        fpsHandler.setText(fpsCounter.getFPS().toString(), canvasWidth, canvasHeight);
+        fpsTextHandler.setText(fpsCounter.getFPS().toString());
+        fpsTextHandler.draw();
         fpsCounter.end();
     }
     
