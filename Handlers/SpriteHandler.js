@@ -25,6 +25,10 @@ define(['Handlers/Handler', 'Custom Utility/getGLCoordsFromNormalizedShaderCoord
             color: {
                 type: "vec3",
                 value: [1.0, 0.0, 0.0]
+            }, 
+            useCustomColor: {
+                type: "float",
+                value: [0.0]
             },
             sprite: {
                 type: "sampler2D",

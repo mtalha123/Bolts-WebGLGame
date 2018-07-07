@@ -15,6 +15,7 @@ uniform vec2 center;
 uniform float widthAndHeight;
 uniform vec3 color;
 uniform vec2 bottomLeftCornerPos;
+uniform float useCustomColor;
 uniform sampler2D sprite;
 
 void main()
@@ -22,6 +23,8 @@ void main()
 	vec2 uv = (gl_FragCoord.xy - bottomLeftCornerPos) / widthAndHeight;
     uv = rotateCoord(uv, iGlobalTime / 50.0, ((center - bottomLeftCornerPos) / widthAndHeight));
     vec4 texColor = texture2D(sprite, uv);    
-    texColor = vec4(color, texColor.a);
+    if(useCustomColor == 1.0){
+        texColor = vec4(color, texColor.a);
+    }
     gl_FragColor = texColor;
 }
