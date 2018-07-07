@@ -49,6 +49,7 @@ define(['Custom Utility/Timer'], function(Timer){
     function update(){
         for(var i = 0; i < timingEventsObjs.length; i++){
             if(timingEventsObjs[i].timer.getTime() > timingEventsObjs[i].timePerEvent){
+                timingEventsObjs[i].updateFunc.call(timingEventsObjs[i].obj, timingEventsObjs[i].timePerEvent);  
                 timingEventsObjs[i].numTimesToRepeatEvent--;
                 timingEventsObjs[i].timer.reset();
                 timingEventsObjs[i].timer.start();
