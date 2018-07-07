@@ -1,26 +1,27 @@
 define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
-    function FourPointTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);    
+    function FourPointTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);    
         
         this._radius = p_radius;
         this._type = "main";
         this._hitbox = new CircularHitRegions(position);
         this._hitbox.addRegion(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2, gl, canvasHeight, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX() + p_radius, position.getY()), p_radius / 2, gl, canvasHeight, EffectsManager, AudioManager));
         
         this._hitbox.addRegion(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager, AudioManager));
         
         this._hitbox.addRegion(new Vector(position.getX() - p_radius, position.getY()), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager, AudioManager));
         
         this._hitbox.addRegion(new Vector(position.getX(), position.getY() - p_radius), p_radius / 2.5, 
-                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager));
+                                      new SliceAlgorithm(new Vector(position.getX(), position.getY() + p_radius), p_radius / 2, gl, canvasHeight, EffectsManager, AudioManager));
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
         this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestFourPointLightningEffect(false, gl, 30, position, {radius: [p_radius]});
+        this._spawnSoundEffect = AudioManager.getAudioHandler("main_target_spawn_sound_effect");
         
         this._rotationAngle = 0;
         this._rotationSpeed = 0.05;

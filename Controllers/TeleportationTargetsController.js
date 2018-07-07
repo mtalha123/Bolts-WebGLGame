@@ -1,12 +1,12 @@
 define(['Entities/TeleportationTarget', 'Border', 'Custom Utility/Random', 'Controllers/EntityController', 'Custom Utility/Vector'], function(TeleportationTarget, Border, Random, EntityController, Vector){
     
-    function TeleportationTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
+    function TeleportationTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager, AudioManager){
         EntityController.call(this, appMetaData, maxEntitesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
 
         for(var i = 0; i < maxEntitesToSpawn; i++){
-            this._entitiesPool[i] = new TeleportationTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(0, 0), EffectsManager);
+            this._entitiesPool[i] = new TeleportationTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(0, 0), EffectsManager, AudioManager);
         }
     }
     

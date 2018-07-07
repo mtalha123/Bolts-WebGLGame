@@ -1,6 +1,6 @@
 define(['EventSystem'], function(EventSystem){
     
-    function Entity(canvasWidth, canvasHeight, gl, position){       
+    function Entity(canvasWidth, canvasHeight, gl, position, AudioManager){       
         this._position = this._prevPosition = position; 
         this._hitbox = null;
         
@@ -11,6 +11,7 @@ define(['EventSystem'], function(EventSystem){
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
         this._changeFunctionsToApplyNextSpawn = [];
+        this._spawnSoundEffect = undefined;
         EventSystem.register(this.receiveEvent, "lightning_strike", this);
         EventSystem.register(this.receiveEvent, "game_level_up", this);
         EventSystem.register(this.receiveEvent, "game_restart", this);
@@ -46,6 +47,7 @@ define(['EventSystem'], function(EventSystem){
         }
         this._changeFunctionsToApplyNextSpawn = [];
         this._hitbox.doTutorial();
+        this._spawnSoundEffect.play();
         callback();
     }
     

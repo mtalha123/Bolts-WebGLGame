@@ -1,9 +1,9 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'Custom Utility/Timer', 'Custom Utility/Random', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'Border', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, Timer, Random, SliceAlgorithm, MainTargetsPositions, EventSystem, Border, timingCallbacks){
 
-    function TeleportationTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);
+    function TeleportationTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
         this._physicsBody.setSpeed(0.02 * canvasHeight);
@@ -21,6 +21,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._scoreWorth = 4;
         this._speed = 0.02 * canvasHeight;
         this.setSpeed(this._speed);
+        this._spawnSoundEffect = AudioManager.getAudioHandler("main_target_spawn_sound_effect");
         
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);

@@ -45,9 +45,10 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var score;
     var radiusOfIndicators = 100;
     var lightningStrikeHandler;
+    var lightningStrikeSoundEffect;
     var Border;
     
-    function initialize(p_PlayingState, p_EffectsManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
+    function initialize(p_PlayingState, p_EffectsManager, AudioManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
         EffectsManager = p_EffectsManager;
         PlayingState = p_PlayingState;
         Border = p_Border;
@@ -65,6 +66,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         
         lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(cWidth / 2, cHeight / 3.3), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(2000);
+        lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
         
         darkerScreenHandler = EffectsManager.requestFullScreenColorHandler(false, 360, gl);
         callbackToSwitchState = callback;
@@ -125,6 +127,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
                     bestScoreHandler.doDestroyEffect(new Vector(context.canvas.width / 3, context.canvas.height / 1.5), function(){});                
                     scoreHandler.doDestroyEffect(new Vector(context.canvas.width / 1.3, context.canvas.height / 2), function(){});
                     lightningStrikeHandler.doStrikeEffect();
+                    lightningStrikeSoundEffect.play();
                     EventSystem.publishEventImmediately("game_restart", {});
                     callbackToSwitchState(PlayingState);
                 }

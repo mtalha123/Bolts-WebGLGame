@@ -3,7 +3,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
     var CLOCKWISE = "CW";
     var COUNTER_CLOCKWISE = "CCW";
     
-    function RingAlgorithm(position, radius, regionThickness, gl, EffectsManager){
+    function RingAlgorithm(position, radius, regionThickness, gl, EffectsManager, AudioManager){
         this._inputArray = [];   
         this._position = position;
         this._radius = radius;
@@ -15,6 +15,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
         this._currentActiveQuad = undefined;
         this._handler = EffectsManager.requestRingLightning(true, gl, 80, position, {radius: [radius]});
         this._circleArrowHandler = EffectsManager.requestCircleArrowHandler(false, gl, 80, 300, {});
+        this._ringSoundEffect = AudioManager.getAudioHandler("achievement_algorithm_sound_effect");
     }
     
     RingAlgorithm.prototype.processInput = function(mouseInputObj){
@@ -57,6 +58,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
                     this._currRouteActive.shift();
                     
                     if(this._currRouteActive.length === 0){
+                        this._ringSoundEffect.play();
                         this.reset();
                         return true;
                     }

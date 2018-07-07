@@ -1,13 +1,14 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem){
 
-    function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
+    function BonusTargetBubblyOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "bonus";
         
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
         this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
         
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }

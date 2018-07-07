@@ -1,9 +1,9 @@
 define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm', 'MainTargetsPositions', 'Custom Utility/rotateCoord', 'Custom Utility/Timer'], function(CirclePhysicsBody, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm, MainTargetsPositions, rotateCoord, Timer){
     
-    function OrbitEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
+    function OrbitEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestOrbitEnemy(false, gl, 20, position, {radius: [this._radius]});
@@ -26,6 +26,8 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         this._delayCapturingTimer = new Timer();
         this._TIME_DELAY_TO_CAPTURE = 2000;
         this._canCapture = true;
+        this._spawnSoundEffect = AudioManager.getAudioHandler("enemy_spawn_sound_effect");
+        this._captureSoundEffect = AudioManager.getAudioHandler("capture_sound_effect");
     }
 
     //inherit from Entity
@@ -106,6 +108,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
                 if(this._numCapturedEntities === 4){
                     this._particlesEmanatingHandler.shouldDraw(false);
                 }
+                this._captureSoundEffect.play();
             }
         }
     }

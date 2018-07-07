@@ -1,7 +1,7 @@
 define(['Entities/Entity', 'Custom Utility/Vector'], function(Entity, Vector){
 
-    function MovingEntity(canvasWidth, canvasHeight, gl, position){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
+    function MovingEntity(canvasWidth, canvasHeight, gl, position, AudioManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         
         this._physicsBody = null;
         

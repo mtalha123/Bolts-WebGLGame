@@ -1,12 +1,12 @@
 define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityControllerThatSpawns', 'Custom Utility/Vector'], function(BonusTargetOrb, SynchronizedTimers, Border, Random, EventSystem, EntityControllerThatSpawns, Vector){
     
-    function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager){
+    function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager, AudioManager){
         EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
         this._spawnAttemptDelay = 4000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool.push(new BonusTargetOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(400, 400), EffectsManager));
+            this._entitiesPool.push(new BonusTargetOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(400, 400), EffectsManager, AudioManager));
         }
     }
     

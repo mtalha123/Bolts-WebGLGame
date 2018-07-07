@@ -1,12 +1,14 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant', 'Custom Utility/Timer'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant, Timer){  
     
-    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
+    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
+        this._spawnSoundEffect = AudioManager.getAudioHandler("enemy_spawn_sound_effect");
+        this._captureSoundEffect = AudioManager.getAudioHandler("capture_sound_effect");
         
         this._maxNumCaptureEntities = 4;
         this._numTimesSliced = 0;
@@ -75,7 +77,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
                     this._listEntitiesCaptured[quadOfEntity - 1] = allTargetObjs[i].target;
                     this._handler.doTentacleGrab(allTargetObjs[i].position, quadOfEntity);
                     this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
-
+                    this._captureSoundEffect.play();
+                    
                     EventSystem.publishEventImmediately("entity_captured", {entity: allTargetObjs[i].target, capture_type: "destroy"});
                 }
             }

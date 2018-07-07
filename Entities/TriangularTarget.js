@@ -1,21 +1,22 @@
 define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
-    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);    
+    function TriangularTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);    
         
         this._radius = p_radius;
         this._hitbox = new CircularHitRegions(position);
         var firstRegion = new Vector(position.getX() + p_radius, position.getY());
         var secondRegion = rotateCoord(new Vector(position.getX() + p_radius, position.getY()), Math.PI - (Math.PI/3), position);
         var thirdRegion = rotateCoord(new Vector(position.getX() + p_radius, position.getY()), Math.PI + (Math.PI/3), position);
-        this._hitbox.addRegion(firstRegion, p_radius / 3, new SliceAlgorithm(firstRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
-        this._hitbox.addRegion(secondRegion, p_radius / 3, new SliceAlgorithm(secondRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
-        this._hitbox.addRegion(thirdRegion, p_radius / 3, new SliceAlgorithm(thirdRegion, p_radius / 3, gl, canvasHeight, EffectsManager));
+        this._hitbox.addRegion(firstRegion, p_radius / 3, new SliceAlgorithm(firstRegion, p_radius / 3, gl, canvasHeight, EffectsManager, AudioManager));
+        this._hitbox.addRegion(secondRegion, p_radius / 3, new SliceAlgorithm(secondRegion, p_radius / 3, gl, canvasHeight, EffectsManager, AudioManager));
+        this._hitbox.addRegion(thirdRegion, p_radius / 3, new SliceAlgorithm(thirdRegion, p_radius / 3, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "main";
         
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
         this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestTriangularTargetEffect(false, gl, 20, position, {radius: [p_radius]});
+        this._spawnSoundEffect = AudioManager.getAudioHandler("main_target_spawn_sound_effect");
         
         this._rotationAngle = 0;
         this._numGuardsActivated = 0;

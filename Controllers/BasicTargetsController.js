@@ -1,12 +1,12 @@
 define(['Entities/BasicTarget', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityController', 'Custom Utility/Vector'], function(BasicTarget, SynchronizedTimers, Border, Random, EventSystem, EntityController, Vector){
     
-    function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager){
+    function BasicTargetsController(gl, appMetaData, maxEntitesToSpawn, EffectsManager, AudioManager){
         EntityController.call(this, appMetaData, maxEntitesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.06;
         this._spawnAttemptDelay = 2000;
         
         for(var i = 0; i < maxEntitesToSpawn; i++){
-            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), EffectsManager);
+            this._entitiesPool[i] = new BasicTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, 8, new Vector(0, 0), EffectsManager, AudioManager);
         }
     }
     

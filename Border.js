@@ -14,8 +14,9 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     var appMetaData;
     var totalCharge, currentCharge;
     var lightningStrikeHandler;
+    var lightningStrikeSoundEffect;
     
-    function initialize(gl, p_appMetaData, p_totalCharge, AssetManager, EffectsManager){     
+    function initialize(gl, p_appMetaData, p_totalCharge, AssetManager, EffectsManager, AudioManager){     
         appMetaData = p_appMetaData;
         
         margin = 0.05 * appMetaData.getCanvasHeight();
@@ -42,6 +43,8 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, new Vector(borderPath[0], borderPath[1] - 50), new Vector(borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50), {});
         lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(scoreX, scoreY + margin), new Vector(scoreX, 0), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(4000);
+        lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
+        
         
         EventSystem.register(receiveEvent, "entity_spawned");
         EventSystem.register(receiveEvent, "entity_destroyed");
@@ -129,6 +132,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
     function processGameLosing(){
         if(currentCharge === 0){
             lightningStrikeHandler.doStrikeEffect(function(){});
+            lightningStrikeSoundEffect.play();
             EventSystem.publishEventImmediately("game_lost", {score: score});
             healthBarHandler.shouldDraw(false);
             scoreHandler.shouldDraw(false);

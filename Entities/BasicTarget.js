@@ -1,15 +1,16 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
-    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position);
+    function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, EffectsManager, AudioManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
         this._physicsBody.setSpeed(this._speed);
         this._handler = EffectsManager.requestBasicTargetEffect(false, gl, 2, position, {radius: [p_radius], fluctuation: [5]});
         this._numSlicesNeededToDestroy = 1;
         this._currSlicesDone = 0;
         this._type = "main";
+        this._spawnSoundEffect = AudioManager.getAudioHandler("main_target_spawn_sound_effect");
         
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
@@ -50,6 +51,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
         MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
         this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
+        this._spawnSoundEffect.play();
     }
     
     BasicTarget.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){       

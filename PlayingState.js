@@ -34,29 +34,29 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
     var timeUntilNextMainTargetSpawns = 2500;
     var mainTargetsChancesOfSpawning = [];
     
-    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, p_Cursor, p_Border, p_RestartState, p_PausedState, callback){
+    function initialize(gl, appMetaData, p_EffectsManager, p_InputEventsManager, AssetManager, AudioManager, p_Cursor, p_Border, p_RestartState, p_PausedState, callback){
         InputEventsManager = p_InputEventsManager;
         EffectsManager = p_EffectsManager;
         Border = p_Border;
 
         ComboSystem.initialize(gl, EffectsManager, Border);
-        BigLightningStrike.initialize(gl, appMetaData.getCanvasHeight(), AssetManager, EffectsManager, p_Cursor);
+        BigLightningStrike.initialize(gl, appMetaData.getCanvasHeight(), AssetManager, EffectsManager, AudioManager, p_Cursor);
         
         // Main target controllers
-        basicTargetsController = new BasicTargetsController(gl, appMetaData, 10, EffectsManager); 
-        triangularTargetController = new TriangularTargetController(gl, appMetaData, 7, EffectsManager);
-        fourPointTargetController = new FourPointTargetController(gl, appMetaData, 4, EffectsManager);
-        teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 6, EffectsManager);
+        basicTargetsController = new BasicTargetsController(gl, appMetaData, 10, EffectsManager, AudioManager); 
+        triangularTargetController = new TriangularTargetController(gl, appMetaData, 7, EffectsManager, AudioManager);
+        fourPointTargetController = new FourPointTargetController(gl, appMetaData, 4, EffectsManager, AudioManager);
+        teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 6, EffectsManager, AudioManager);
         
         // Bonus target controllers
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager);
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager, AudioManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager);
         
         // Enemy controllers
-        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager);
-        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, 0, EffectsManager);
-        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 2, 0, EffectsManager);
+        spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
+        tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
+        orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
         
         
         fpsHandler = EffectsManager.requestTextEffect(false, gl, 1, {}, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.88), fpsCounter.getFPS().toString());
@@ -162,6 +162,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             mainTargetsChancesOfSpawning = [[0, triangularTargetController], [0, fourPointTargetController], [0, teleportationTargetsController], [100, basicTargetsController]];
             currentGameLevel = 1;
             timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);
+            timeUntilNextMainTargetSpawns = 2500
             RestartState.activate(eventInfo.eventData.score);
             callbackToSwitchState(RestartState);
         }else if(eventInfo.eventType === "keydown"){
@@ -200,7 +201,6 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 3){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);  
-                timeUntilNextMainTargetSpawns = 2500;
                 
             }else if(currentGameLevel === 4){
                 

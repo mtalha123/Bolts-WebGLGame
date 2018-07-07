@@ -1,15 +1,16 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem, timingCallbacks){
 
-    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);
+    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "bonus";
         this._scoreWorth = 2;
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         this._numSlicesNeededToDestroy = 2;
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     

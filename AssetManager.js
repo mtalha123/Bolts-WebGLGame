@@ -1,25 +1,17 @@
-define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture', 'Custom Utility/getGlTextureForImage', 'Custom Utility/getGLTextureForNoise'], function(getTextResource, getSimplexNoiseTexture, getGLTextureForImage, getGLTextureForNoise){
-    var numTotalAssets = 37;
+define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture', 'Custom Utility/getGlTextureForImage', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/getAudioResource'], function(getTextResource, getSimplexNoiseTexture, getGLTextureForImage, getGLTextureForNoise, getAudioResource){
+    var numTotalAssets;
     var numLoadedAssets = 0;
     var textures = {};
     var shaders = {};
     var otherTextAssets = {};
+    var sounds = {};
     
-    function loadAllAssets(gl, callbackForEachLoaded, callbackWhenAllLoaded){
-        //load images
-        var arialPng = new Image();
-        arialPng.src = "Assets/arial.png";
-        var spiderWebPng = new Image();
-        spiderWebPng.src = "Assets/spiderweb.png";
-        var lgBoltPng = new Image();
-        lgBoltPng.src = "Assets/lgbolt.png";
-        var straightArrowPng = new Image();
-        straightArrowPng.src = "Assets/straightArrow.png";    
-        var circleArrowPng = new Image();
-        circleArrowPng.src = "Assets/circleArrow.png";
-        
-        Promise.all([
+    function loadAllAssets(gl, callbackForEachLoaded, callbackWhenAllLoaded){        
+        var promises = [
             new Promise(function(resolve, reject){
+                var arialPng = new Image();
+                arialPng.src = "Assets/arial.png";
+                
                 arialPng.onload = function(){
                     numLoadedAssets++;
                     var arialTexture = getGLTextureForImage(gl, arialPng);
@@ -30,6 +22,9 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),
             
             new Promise(function(resolve, reject){
+                var spiderWebPng = new Image();
+                spiderWebPng.src = "Assets/spiderweb.png";
+                
                 spiderWebPng.onload = function(){
                     numLoadedAssets++;
                     var spiderWebTexture = getGLTextureForImage(gl, spiderWebPng);
@@ -40,6 +35,9 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),          
             
             new Promise(function(resolve, reject){
+                var lgBoltPng = new Image();
+                lgBoltPng.src = "Assets/lgbolt.png";
+                
                 lgBoltPng.onload = function(){
                     numLoadedAssets++;
                     var texture = getGLTextureForImage(gl, lgBoltPng);
@@ -50,6 +48,9 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }),       
             
             new Promise(function(resolve, reject){
+                var straightArrowPng = new Image();
+                straightArrowPng.src = "Assets/straightArrow.png";
+                
                 straightArrowPng.onload = function(){
                     numLoadedAssets++;
                     var texture = getGLTextureForImage(gl, straightArrowPng);
@@ -60,6 +61,9 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             }), 
             
             new Promise(function(resolve, reject){
+                var circleArrowPng = new Image();
+                circleArrowPng.src = "Assets/circleArrow.png";
+                
                 circleArrowPng.onload = function(){
                     numLoadedAssets++;
                     var texture = getGLTextureForImage(gl, circleArrowPng);
@@ -67,6 +71,104 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                     callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                     resolve("Circle Arrow Web Texture Loaded");
                 }
+            }),       
+            
+            new Promise(function(resolve, reject){
+                var mouseUnclickedPng = new Image();
+                mouseUnclickedPng.src = "Assets/mouseUnclicked.png";
+                
+                mouseUnclickedPng.onload = function(){
+                    numLoadedAssets++;
+                    var texture = getGLTextureForImage(gl, mouseUnclickedPng);
+                    textures.mouse_unclicked = texture;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                }
+            }),  
+            
+            new Promise(function(resolve, reject){
+                var mouseClickedPng = new Image();
+                mouseClickedPng.src = "Assets/mouseClicked.png";
+                
+                mouseClickedPng.onload = function(){
+                    numLoadedAssets++;
+                    var texture = getGLTextureForImage(gl, mouseClickedPng);
+                    textures.mouse_clicked = texture;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                }
+            }),
+
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/backgroundMusic.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.background_music = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/mainTargetSpawnSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.main_target_spawn_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/bonusTargetSpawnSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.bonus_target_spawn_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),   
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/enemySpawnSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.enemy_spawn_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),  
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/achievementAlgorithmSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.achievement_algorithm_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),            
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/captureSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.capture_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),       
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/spikeEnemyAbsorbingLightningSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.spike_enemy_absorbing_lightning_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
+            }),     
+            
+            new Promise(function(resolve, reject){
+                getAudioResource("http://192.168.0.13:4000/Assets/lightningStrikeSoundEffect.wav", function(error, audio){
+                    numLoadedAssets++;
+                    sounds.lightning_strike_sound_effect = audio;
+                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
+                    resolve();
+                });
             }),
             
             new Promise(function(resolve, reject){
@@ -327,9 +429,10 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                 callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                 resolve("Slower Simplex Noise Data Loaded");
             })
-        ]).then(function(){
-            callbackWhenAllLoaded();
-        });
+        ];
+
+        numTotalAssets = promises.length;        
+        Promise.all(promises).then(callbackWhenAllLoaded);
     }
     
     function getTextureAsset(resourceString, optReturnAll){
@@ -351,6 +454,13 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
             return otherTextAssets;
         }
         return otherTextAssets[resourceString];
+    } 
+    
+    function getAudioAsset(resourceString, optReturnAll){
+        if(optReturnAll){
+            return sounds;
+        }
+        return sounds[resourceString];
     }
     
     function getNumTotalAssets(){
@@ -362,6 +472,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
         getTextureAsset: getTextureAsset,
         getShaderAsset: getShaderAsset,
         getTextAsset: getTextAsset,
+        getAudioAsset: getAudioAsset,
         getNumTotalAssets: getNumTotalAssets,
     };
 });

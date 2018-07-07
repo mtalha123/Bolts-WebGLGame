@@ -1,10 +1,10 @@
 define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector', 'SliceAlgorithm', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Border', 'Custom Utility/Random', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, Entity, CircularHitBox, Vector, SliceAlgorithm, CircularHitBoxWithAlgorithm, Border, Random, EventSystem, timingCallbacks){
 
-    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position);     
+    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);     
         
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [p_radius]});
         this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 50, 30, new Vector(0, 0), {FXType: [2], maxLifetime: [100], radiusOfSource: [p_radius * 1.5]});
         this._particlesDestDist = 0.1 * canvasHeight;
@@ -14,6 +14,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._currentStage = 1;
         this._nextOrbSpawnPosition = new Vector(0, 0); 
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     

@@ -1,9 +1,9 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm){
     
-    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, 0);
+    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager));
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
@@ -19,6 +19,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         
         this._lightningStealTimer = SynchronizedTimers.getTimer();
         this._timeUntilStealLightning = 1500;
+        this._spawnSoundEffect = AudioManager.getAudioHandler("enemy_spawn_sound_effect");
     }
     
     //inherit from MovingEntity

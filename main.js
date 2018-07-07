@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border', 'AudioManager'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border, AudioManager){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -74,13 +74,13 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     
     var updateCounter = 0;
     
-    var initializationDone = false;
-    
     LoadingState.initialize(context);
     var currentState = LoadingState;
     currentState.draw();
     
     var windowFocused = true;
+    
+    var backgroundMusicHandler;
     
     // Additive blending
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -158,10 +158,15 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
                 LoadingState.setCompletion(completion);
             }, function(){
                 console.log("All assets loaded.");
-                initializationDone = true;
-                initialize();
-                LoadingState.clear();
-                currentState = StartingState;
+                AudioManager.initialize(AssetManager, function(){
+                    console.log("All audio decoded.");
+                    initialize();
+                    LoadingState.clear();
+                    backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
+                    backgroundMusicHandler.play();
+                    backgroundMusicHandler.setVolume(0.3);
+                    currentState = StartingState;    
+                });
             });
         }
     }
@@ -171,7 +176,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
         ShaderLibrary.initialize(gl);
         EffectsManager.initialize(ShaderLibrary, appMetaData, AssetManager);
         Cursor.initialize(gl, appMetaData, EffectsManager);
-        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager);
+        Border.initialize(gl, appMetaData, 10, AssetManager, EffectsManager, AudioManager);
         
         InputEventsManager.initialize(canvas, appMetaData);
         
@@ -179,11 +184,11 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
             currentState = state;
         };
        
-        RestartState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
+        RestartState.initialize(PlayingState, EffectsManager, AudioManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
         
-        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, Cursor, Border, RestartState, PausedState, callbackForSwitchingStates);
+        PlayingState.initialize(gl, appMetaData, EffectsManager, InputEventsManager, AssetManager, AudioManager, Cursor, Border, RestartState, PausedState, callbackForSwitchingStates);
         
-        StartingState.initialize(PlayingState, EffectsManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
+        StartingState.initialize(PlayingState, EffectsManager, AudioManager, appMetaData, gl, context, Cursor, InputEventsManager, Border, callbackForSwitchingStates);
         
         PausedState.initialize(appMetaData, gl, PlayingState, context, EffectsManager, callbackForSwitchingStates, InputEventsManager)
         

@@ -1,13 +1,13 @@
 define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityControllerThatSpawns', 'Custom Utility/Vector'], function(BonusTargetBubblyOrbCompound, SynchronizedTimers, Border, Random, EventSystem, EntityControllerThatSpawns, Vector){
     
-    function BonusTargetBubblyOrbsController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager){
+    function BonusTargetBubblyOrbsController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager, AudioManager){
         EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.07;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 4000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){              
-            this._entitiesPool[i] = new BonusTargetBubblyOrbCompound(gl, appMetaData, this._targetRadius, new Vector(100, 100), EffectsManager);
+            this._entitiesPool[i] = new BonusTargetBubblyOrbCompound(gl, appMetaData, this._targetRadius, new Vector(100, 100), EffectsManager, AudioManager);
         }
     }
     

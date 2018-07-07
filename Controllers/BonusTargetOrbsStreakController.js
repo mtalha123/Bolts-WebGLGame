@@ -1,13 +1,13 @@
 define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem', 'Controllers/EntityControllerThatSpawns', 'Custom Utility/Vector'], function(BonusTargetOrbStreak, SynchronizedTimers, Border, Random, EventSystem, EntityControllerThatSpawns, Vector){
     
-    function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager){
+    function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager, AudioManager){
         EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 4000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new BonusTargetOrbStreak(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
+            this._entitiesPool[i] = new BonusTargetOrbStreak(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager, AudioManager);
         }
     }
     

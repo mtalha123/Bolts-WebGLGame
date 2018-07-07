@@ -9,9 +9,10 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var InputEventsManager;
     var shouldDrawText = true;
     var lightningStrikeHandler;
-    var Border;
+    var lightningStrikeSoundEffect;
+    var Border; 
     
-    function initialize(p_PlayingState, p_EffectsManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
+    function initialize(p_PlayingState, p_EffectsManager, AudioManager, appMetaData, gl, p_context, p_Cursor, p_InputEventsManager, p_Border, callback){
         EffectsManager = p_EffectsManager;
         PlayingState = p_PlayingState;
         context = p_context;
@@ -25,6 +26,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         hitRegions.addRegion(new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), 100);
         lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(2000);
+        lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
     }
     
     function draw(gl, interpolation){
@@ -61,6 +63,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
                 lightningStrikeHandler.doStrikeEffect();
                 Border.showScore();
                 Border.showHealthBar();
+                lightningStrikeSoundEffect.play();
                 callbackToSwitchState(PlayingState);
             }
         }

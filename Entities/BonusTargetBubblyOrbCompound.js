@@ -15,13 +15,13 @@
     }
      
      
-     function BonusTargetBubblyOrbCompound(gl, appMetaData, targetRadius, position, EffectsManager){
+     function BonusTargetBubblyOrbCompound(gl, appMetaData, targetRadius, position, EffectsManager, AudioManager){
         this._appMetaData = appMetaData;
         this._currActivatedTargetObjs = [];
         this._scoreWorth = 10;
 
         this._initialTargetObj = {
-            target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, position, EffectsManager),
+            target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius, position, EffectsManager, AudioManager),
             stage: 1
         };
 
@@ -31,13 +31,13 @@
         for(var i = 0; i < 4; i++){
             if(i < 2){
                this._targetObjsSecondStage[i] = {
-                    target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 1.5, position, EffectsManager),
+                    target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 1.5, position, EffectsManager, AudioManager),
                     stage: 2
                 }; 
             }
 
             this._targetObjsThirdStage[i] = {
-                target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 2, position, EffectsManager),
+                target: new BonusTargetBubblyOrb(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, targetRadius / 2, position, EffectsManager, AudioManager),
                 stage: 3
             };
         }

@@ -1,12 +1,12 @@
 define(['Entities/TriangularTarget', 'Border', 'Custom Utility/Random', 'Controllers/EntityController', 'Custom Utility/Vector'], function(TriangularTarget, Border, Random, EntityController, Vector){
     
-    function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager){
+    function TriangularTargetController(gl, appMetaData, maxEntitiesToSpawn, EffectsManager, AudioManager){
         EntityController.call(this, appMetaData, maxEntitiesToSpawn); 
         this._targetRadius = appMetaData.getCanvasHeight() * 0.08;
         this._spawnAttemptDelay = 5000;
 
         for(var i = 0; i < maxEntitiesToSpawn; i++){
-            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager);
+            this._entitiesPool[i] = new TriangularTarget(appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, this._targetRadius, new Vector(100, 100), EffectsManager, AudioManager);
         }
     }
     

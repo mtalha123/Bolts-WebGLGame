@@ -1,5 +1,5 @@
 define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector, rotateCoord){
-    function SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager){
+    function SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager, AudioManager){
         this._inputArray = [];   
         this._position = position;
         this._radius = radius;
@@ -8,6 +8,7 @@ define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector,
         this._maxDist = canvasHeight * 0.5;
 //        this._lineSegmentHandlerForTutorial = EffectsManager.requestLineSegmentHandler(false, gl, 200, rotateCoord(position.addTo(new Vector(radius * 3, 0)), Math.PI / 4, position),
         this._straightArrowHandler = EffectsManager.requestStraightArrowHandler(false, gl, 200, 500, {});
+        this._sliceSoundEffect = AudioManager.getAudioHandler("achievement_algorithm_sound_effect");
     }
     
     SliceAlgorithm.prototype.processInput = function(mouseInputObj){
@@ -33,6 +34,7 @@ define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector,
                     var coordsForBolt = this._getCoordsForSliceBolt();
                     this._handler.setLightningCoords([coordsForBolt[0].getX(), coordsForBolt[0].getY(), coordsForBolt[1].getX(), coordsForBolt[1].getY()]);
                     this._handler.doDisappearEffect();
+                    this._sliceSoundEffect.play();
                     return true;    
                 }
             }
