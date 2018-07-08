@@ -51,7 +51,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         // Bonus target controllers
         bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager, TextManager); 
         bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager, AudioManager, TextManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 100, EffectsManager, AudioManager, TextManager);
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager, TextManager);
         
         // Enemy controllers
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
