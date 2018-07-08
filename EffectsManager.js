@@ -1,4 +1,4 @@
-define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTargetHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler', 'Handlers/LineSegmentHandler', 'Handlers/StraightArrowHandler', 'Handlers/CircleArrowHandler'], function(map, LightningHandler, BasicTargetHandler, CursorHandler, ComboHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler, LineSegmentHandler, StraightArrowHandler, CircleArrowHandler){
+define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTargetHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler', 'Handlers/StraightArrowHandler', 'Handlers/CircleArrowHandler'], function(map, LightningHandler, BasicTargetHandler, CursorHandler, ComboHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler, StraightArrowHandler, CircleArrowHandler){
     
     var allHandlers = [];
     var automaticUpdatesHandlerObjs = [];
@@ -192,14 +192,7 @@ define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTarget
 
         addHandlers(handler.getAllHandlers());
         return handler;
-    }   
-    
-    function requestLineSegmentHandler(shouldDraw, gl, zOrder, startCoord, endCoord, opts){
-        var handler = new LineSegmentHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, startCoord, endCoord, opts, ShaderLibrary);
-
-        addHandlers(handler.getAllHandlers());
-        return handler;
-    }  
+    }     
     
     function requestStraightArrowHandler(shouldDraw, gl, zOrder, widthAndHeight, opts){
         var handler = new StraightArrowHandler(shouldDraw, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, widthAndHeight, opts, ShaderLibrary, {sampler: 0, texture: AssetManager.getTextureAsset("straightArrow")});
@@ -250,7 +243,6 @@ define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTarget
         requestGlowingRingHandler: requestGlowingRingHandler,
         requestSpriteHandler: requestSpriteHandler,
         requestRectangleHandler: requestRectangleHandler,
-        requestLineSegmentHandler: requestLineSegmentHandler,
         requestStraightArrowHandler: requestStraightArrowHandler,
         requestCircleArrowHandler: requestCircleArrowHandler
     };

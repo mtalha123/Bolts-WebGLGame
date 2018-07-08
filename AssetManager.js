@@ -353,16 +353,7 @@ define(['Custom Utility/getTextResource', 'Custom Utility/getSimplexNoiseTexture
                     callbackForEachLoaded(numLoadedAssets/numTotalAssets);
                     resolve("Rectangle Shaders Loaded");
                 });
-            }), 
-            
-            new Promise(function(resolve, reject){
-                getTextResource("http://192.168.0.13:4000/Shaders/lineSegmentShaders.glsl", function(error, text){
-                    numLoadedAssets++;
-                    shaders.line_segment = text;
-                    callbackForEachLoaded(numLoadedAssets/numTotalAssets);
-                    resolve("Line Segment Shaders Loaded");
-                });
-            }),        
+            }),     
             
             new Promise(function(resolve, reject){
                 getTextResource("http://192.168.0.13:4000/Shaders/straightArrowShaders.glsl", function(error, text){

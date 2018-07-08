@@ -6,7 +6,6 @@ define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector,
         this._handler = EffectsManager.requestLightningEffect(false, gl, 80, {lineWidth: [0.5], glowFactor: [7], spikedLgBool: [1.0], boltColor: [1.0, 0.0, 0.4], glowColor: [1.0, 0.1, 0.3], fluctuation: [35]}, [0, 0, 100, 100]);
         this._degreeLeeway = 30;
         this._maxDist = canvasHeight * 0.5;
-//        this._lineSegmentHandlerForTutorial = EffectsManager.requestLineSegmentHandler(false, gl, 200, rotateCoord(position.addTo(new Vector(radius * 3, 0)), Math.PI / 4, position),
         this._straightArrowHandler = EffectsManager.requestStraightArrowHandler(false, gl, 200, 500, {});
         this._sliceSoundEffect = AudioManager.getAudioHandler("achievement_algorithm_sound_effect");
     }
@@ -45,8 +44,6 @@ define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector,
     
     SliceAlgorithm.prototype.setPosition = function(newPosition){
         this._position = newPosition;
-//        this._lineSegmentHandlerForTutorial.setCoords(rotateCoord(newPosition.addTo(new Vector(this._radius * 3, 0)), Math.PI / 4, newPosition),
-//                                                      rotateCoord(newPosition.addTo(new Vector(this._radius * 3, 0)), Math.PI + (Math.PI / 4), newPosition));
         this._straightArrowHandler.setPosition(newPosition);
     }
     
