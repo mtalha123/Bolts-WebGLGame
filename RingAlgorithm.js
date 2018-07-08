@@ -73,7 +73,6 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
         this._position = newPosition;
         this._handler.setPosition(newPosition);
         this._circleArrowHandler.setPosition(newPosition);
-        this.reset();
     }
     
     RingAlgorithm.prototype.reset = function(){
