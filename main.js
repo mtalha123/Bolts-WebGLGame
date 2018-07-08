@@ -20,7 +20,7 @@ requirejs.config({
 
 
 
-require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border', 'AudioManager', 'TextManager'], function(Timer, Cursor, EventSystem, NetworkManager, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border, AudioManager, TextManager){
+require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border', 'AudioManager', 'TextManager'], function(Timer, Cursor, EventSystem, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border, AudioManager, TextManager){
 
 //-----------------------  INITIALIZATION STUFF---------------------------------------
     
@@ -69,8 +69,6 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     //in case of when an update happens in the next second but the # of updates hasn't been processed for the
     //first second yet, the difference between the time (which would now be over 1000 ms) and 1000 is the offsetTime
     var offsetTime = 0;
-        
-    NetworkManager.initializeAndConnect(canvasWidth, canvasHeight, networkEventListener);
     
     var updateCounter = 0;
     
@@ -86,9 +84,23 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     
     // Additive blending
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+    AssetManager.loadAllAssets(gl, function(completion){
+        LoadingState.setCompletion(completion);
+    }, function(){
+        console.log("All assets loaded.");
+        AudioManager.initialize(AssetManager, function(){
+            console.log("All audio decoded.");
+            initialize();
+            backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
+            backgroundMusicHandler.play();
+            backgroundMusicHandler.setVolume(0.3);
+            currentState = StartingState;    
+        });
+    });
     
     function gameLoop(){
-        if(NetworkManager.connectedToServer() && windowFocused){                
+        if(windowFocused){                
                 //set to 0 each time game loop runs so that it can be utilized for the next set of updates
                 loops = 0;
 
@@ -153,24 +165,6 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'NetworkManager', 'Inp
     function update(){        
         SynchronizedTimers.updateAllTimers(tickTimeMillis);        
         currentState.update();
-    }
-    
-    function networkEventListener(eventType, eventData){
-        if(eventType === "S_initialize"){
-            AssetManager.loadAllAssets(gl, function(completion){
-                LoadingState.setCompletion(completion);
-            }, function(){
-                console.log("All assets loaded.");
-                AudioManager.initialize(AssetManager, function(){
-                    console.log("All audio decoded.");
-                    initialize();
-                    backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
-                    backgroundMusicHandler.play();
-                    backgroundMusicHandler.setVolume(0.3);
-                    currentState = StartingState;    
-                });
-            });
-        }
     }
     
     function initialize(){
