@@ -1,4 +1,4 @@
-define([], function(){
+define(['timingCallbacks', 'Custom Utility/Vector'], function(timingCallbacks, Vector){
     var context;
     var canvasWidth;
     var canvasHeight;
@@ -16,7 +16,7 @@ define([], function(){
     
     TextHandler.prototype.draw = function(){
         if(this._shouldDraw){
-            this._context.fillStyle = this._color;
+            this._context.fillStyle = "rgba(" + this._color.join() + ")";
             this._context.shadowColor = this._shadowColor;
             this._context.font = this._size.toString().concat("px").concat(" ").concat(this._font);
             this._context.fillText(this._text, this._position.getX(), canvasHeight - this._position.getY());
@@ -39,6 +39,22 @@ define([], function(){
         this._shadowColor = shadowColor;
     }    
     
+    TextHandler.prototype.doFadeUpwardsEffect = function(){
+        var duration = 1500;
+        var distToGoUp = canvasHeight * 0.1;
+        var backup_pos = new Vector(this._position.getX(), this._position.getY());
+        this._shouldDraw = true;
+        
+        timingCallbacks.addTimingEvents(this, duration, 1, function(time){
+            var completion = time / duration;
+            this.setPosition(backup_pos.addTo(new Vector(0, completion * distToGoUp)));
+            this._color[3] = 1.0 - completion;
+        }, function(){
+            this._shouldDraw = false;
+            this._color[3] = 1.0;
+            this._position = backup_pos;
+        });
+    }
     
     function initialize(p_context, p_canvasWidth, p_canvasHeight){
         context = p_context;

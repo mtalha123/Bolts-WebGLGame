@@ -49,16 +49,16 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
         teleportationTargetsController = new TeleportationTargetsController(gl, appMetaData, 6, EffectsManager, AudioManager);
         
         // Bonus target controllers
-        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager); 
-        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager, AudioManager); 
-        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager);
+        bonusTargetOrbsController = new BonusTargetOrbsController(gl, appMetaData, 3, 0, EffectsManager, AudioManager, TextManager); 
+        bonusTargetOrbsStreakController = new BonusTargetOrbsStreakController(gl, appMetaData, 3, 0, EffectsManager, AudioManager, TextManager); 
+        bonusTargetBubblyOrbsController = new BonusTargetBubblyOrbsController(gl, appMetaData, 3, 100, EffectsManager, AudioManager, TextManager);
         
         // Enemy controllers
         spikeEnemyController = new SpikeEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
         tentacleEnemyController = new TentacleEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
         orbitEnemyController = new OrbitEnemyController(gl, appMetaData, 2, 0, EffectsManager, AudioManager);
         
-        fpsTextHandler = TextManager.requestTextHandler("Comic Sans MS", "blue", appMetaData.getCanvasHeight() * 0.05, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.95), fpsCounter.getFPS().toString(), false);
+        fpsTextHandler = TextManager.requestTextHandler("Comic Sans MS", [0, 0, 255, 1.0], appMetaData.getCanvasHeight() * 0.05, new Vector(appMetaData.getCanvasWidth() * 0.9, appMetaData.getCanvasHeight() * 0.95), fpsCounter.getFPS().toString(), false);
         
         Cursor = p_Cursor;
         

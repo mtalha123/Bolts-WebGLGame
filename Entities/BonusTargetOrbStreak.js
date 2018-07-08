@@ -1,6 +1,6 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem, timingCallbacks){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem', 'timingCallbacks', 'Custom Utility/Vector'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem, timingCallbacks, Vector){
 
-    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
+    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager, TextManager){
         Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
@@ -11,6 +11,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._numSlicesNeededToDestroy = 2;
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
+        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(p_radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
@@ -26,12 +27,14 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         Entity.Entity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._disintegratingParticles.setPosition(newPosition);
+        this._bonusTextHandler.setPosition(newPosition.addTo(new Vector(this._radius * 2, 0)));
     }
     
     BonusTargetOrbStreak.prototype._setPositionWithInterpolation = function(newPosition){
         Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._disintegratingParticles.setPosition(newPosition);
+        this._bonusTextHandler.setPosition(newPosition.addTo(new Vector(this._radius * 2, 0)));
     }
     
     BonusTargetOrbStreak.prototype.reset = function(){
@@ -65,7 +68,14 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             EventSystem.publishEventImmediately("bonus_target_disintegrated", {entity: this});
         });
         
+        this._bonusTextHandler.doFadeUpwardsEffect();
+        
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
+    }
+    
+    BonusTargetOrbStreak.prototype.prepareForDrawing = function(interpolation){
+        Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
+        this._bonusTextHandler.draw();
     }
     
     BonusTargetOrbStreak.prototype.receiveEvent = function(eventInfo){

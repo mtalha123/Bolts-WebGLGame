@@ -6,7 +6,7 @@ define(['Custom Utility/Vector'], function(Vector){
     
     function initialize(p_context, canvasWidth, canvasHeight, TextManager){
         context = p_context;
-        textHandler = TextManager.requestTextHandler("Comic Sans MS", "white", canvasHeight * 0.05, new Vector(canvasWidth / 2, canvasHeight / 2), "LOADING", false);
+        textHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.05, new Vector(canvasWidth / 2, canvasHeight / 2), "LOADING", false);
         radius = canvasHeight * 0.15;
     }
     

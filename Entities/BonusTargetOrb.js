@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector', 'SliceAlgorithm', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Border', 'Custom Utility/Random', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, Entity, CircularHitBox, Vector, SliceAlgorithm, CircularHitBoxWithAlgorithm, Border, Random, EventSystem, timingCallbacks){
 
-    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);     
+    function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager, TextManager){
+        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager, TextManager);     
         
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
@@ -15,6 +15,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._nextOrbSpawnPosition = new Vector(0, 0); 
         this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
+        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(p_radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
@@ -29,6 +30,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._setNextOrbSpawnDirection();
         this.setParticlesDirection(this._currParticlesDirection);
         this._disintegratingParticles.setPosition(newPosition);
+        this._bonusTextHandler.setPosition(newPosition.addTo(new Vector(this._radius * 2, 0)));
     }
     
     BonusTargetOrb.prototype._setPositionWithInterpolation = function(newPosition){
@@ -38,11 +40,13 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this.setParticlesDirection(this._currParticlesDirection);
         this._setNextOrbSpawnDirection();
         this._disintegratingParticles.setPosition(newPosition);
+        this._bonusTextHandler.setPosition(newPosition.addTo(new Vector(this._radius * 2, 0)));
     }
     
     BonusTargetOrb.prototype.prepareForDrawing = function(interpolation){
         Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
         this._particlesHandler.update();
+        this._bonusTextHandler.draw();
     }
     
     BonusTargetOrb.prototype.spawn = function(callback){
@@ -55,6 +59,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
             this.reset();
             EventSystem.publishEventImmediately("bonus_target_disintegrated", {entity: this});
         });
+        this._bonusTextHandler.doFadeUpwardsEffect();
     }
     
     BonusTargetOrb.prototype.reset = function(){

@@ -29,7 +29,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), Border.getScorePosition(), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(2000);
         lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
-        textHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.05, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), "Start", false);
+        textHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 0, 1.0], appMetaData.getCanvasHeight() * 0.05, new Vector(appMetaData.getCanvasWidth() / 2, appMetaData.getCanvasHeight() / 2), "Start", false);
     }
     
     function draw(gl, interpolation){

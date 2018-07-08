@@ -15,7 +15,7 @@ define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(
         var radius = canvasHeight * 0.06;   
         var center = new Vector(Border.getLeftX() + (radius * 1.5), Border.getTopY() - (radius * 1.5));
         comboHandler = EffectsManager.requestComboEffect(false, gl, 0, center, {radius: [radius], spreadOfEdgeEffect: [canvasHeight * 0.015]});
-        comboTextHandler = TextManager.requestTextHandler("Comic Sans MS", "red", canvasHeight * 0.05, center, "", false);
+        comboTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 0, 0, 1.0], canvasHeight * 0.05, center, "", false);
         comboTextHandler.setShadowColor("red");
     }
     

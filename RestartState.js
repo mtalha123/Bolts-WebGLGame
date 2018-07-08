@@ -76,7 +76,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         hitRegions = new CircularHitRegions(new Vector(canvasWidth / 2, canvasHeight / 3.3));
         hitRegions.addRegion(new Vector(canvasWidth / 2, canvasHeight / 3.3), radiusOfIndicators);
         
-        textHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.04, new Vector(100, 100), "", false);
+        textHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 0, 1.0], appMetaData.getCanvasHeight() * 0.04, new Vector(100, 100), "", false);
         
         Cursor = p_Cursor;
         InputEventsManager = p_InputEventsManager;

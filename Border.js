@@ -39,7 +39,7 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         
         handler = EffectsManager.requestLightningEffect(false, gl, 3, {}, borderPath);
         handler.setToBorderPath(gl, borderPath[0], borderPath[10]);
-        scoreHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.05, new Vector(scoreX, scoreY), "0", false);
+        scoreHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 0, 1.0], appMetaData.getCanvasHeight() * 0.05, new Vector(scoreX, scoreY), "0", false);
         healthBarHandler = EffectsManager.requestLifebarHandler(false, gl, 60, new Vector(borderPath[0], borderPath[1] - 50), new Vector(borderPath[borderPath.length-2], borderPath[borderPath.length-1] - 50), {});
         lightningStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, new Vector(scoreX, scoreY), new Vector(scoreX, 0), {lineWidth: [10], glowFactor: [20]});
         lightningStrikeHandler.setDuration(4000);

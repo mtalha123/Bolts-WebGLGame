@@ -10,7 +10,7 @@ define(['EventSystem', 'Custom Utility/Vector'], function(EventSystem, Vector){
         callbackToSwitchState = p_callbackToSwitchState;
         InputEventsManager = p_InputEventsManager;
         appMetaData = p_appMetaData;
-        pausedTextHandler = TextManager.requestTextHandler("Comic Sans MS", "yellow", appMetaData.getCanvasHeight() * 0.04, new Vector(100, 100), "", false);
+        pausedTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 0, 1.0], appMetaData.getCanvasHeight() * 0.04, new Vector(100, 100), "", false);
     }
     
     function update(){
