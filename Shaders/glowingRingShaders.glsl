@@ -29,9 +29,7 @@ void main()
     uv.x *= aspectRatio;
     center.x *= aspectRatio;
     
-    
-    float angleOfCompletion = angleCompletion * (2.0 * PI);
-    uv = rotateCoord(uv, abs((PI / 2.0) - angleOfCompletion), center);    
+    float angleOfCompletion = angleCompletion * (2.0 * PI);   
     float uvAngle = getUVAngle(uv, center);
     vec2 pointOnRing = center + (normalize(uv - center) * radius);
     vec4 color;

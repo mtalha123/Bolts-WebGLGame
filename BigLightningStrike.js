@@ -12,6 +12,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
     var lightningStrikeSoundEffect;
     var mouseIconClickedHandler;
     var mouseIconUnclickedHandler;
+    var particlesFromDestroyedTargetHandlers = [];
     
     var mouseAnimationTimer;
     var mouseAnimationClicked = false;
@@ -32,6 +33,11 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
         lgStrikeHandler = EffectsManager.requestLightningStrikeHandler(false, gl, 100, startCoord, new Vector(100, 100), {lineWidth: [6], glowFactor: [40], jaggedFactor: [1], fluctuation: [80], boltColor: [1.0, 0.0, 0.4]});
         lgStrikeHandler.setDuration(6000);
         lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
+        
+        for(var i = 0; i < 5; i++){
+            particlesFromDestroyedTargetHandlers[i] = EffectsManager.requestBasicParticleEffect(false, gl, 20, 300, new Vector(100, 100), {FXType: [5], maxLifetime: [1000], radiusOfSource: [60], particlesColor: [1.0, 0.0, 0.4]});
+            particlesFromDestroyedTargetHandlers[i].setDestinationForParticles(startCoord);
+        }
         
         EventSystem.register(receiveEvent, "right_mouse_down");
         EventSystem.register(receiveEvent, "left_mouse_down");
@@ -84,7 +90,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
                 mouseIconClickedHandler.shouldDraw(false);
                 EventSystem.publishEventImmediately("lightning_strike", {start: startCoord, end: Cursor.getPosition(), width: widthOfAreaCovered});
             }
-        }else if(eventInfo.eventType === "right_mouse_down" || eventInfo.eventType === "right_mouse_held_down"){
+        }else if(eventInfo.eventType === "right_mouse_down" || eventInfo.eventType === "right_mouse_held_down"){            
             if(canActivate){
                 if(readyToFire){
                     readyToFire = false;
@@ -101,12 +107,25 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
         }else if(eventInfo.eventType === "entity_destroyed" && eventInfo.eventData.type === "bonus"){
             if(currNumCharges < numChargesNeeded){
                 currNumCharges++;
-                glowingRingHandler.setCompletion(currNumCharges / numChargesNeeded);
                 
-                if(currNumCharges === numChargesNeeded){
-                    lgBoltIconHandler.setColor(1.0, 0.0, 0.4);
-                    mouseAnimationTimer.start();
+                var particlesHandlerToUse = particlesFromDestroyedTargetHandlers[0];
+                for(var i = 0; i < particlesFromDestroyedTargetHandlers.length; i++){
+                    if(!particlesFromDestroyedTargetHandlers[i].isDrawing()){
+                        particlesHandlerToUse = particlesFromDestroyedTargetHandlers[i];
+                        break;
+                    }
                 }
+                
+                particlesHandlerToUse.setPosition(eventInfo.eventData.entity.getPosition());
+                particlesHandlerToUse.setRadiusOfSource(eventInfo.eventData.entity.getRadius() * 2);
+                particlesHandlerToUse.doEffect(function(){
+                    glowingRingHandler.setCompletion(currNumCharges / numChargesNeeded);
+
+                    if(currNumCharges === numChargesNeeded){
+                        lgBoltIconHandler.setColor(1.0, 0.0, 0.4);
+                        mouseAnimationTimer.start();
+                    }
+                });
             }
         }else if(eventInfo.eventType === "game_restart"){
             currNumCharges = 0;

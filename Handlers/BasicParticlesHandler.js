@@ -4,6 +4,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     // FXType 2: Particles flowing toward destination
     // FXType 3: Particles flowing out of center randomly
     // FXType 4: Particles flowing upward slowly
+    // FXType 5: Particles flowing toward destination but only meant to occur once (not repeatedly respawning as in FXType 2)
     
     function BasicParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts, ShaderLibrary){        
         this._uniforms = {
@@ -114,6 +115,11 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     
     BasicParticlesHandler.prototype.getDestinationForParticles = function(){
         return new Vector(this._uniforms.destination.value[0], this._uniforms.destination.value[1]);
+    } 
+    
+        
+    BasicParticlesHandler.prototype.setRadiusOfSource = function(radiusOfSource){
+        this._uniforms.radiusOfSource.value[0] = radiusOfSource;
     }    
     
     BasicParticlesHandler.prototype.setTimeIncrementor = function(timeIncrementor){
