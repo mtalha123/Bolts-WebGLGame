@@ -120,7 +120,6 @@
                 if(currActivatedTargetObj.stage === 3){
                     this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
                     if(isLastTarget){
-                        EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
                         timingCallbacks.removeTimingEvents(this);
                         return true;
                     }
