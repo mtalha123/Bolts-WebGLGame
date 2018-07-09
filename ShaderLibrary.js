@@ -20,7 +20,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var GLOWING_RING = "GLOWING_RING";
     var SPRITE = "SPRITE";
     var RECTANGLE = "RECTANGLE";
-    var LINE_SEGMENT = "LINE_SEGMENT";
     var STRAIGHT_ARROW = "STRAIGHT_ARROW";
     var CIRCLE_ARROW = "CIRCLE_ARROW";
     
@@ -100,7 +99,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         GLOWING_RING: GLOWING_RING,
         SPRITE: SPRITE,
         RECTANGLE: RECTANGLE,
-        LINE_SEGMENT: LINE_SEGMENT,
         STRAIGHT_ARROW: STRAIGHT_ARROW,
         CIRCLE_ARROW: CIRCLE_ARROW
     };
