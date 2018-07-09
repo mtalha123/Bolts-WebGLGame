@@ -80,6 +80,10 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         this._uniforms.iGlobalTime.value[0] = this._time;
     }
     
+    Handler.prototype.isDrawing = function(){
+        return this._shouldDraw;
+    }
+    
     Handler.prototype.resetProperties = function(opts){
         this._setToDefaultUniforms(opts);
     }
