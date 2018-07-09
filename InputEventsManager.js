@@ -68,11 +68,11 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
     function handleMouseEvent(eventType, eventData){        
         switch(eventType){
             case "mousedown":
-                if(event.button === 0){ // left click
+                if(eventData.button === 0){ // left click
                     Cursor.press();
                     inputObj.mouseState.type = "left_mouse_down";
                     leftMouseDown = true;
-                }else if(event.button === 2){ // right click
+                }else if(eventData.button === 2){ // right click
                     inputObj.mouseState.type = "right_mouse_down";
                     rightMouseDown = true;
                 }
