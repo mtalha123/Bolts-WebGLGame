@@ -9,7 +9,7 @@
 requirejs.config({
     baseUrl : "./",
     paths : {
-        socketio: 'http://192.168.0.13:4000/socket.io/socket.io.js'
+        socketio: 'http://192.168.0.12:4000/socket.io/socket.io.js'
     },
     shim: {
         'socketio': {
@@ -21,8 +21,6 @@ requirejs.config({
 
 
 require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 'SynchronizedTimers', 'ShaderLibrary', 'EffectsManager', 'appMetaData', 'AssetManager', 'LoadingState', 'StartingState', 'PlayingState', 'RestartState', 'PausedState', 'timingCallbacks', 'Border', 'AudioManager', 'TextManager'], function(Timer, Cursor, EventSystem, InputEventsManager, SynchronizedTimers, ShaderLibrary, EffectsManager, appMetaData, AssetManager, LoadingState, StartingState, PlayingState, RestartState, PausedState, timingCallbacks, Border, AudioManager, TextManager){
-
-//-----------------------  INITIALIZATION STUFF---------------------------------------
     
     var body = document.getElementsByTagName("body");
 
@@ -45,7 +43,6 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
     var context = (document.getElementById("2dCanvas")).getContext("2d");
     context.canvas.width = canvasWidth;
     context.canvas.height = canvasHeight;
-//-------------------------------------------------------------------------------------
     
     var tickTimer = new Timer();
     
