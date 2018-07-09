@@ -7,6 +7,7 @@ define(['EventSystem'], function(EventSystem){
         this._handler = null;
         this._alive = false;
         this._type = undefined; // type of Entity this is. This will be overridden by specific entities.
+        this._radius = undefined;
         this._scoreWorth = 1;
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
@@ -75,6 +76,10 @@ define(['EventSystem'], function(EventSystem){
     
     Entity.prototype.getScoreWorth = function(){
         return this._scoreWorth;
+    }  
+    
+    Entity.prototype.getRadius = function(){
+        return this._radius;
     }
     
     Entity.prototype.receiveEvent = function(eventInfo){
