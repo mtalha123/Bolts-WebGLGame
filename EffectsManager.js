@@ -1,4 +1,4 @@
-define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTargetHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/BasicParticlesHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler', 'Handlers/StraightArrowHandler', 'Handlers/CircleArrowHandler'], function(map, LightningHandler, BasicTargetHandler, CursorHandler, ComboHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, BasicParticlesHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler, StraightArrowHandler, CircleArrowHandler){
+define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTargetHandler', 'Handlers/CursorHandler', 'Handlers/ComboHandler', 'Handlers/LightningOrbHandler', 'Handlers/LightningOrbStreakHandler', 'Handlers/BubblyOrbHandler', 'Handlers/TriangularTargetHandler', 'Handlers/FourPointTargetHandler', 'Handlers/SpikeEnemyHandler', 'Handlers/FullScreenColorHandler', 'Handlers/LifebarHandler', 'Custom Utility/Timer', 'Handlers/TentacleEnemyHandler', 'Handlers/OrbitEnemyHandler', 'Handlers/RingLightningHandler', 'Handlers/TeleportationTargetHandler', 'Handlers/LightningStrikeHandler', 'Handlers/GlowingRingHandler', 'Handlers/SpriteHandler', 'Handlers/RectangleHandler', 'Handlers/StraightArrowHandler', 'Handlers/CircleArrowHandler', 'Handlers/ParticleExplosionHandler', 'Handlers/DirectedParticlesHandler', 'Handlers/ParticlesFlowingFromCenterHandler', 'Handlers/ParticlesFlowingUpwardHandler'], function(map, LightningHandler, BasicTargetHandler, CursorHandler, ComboHandler, LightningOrbHandler, LightningOrbStreakHandler, BubblyOrbHandler, TriangularTargetHandler, FourPointTargetHandler, SpikeEnemyHandler, FullScreenColorHandler, LifebarHandler, Timer, TentacleEnemyHandler, OrbitEnemyHandler, RingLightningHandler, TeleportationTargetHandler, LightningStrikeHandler, GlowingRingHandler, SpriteHandler, RectangleHandler, StraightArrowHandler, CircleArrowHandler, ParticleExplosionHandler, DirectedParticlesHandler, ParticlesFlowingFromCenterHandler, ParticlesFlowingUpwardHandler){
     
     var allHandlers = [];
     var automaticUpdatesHandlerObjs = [];
@@ -117,13 +117,6 @@ define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTarget
         return handler;
     }
     
-    function requestBasicParticleEffect(shouldDraw, gl, numParticles, zOrder, position, opts){
-        var handler = new BasicParticlesHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary);
-
-        addHandlers(handler);
-        return handler;
-    }
-    
     function requestFullScreenColorHandler(shouldDraw, zOrder, gl){
         var handler = new FullScreenColorHandler(shouldDraw, zOrder, gl, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), ShaderLibrary);
 
@@ -206,6 +199,34 @@ define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTarget
         
         addHandlers(handler.getAllHandlers());
         return handler;
+    }   
+    
+    function requestParticleExplosionEffect(shouldDraw, gl, numParticles, zOrder, position, opts){
+        var handler = new ParticleExplosionHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary);
+
+        addHandlers(handler);
+        return handler;
+    }
+    
+    function requestDirectedParticlesEffect(shouldDraw, gl, numParticles, zOrder, position, opts){
+        var handler = new DirectedParticlesHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary);
+
+        addHandlers(handler);
+        return handler;
+    }
+    
+    function requestParticlesFlowingFromCenterEffect(shouldDraw, gl, numParticles, zOrder, position, opts){
+        var handler = new ParticlesFlowingFromCenterHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary);
+
+        addHandlers(handler);
+        return handler;
+    }
+    
+    function requestParticlesFlowingUpwardEffect(shouldDraw, gl, numParticles, zOrder, position, opts){
+        var handler = new ParticlesFlowingUpwardHandler(shouldDraw, numParticles, appMetaData.getCanvasWidth(), appMetaData.getCanvasHeight(), gl, zOrder, position, opts, ShaderLibrary);
+
+        addHandlers(handler);
+        return handler;
     }
     
     function getHandlers(){
@@ -232,7 +253,6 @@ define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTarget
         requestTriangularTargetEffect: requestTriangularTargetEffect,
         requestFourPointLightningEffect: requestFourPointLightningEffect,
         requestEnemySpikeEffect: requestEnemySpikeEffect,
-        requestBasicParticleEffect: requestBasicParticleEffect,
         requestFullScreenColorHandler: requestFullScreenColorHandler,
         requestLifebarHandler: requestLifebarHandler,
         requestTentacleEnemyHandler: requestTentacleEnemyHandler,
@@ -244,7 +264,11 @@ define(['Custom Utility/map', 'Handlers/LightningHandler', 'Handlers/BasicTarget
         requestSpriteHandler: requestSpriteHandler,
         requestRectangleHandler: requestRectangleHandler,
         requestStraightArrowHandler: requestStraightArrowHandler,
-        requestCircleArrowHandler: requestCircleArrowHandler
+        requestCircleArrowHandler: requestCircleArrowHandler,
+        requestParticleExplosionEffect: requestParticleExplosionEffect,
+        requestDirectedParticlesEffect: requestDirectedParticlesEffect,
+        requestParticlesFlowingFromCenterEffect: requestParticlesFlowingFromCenterEffect,
+        requestParticlesFlowingUpwardEffect: requestParticlesFlowingUpwardEffect
     };
     
 });

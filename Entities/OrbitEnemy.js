@@ -7,11 +7,11 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         this._type = "enemy";
         
         this._handler = EffectsManager.requestOrbitEnemy(false, gl, 20, position, {radius: [this._radius]});
-        this._particlesEmanatingHandler = EffectsManager.requestBasicParticleEffect(false, gl, 7, 30, new Vector(0, 0), {FXType: [3], maxLifetime: [80], radiusOfParticlesEmanating: [p_radius * 1.5], particlesColor: [1.0, 0.0, 0.0]});
+        this._particlesEmanatingHandler = EffectsManager.requestParticlesFlowingFromCenterEffect(false, gl, 7, 30, new Vector(0, 0), {maxLifetime: [80], radiusOfParticlesEmanating: [p_radius * 1.5], particlesColor: [1.0, 0.0, 0.0]});
         
         this._particlesDirectedHandlersPool = [];
         for(var i = 0; i < 4; i++){
-            this._particlesDirectedHandlersPool[i] = EffectsManager.requestBasicParticleEffect(false, gl, 20, 30, position, {FXType: [2], maxLifetime: [200], radiusOfSource: [p_radius / 3.0], particlesColor: [1.0, 0.0, 0.0]});
+            this._particlesDirectedHandlersPool[i] = EffectsManager.requestDirectedParticlesEffect(false, gl, 20, 30, position, {randomLifetimesOn: [1.0], maxLifetime: [200], radiusOfSource: [p_radius / 3.0], particlesColor: [1.0, 0.0, 0.0]});
             this._particlesDirectedHandlersPool[i].setTimeIncrementor(5);
         }
         
@@ -82,7 +82,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
         this._nextCapturePosition = rotateCoord(this._nextCapturePosition, angleIncrement, this._position);   
         
         for(var i = 0; i < this._particlesDirectedHandlersActive.length; i++){
-            this._particlesDirectedHandlersActive[i].setDestinationForParticles(rotateCoord(this._particlesDirectedHandlersActive[i].getDestinationForParticles(), angleIncrement, this._position));
+            this._particlesDirectedHandlersActive[i].setDestination(rotateCoord(this._particlesDirectedHandlersActive[i].getDestination(), angleIncrement, this._position));
             this._particlesDirectedHandlersActive[i].update();
         }
         
@@ -103,7 +103,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
                 this._particlesDirectedHandlersActive.push(this._particlesDirectedHandlersPool.shift());
                 this._particlesDirectedHandlersActive[this._numCapturedEntities - 1].shouldDraw(true);
                 this._particlesDirectedHandlersActive[this._numCapturedEntities - 1].setPosition(this._position);
-                this._particlesDirectedHandlersActive[this._numCapturedEntities - 1].setDestinationForParticles(this._nextCapturePosition);
+                this._particlesDirectedHandlersActive[this._numCapturedEntities - 1].setDestination(this._nextCapturePosition);
                 this._nextCapturePosition = rotateCoord(this._nextCapturePosition, Math.PI / 2, this._position);
                 if(this._numCapturedEntities === 4){
                     this._particlesEmanatingHandler.shouldDraw(false);

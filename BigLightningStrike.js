@@ -35,8 +35,8 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
         lightningStrikeSoundEffect = AudioManager.getAudioHandler("lightning_strike_sound_effect");
         
         for(var i = 0; i < 5; i++){
-            particlesFromDestroyedTargetHandlers[i] = EffectsManager.requestBasicParticleEffect(false, gl, 20, 300, new Vector(100, 100), {FXType: [5], maxLifetime: [1000], radiusOfSource: [60], particlesColor: [1.0, 0.0, 0.4]});
-            particlesFromDestroyedTargetHandlers[i].setDestinationForParticles(startCoord);
+            particlesFromDestroyedTargetHandlers[i] = EffectsManager.requestDirectedParticlesEffect(false, gl, 20, 300, new Vector(100, 100), {maxLifetime: [1000], radiusOfSource: [60], particlesColor: [1.0, 0.0, 0.4]});
+            particlesFromDestroyedTargetHandlers[i].setDestination(startCoord);
         }
         
         EventSystem.register(receiveEvent, "right_mouse_down");

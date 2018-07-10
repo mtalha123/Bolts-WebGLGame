@@ -1,4 +1,4 @@
-define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'timingCallbacks', 'Handlers/BasicParticlesHandler'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, coordsToRGB, Vector, timingCallbacks, BasicParticlesHandler){
+define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/getGLTextureForNoise', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector', 'timingCallbacks', 'Handlers/ParticleExplosionHandler'], function(Handler, getVerticesUnNormalized, getVerticesNormalized, getGLCoordsFromNormalizedShaderCoords, getGLTextureForNoise, coordsToRGB, Vector, timingCallbacks, ParticleExplosionHandler){
     
     function LightningStrikeHandler(shouldDraw, canvasWidth, canvasHeight, gl, zOrder, lightningStart, lightningEnd, opts, ShaderLibrary, noiseTextureData){
         this._uniforms = { 
@@ -51,7 +51,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIGHTNING_STRIKE);        
         Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);
-        this._particlesHandler = new BasicParticlesHandler(false, 30, canvasWidth, canvasHeight, gl, zOrder, lightningEnd, {FXType: [1], maxLifetime: [300], particlesColor: [1.0, 1.0, 0.7], radiusOfExplosion: [canvasHeight * 0.08]}, ShaderLibrary);
+        this._particlesHandler = new ParticleExplosionHandler(false, 30, canvasWidth, canvasHeight, gl, zOrder, lightningEnd, {maxLifetime: [300], particlesColor: [1.0, 1.0, 0.7], radiusOfExplosion: [canvasHeight * 0.08]}, ShaderLibrary);
         this._handlers.push(this._particlesHandler);
         this.setLightningStrikeCoords(lightningStart, lightningEnd);
         this._duration = 1000;

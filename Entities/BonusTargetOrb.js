@@ -6,14 +6,14 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [p_radius]});
-        this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 50, 30, new Vector(0, 0), {FXType: [2], maxLifetime: [100], radiusOfSource: [p_radius * 1.5]});
+        this._particlesHandler = EffectsManager.requestDirectedParticlesEffect(false, gl, 50, 30, new Vector(0, 0), {randomLifetimesOn: [1.0], maxLifetime: [100], radiusOfSource: [p_radius * 1.5]});
         this._particlesDestDist = 0.1 * canvasHeight;
         this._scoreWorth = 4;
         this._currParticlesDirection = "LEFT";
         this._type = "bonus";        
         this._currentStage = 1;
         this._nextOrbSpawnPosition = new Vector(0, 0); 
-        this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [p_radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
         this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(p_radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);
@@ -74,13 +74,13 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._currParticlesDirection = direction;
         
         if(direction === "LEFT"){
-            this._particlesHandler.setDestinationForParticles(new Vector(this._position.getX() - this._particlesDestDist, this._position.getY()));
+            this._particlesHandler.setDestination(new Vector(this._position.getX() - this._particlesDestDist, this._position.getY()));
         }else if(direction === "UP"){
-            this._particlesHandler.setDestinationForParticles(new Vector(this._position.getX(), this._position.getY() + this._particlesDestDist));
+            this._particlesHandler.setDestination(new Vector(this._position.getX(), this._position.getY() + this._particlesDestDist));
         }else if(direction === "RIGHT"){
-            this._particlesHandler.setDestinationForParticles(new Vector(this._position.getX() + this._particlesDestDist, this._position.getY()));
+            this._particlesHandler.setDestination(new Vector(this._position.getX() + this._particlesDestDist, this._position.getY()));
         }else if(direction === "DOWN"){
-            this._particlesHandler.setDestinationForParticles(new Vector(this._position.getX(), this._position.getY() - this._particlesDestDist));
+            this._particlesHandler.setDestination(new Vector(this._position.getX(), this._position.getY() - this._particlesDestDist));
         } 
     }
     

@@ -7,7 +7,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._type = "bonus";
         
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [p_radius]});
-        this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._particlesHandler = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [p_radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
         this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(p_radius * 2, 0)), "Bonus", false);
         

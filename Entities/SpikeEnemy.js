@@ -7,7 +7,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._type = "enemy";
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
-        this._particlesHandler = EffectsManager.requestBasicParticleEffect(false, gl, 25, 30, position, {FXType: [2], maxLifetime: [100], radiusOfSource: [canvasHeight * 0.02], particlesColor: [1.0, 1.0, 0.7]});
+        this._particlesHandler = EffectsManager.requestDirectedParticlesEffect(false, gl, 25, 30, position, {randomLifetimesOn: [1], maxLifetime: [100], radiusOfSource: [canvasHeight * 0.02], particlesColor: [1.0, 1.0, 0.7]});
         this._particlesHandler.setTimeIncrementor(6);
                 
         this._destination = new Vector(0, 0);
@@ -69,7 +69,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
             this._setPositionWithInterpolation(newPos);   
         }else{
             this._particlesHandler.shouldDraw(true);
-            this._particlesHandler.setDestinationForParticles(this._position);
+            this._particlesHandler.setDestination(this._position);
             this._particlesHandler.setPosition(this._destination);
             this._prevPosition = this._position;
             

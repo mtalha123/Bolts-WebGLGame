@@ -9,7 +9,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         this._numSlicesNeededToDestroy = 2;
-        this._disintegratingParticles = EffectsManager.requestBasicParticleEffect(false, gl, 40, 100, position, {FXType: [4], maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [p_radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
         this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(p_radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);

@@ -9,7 +9,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var TRIANGULAR_TARGET = "TRIANGULAR_TARGET";
     var FOUR_POINT_TARGET = "FOUR_POINT_TARGET";
     var ENEMY_SPIKE = "ENEMY_SPIKE";
-    var PARTICLE = "PARTICLE";
     var FULL_SCREEN_COLOR = "FULL_SCREEN_COLOR";
     var LIFEBAR = "LIFEBAR";
     var TENTACLE_ENEMY = "TENTACLE_ENEMY";
@@ -22,6 +21,10 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
     var RECTANGLE = "RECTANGLE";
     var STRAIGHT_ARROW = "STRAIGHT_ARROW";
     var CIRCLE_ARROW = "CIRCLE_ARROW";
+    var PARTICLE_EXPLOSION = "PARTICLE_EXPLOSION";
+    var DIRECTED_PARTICLES = "DIRECTED_PARTICLES";
+    var PARTICLES_FLOWING_FROM_CENTER = "PARTICLES_FLOWING_FROM_CENTER";
+    var PARTICLES_FLOWING_UPWARD = "PARTICLES_FLOWING_UPWARD";
     
     var allPrograms = {};    
     
@@ -88,7 +91,6 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         TRIANGULAR_TARGET: TRIANGULAR_TARGET,
         FOUR_POINT_TARGET: FOUR_POINT_TARGET,
         ENEMY_SPIKE: ENEMY_SPIKE,
-        PARTICLE: PARTICLE,
         FULL_SCREEN_COLOR: FULL_SCREEN_COLOR,
         LIFEBAR: LIFEBAR,
         TENTACLE_ENEMY: TENTACLE_ENEMY,
@@ -100,6 +102,10 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
         SPRITE: SPRITE,
         RECTANGLE: RECTANGLE,
         STRAIGHT_ARROW: STRAIGHT_ARROW,
-        CIRCLE_ARROW: CIRCLE_ARROW
+        CIRCLE_ARROW: CIRCLE_ARROW,
+        PARTICLE_EXPLOSION: PARTICLE_EXPLOSION,
+        DIRECTED_PARTICLES: DIRECTED_PARTICLES,
+        PARTICLES_FLOWING_FROM_CENTER: PARTICLES_FLOWING_FROM_CENTER,
+        PARTICLES_FLOWING_UPWARD: PARTICLES_FLOWING_UPWARD
     };
 });
