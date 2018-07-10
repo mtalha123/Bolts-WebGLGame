@@ -52,6 +52,7 @@ define(['SynchronizedTimers', 'Controllers/EntityController', 'Custom Utility/Ra
         EntityController.prototype.reset.call(this);        
         this._spawnTimer.reset();
         this._spawnAttemptDelay = 3000;
+        this._chanceOfSpawning = 0;
     }
     
     return EntityControllerThatSpawns;
