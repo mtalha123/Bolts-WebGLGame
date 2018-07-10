@@ -18,10 +18,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetBubblyOrb.prototype = Object.create(Entity.Entity.prototype);
     BonusTargetBubblyOrb.prototype.constructor = BonusTargetBubblyOrb;
     
-    BonusTargetBubblyOrb.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     BonusTargetBubblyOrb.prototype.spawn = function(callback){
         Entity.Entity.prototype.spawn.call(this, callback);
         this._bonusTextHandler.doFadeUpwardsEffect();

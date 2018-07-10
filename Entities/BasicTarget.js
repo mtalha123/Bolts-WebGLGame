@@ -22,10 +22,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     BasicTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     BasicTarget.prototype.constructor = BasicTarget;
     
-    BasicTarget.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     BasicTarget.prototype.setPosition = function(newPosition){
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);

@@ -34,10 +34,6 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     OrbitEnemy.prototype = Object.create(Entity.Entity.prototype);
     OrbitEnemy.prototype.constructor = OrbitEnemy;
     
-    OrbitEnemy.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     OrbitEnemy.prototype.setPosition = function(newPosition){
         this._position = this._prevPosition = newPosition; 
         this._handler.setPosition(newPosition);

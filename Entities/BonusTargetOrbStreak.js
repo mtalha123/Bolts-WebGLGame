@@ -19,10 +19,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreak.prototype = Object.create(Entity.Entity.prototype);
     BonusTargetOrbStreak.prototype.constructor = BonusTargetOrbStreak;
     
-    BonusTargetOrbStreak.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     BonusTargetOrbStreak.prototype.setPosition = function(newPosition){
         Entity.Entity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);

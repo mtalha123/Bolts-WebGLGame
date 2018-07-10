@@ -28,10 +28,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     TentacleEnemy.prototype = Object.create(Entity.Entity.prototype);
     TentacleEnemy.prototype.constructor = TentacleEnemy;
     
-    TentacleEnemy.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     TentacleEnemy.prototype.setPosition = function(newPosition){
         Entity.Entity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);

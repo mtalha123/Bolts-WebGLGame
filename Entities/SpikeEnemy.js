@@ -26,10 +26,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     SpikeEnemy.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     SpikeEnemy.prototype.constructor = SpikeEnemy;
     
-    SpikeEnemy.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     SpikeEnemy.prototype.setPosition = function(newPosition){
         this._position = this._prevPosition = newPosition; 
         this._handler.setPosition(newPosition);

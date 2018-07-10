@@ -33,10 +33,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     TeleportationTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
     TeleportationTarget.prototype.constructor = TeleportationTarget;
     
-    TeleportationTarget.prototype.getRadius = function(){
-        return this._radius;
-    }
-    
     TeleportationTarget.prototype.setPosition = function(newPosition){
         MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);        
         this._hitbox.setPosition(newPosition);        
