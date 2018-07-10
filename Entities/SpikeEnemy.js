@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm){
     
     function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
+        MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
@@ -23,7 +23,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     //inherit from MovingEntity
-    SpikeEnemy.prototype = Object.create(MovingEntity.MovingEntity.prototype);
+    SpikeEnemy.prototype = Object.create(MovingEntity.prototype);
     SpikeEnemy.prototype.constructor = SpikeEnemy;
     
     SpikeEnemy.prototype.setPosition = function(newPosition){
@@ -34,13 +34,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     SpikeEnemy.prototype._setPositionWithInterpolation = function(newPosition){
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
+        MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
     }
     
     SpikeEnemy.prototype.reset = function(){
-        MovingEntity.MovingEntity.prototype.reset.call(this);
+        MovingEntity.prototype.reset.call(this);
         this._lightningStealTimer.reset();
         this._charge = 0;
         this._hitbox.resetAlgorithm();
@@ -48,13 +48,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     } 
     
     SpikeEnemy.prototype.spawn = function(callback){
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        MovingEntity.prototype.spawn.call(this, callback);
         this._lightningStealTimer.start();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
     } 
     
     SpikeEnemy.prototype.prepareForDrawing = function(interpolation){
-        MovingEntity.MovingEntity.prototype.prepareForDrawing.call(this, interpolation);
+        MovingEntity.prototype.prepareForDrawing.call(this, interpolation);
         this._hitbox.prepareForDrawing();
         this._particlesHandler.update();
     }
@@ -110,7 +110,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         
     SpikeEnemy.prototype.receiveEvent = function(eventInfo){
         var chargeCopy = this._charge; // Need this because the following line of code may reset it
-        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        MovingEntity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "lightning_strike"){
             // check to see if its been destroyed by lightning strike

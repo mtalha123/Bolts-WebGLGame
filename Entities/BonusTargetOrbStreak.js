@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem', 'timingCallbacks', 'Custom Utility/Vector'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem, timingCallbacks, Vector){
 
     function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager, TextManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "bonus";
@@ -16,25 +16,25 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     //inherit from Entity
-    BonusTargetOrbStreak.prototype = Object.create(Entity.Entity.prototype);
+    BonusTargetOrbStreak.prototype = Object.create(Entity.prototype);
     BonusTargetOrbStreak.prototype.constructor = BonusTargetOrbStreak;
     
     BonusTargetOrbStreak.prototype.setPosition = function(newPosition){
-        Entity.Entity.prototype.setPosition.call(this, newPosition);
+        Entity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._disintegratingParticles.setPosition(newPosition);
         this._bonusTextHandler.setPosition(newPosition.addTo(new Vector(this._radius * 2, 0)));
     }
     
     BonusTargetOrbStreak.prototype._setPositionWithInterpolation = function(newPosition){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
+        Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._disintegratingParticles.setPosition(newPosition);
         this._bonusTextHandler.setPosition(newPosition.addTo(new Vector(this._radius * 2, 0)));
     }
     
     BonusTargetOrbStreak.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        Entity.prototype.reset.call(this);
         this._numSlicesNeededToDestroy = 2;
     }
     
@@ -56,7 +56,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     BonusTargetOrbStreak.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        Entity.prototype.spawn.call(this, callback);
         this._handler.setLightningState(true);
         timingCallbacks.addTimingEvents(this, 3000, 1, function(){}, function(){
             this._disintegratingParticles.doEffect();
@@ -70,12 +70,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     BonusTargetOrbStreak.prototype.prepareForDrawing = function(interpolation){
-        Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
+        Entity.prototype.prepareForDrawing.call(this, interpolation);
         this._bonusTextHandler.draw();
     }
     
     BonusTargetOrbStreak.prototype.receiveEvent = function(eventInfo){
-        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        Entity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "game_lost"){
             timingCallbacks.removeTimingEvents(this);

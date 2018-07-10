@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector', 'SliceAlgorithm', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Border', 'Custom Utility/Random', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, Entity, CircularHitBox, Vector, SliceAlgorithm, CircularHitBoxWithAlgorithm, Border, Random, EventSystem, timingCallbacks){
 
     function BonusTargetOrb(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager, TextManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager, TextManager);     
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager, TextManager);     
         
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
@@ -20,11 +20,11 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     }
     
     //inherit from Entity
-    BonusTargetOrb.prototype = Object.create(Entity.Entity.prototype);
+    BonusTargetOrb.prototype = Object.create(Entity.prototype);
     BonusTargetOrb.prototype.constructor = BonusTargetOrb;
     
     BonusTargetOrb.prototype.setPosition = function(newPosition){
-        Entity.Entity.prototype.setPosition.call(this, newPosition);
+        Entity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
         this._setNextOrbSpawnDirection();
@@ -34,7 +34,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     }
     
     BonusTargetOrb.prototype._setPositionWithInterpolation = function(newPosition){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
+        Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
         this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
         this.setParticlesDirection(this._currParticlesDirection);
@@ -44,13 +44,13 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     }
     
     BonusTargetOrb.prototype.prepareForDrawing = function(interpolation){
-        Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
+        Entity.prototype.prepareForDrawing.call(this, interpolation);
         this._particlesHandler.update();
         this._bonusTextHandler.draw();
     }
     
     BonusTargetOrb.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        Entity.prototype.spawn.call(this, callback);
         this._particlesHandler.shouldDraw(true);
         this._handler.turnOnLightning();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "bonus"});
@@ -63,7 +63,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     }
     
     BonusTargetOrb.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        Entity.prototype.reset.call(this);
         this._hitbox.resetAlgorithm();
         this._particlesHandler.reset();
         this._currentStage = 1;
@@ -145,7 +145,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
     }
     
     BonusTargetOrb.prototype.receiveEvent = function(eventInfo){
-        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        Entity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "lightning_strike"){
             // check to see if its been destroyed by lightning strike

@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'Custom Utility/Timer', 'Custom Utility/Random', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'Border', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, Timer, Random, SliceAlgorithm, MainTargetsPositions, EventSystem, Border, timingCallbacks){
 
     function TeleportationTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
+        MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         
@@ -30,23 +30,23 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     //inherit from MovingEntity
-    TeleportationTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
+    TeleportationTarget.prototype = Object.create(MovingEntity.prototype);
     TeleportationTarget.prototype.constructor = TeleportationTarget;
     
     TeleportationTarget.prototype.setPosition = function(newPosition){
-        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);        
+        MovingEntity.prototype.setPosition.call(this, newPosition);        
         this._hitbox.setPosition(newPosition);        
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     TeleportationTarget.prototype._setPositionWithInterpolation = function(newPosition){                
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);        
+        MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);        
         this._hitbox.setPosition(newPosition);        
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     TeleportationTarget.prototype.reset = function(){
-        MovingEntity.MovingEntity.prototype.reset.call(this);
+        MovingEntity.prototype.reset.call(this);
         MainTargetsPositions.removeTargetObj(this);
         this._hitbox.resetAlgorithm();
         this._visible = false;
@@ -58,7 +58,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     
     TeleportationTarget.prototype.spawn = function(callback){
         MainTargetsPositions.addTargetObj(this, this._position);
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        MovingEntity.prototype.spawn.call(this, callback);
         this._timer.start();
         this._visible = true;
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
@@ -81,7 +81,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     TeleportationTarget.prototype.update = function(){
-        MovingEntity.MovingEntity.prototype.update.call(this);
+        MovingEntity.prototype.update.call(this);
         
         if(this._alive){
             if(this._timer.getTime() > this._timeForAppearanceOrDisappearance){
@@ -120,7 +120,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     TeleportationTarget.prototype.receiveEvent = function(eventInfo){
-        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        MovingEntity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){

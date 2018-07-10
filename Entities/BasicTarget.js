@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
     function BasicTarget(canvasWidth, canvasHeight, gl, p_radius, numbolts, position, EffectsManager, AudioManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
+        MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._physicsBody = new CirclePhysicsBody(position, canvasHeight, p_radius + (0.02 * canvasHeight), new Vector(0, 0));
@@ -19,23 +19,23 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     //inherit from MovingEntity
-    BasicTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
+    BasicTarget.prototype = Object.create(MovingEntity.prototype);
     BasicTarget.prototype.constructor = BasicTarget;
     
     BasicTarget.prototype.setPosition = function(newPosition){
-        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
+        MovingEntity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     BasicTarget.prototype._setPositionWithInterpolation = function(newPosition){                
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
+        MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         MainTargetsPositions.updateTargetPosition(this, newPosition);
     }
     
     BasicTarget.prototype.reset = function(){
-        MovingEntity.MovingEntity.prototype.reset.call(this);
+        MovingEntity.prototype.reset.call(this);
         MainTargetsPositions.removeTargetObj(this);
         this._hitbox.resetAlgorithm();
         this._currSlicesDone = 0;
@@ -45,7 +45,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     BasicTarget.prototype.spawn = function(callback){
         MainTargetsPositions.addTargetObj(this, this._position);
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        MovingEntity.prototype.spawn.call(this, callback);
         this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
         this._spawnSoundEffect.play();
     }
@@ -66,12 +66,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     BasicTarget.prototype.destroyAndReset = function(callback){
-        MovingEntity.MovingEntity.prototype.destroyAndReset.call(this, callback);
+        MovingEntity.prototype.destroyAndReset.call(this, callback);
         MainTargetsPositions.removeTargetObj(this);
     }
     
     BasicTarget.prototype.receiveEvent = function(eventInfo){
-        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        MovingEntity.prototype.receiveEvent.call(this, eventInfo);
 
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){

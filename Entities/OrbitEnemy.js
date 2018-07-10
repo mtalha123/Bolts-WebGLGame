@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm', 'MainTargetsPositions', 'Custom Utility/rotateCoord', 'Custom Utility/Timer'], function(CirclePhysicsBody, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm, MainTargetsPositions, rotateCoord, Timer){
     
     function OrbitEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
@@ -31,7 +31,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     }
 
     //inherit from Entity
-    OrbitEnemy.prototype = Object.create(Entity.Entity.prototype);
+    OrbitEnemy.prototype = Object.create(Entity.prototype);
     OrbitEnemy.prototype.constructor = OrbitEnemy;
     
     OrbitEnemy.prototype.setPosition = function(newPosition){
@@ -46,7 +46,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     }
     
     OrbitEnemy.prototype._setPositionWithInterpolation = function(newPosition){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
+        Entity.prototype._setPositionWithInterpolation.call(this, newPosition);        
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
         this._hitbox.setPosition(newPosition);
         this._particlesEmanatingHandler.setPosition(newPosition);
@@ -56,7 +56,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     }
     
     OrbitEnemy.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        Entity.prototype.reset.call(this);
         this._numCapturedEntities = 0;
         this._hitbox.resetAlgorithm();
         this._nextCapturePosition = new Vector(this._position.getX() + this._captureArea, this._position.getY());
@@ -110,7 +110,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     }
     
     OrbitEnemy.prototype.prepareForDrawing = function(interpolation){
-        Entity.Entity.prototype.prepareForDrawing.call(this, interpolation);
+        Entity.prototype.prepareForDrawing.call(this, interpolation);
         this._hitbox.prepareForDrawing(interpolation);
         this._particlesEmanatingHandler.update();
     }
@@ -140,7 +140,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
     }
     
     OrbitEnemy.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        Entity.prototype.spawn.call(this, callback);
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
         this._particlesEmanatingHandler.shouldDraw(true);
     }
@@ -152,7 +152,7 @@ define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWi
             copyOfCapturedEntities[i] = this._capturedEntities[i];
         }
         
-        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        Entity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "lightning_strike"){
             // check to see if its been destroyed by lightning strike

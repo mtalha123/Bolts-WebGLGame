@@ -1,7 +1,7 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant', 'Custom Utility/Timer'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant, Timer){  
     
     function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        Entity.Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
         this._radius = p_radius;
         this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "enemy";
@@ -25,22 +25,22 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     //inherit from Entity
-    TentacleEnemy.prototype = Object.create(Entity.Entity.prototype);
+    TentacleEnemy.prototype = Object.create(Entity.prototype);
     TentacleEnemy.prototype.constructor = TentacleEnemy;
     
     TentacleEnemy.prototype.setPosition = function(newPosition){
-        Entity.Entity.prototype.setPosition.call(this, newPosition);
+        Entity.prototype.setPosition.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
     }
     
     TentacleEnemy.prototype._setPositionWithInterpolation = function(newPosition){
-        Entity.Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
+        Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
         this._hitbox.setPosition(newPosition);
     }
     
     TentacleEnemy.prototype.reset = function(){
-        Entity.Entity.prototype.reset.call(this);
+        Entity.prototype.reset.call(this);
         this._numTimesSliced = 0;
         this._hitbox.resetAlgorithm();
         this._listTentaclesHoldLg = [0, 0, 0, 0];
@@ -49,7 +49,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     } 
     
     TentacleEnemy.prototype.spawn = function(callback){
-        Entity.Entity.prototype.spawn.call(this, callback);
+        Entity.prototype.spawn.call(this, callback);
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
     } 
     
@@ -115,7 +115,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     TentacleEnemy.prototype.receiveEvent = function(eventInfo){        
-        Entity.Entity.prototype.receiveEvent.call(this, eventInfo);
+        Entity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "lightning_strike"){
             // check to see if its been destroyed by lightning strike

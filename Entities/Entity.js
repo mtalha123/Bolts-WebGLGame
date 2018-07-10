@@ -101,7 +101,5 @@ define(['EventSystem'], function(EventSystem){
         }
     }
     
-    return {
-        Entity: Entity
-    };
+    return Entity;
 });

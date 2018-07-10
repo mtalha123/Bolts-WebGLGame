@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitRegions', 'Custom Utility/rotateCoord', 'Custom Utility/Vector', 'CirclePhysicsBody', 'SliceAlgorithm', 'MainTargetsPositions', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, MovingEntity, CircularHitRegions, rotateCoord, Vector, CirclePhysicsBody, SliceAlgorithm, MainTargetsPositions, EventSystem, timingCallbacks){
 
     function FourPointTarget(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        MovingEntity.MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);    
+        MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);    
         
         this._radius = p_radius;
         this._type = "main";
@@ -37,11 +37,11 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     //inherit from MovingEntity
-    FourPointTarget.prototype = Object.create(MovingEntity.MovingEntity.prototype);
+    FourPointTarget.prototype = Object.create(MovingEntity.prototype);
     FourPointTarget.prototype.constructor = FourPointTarget;
     
     FourPointTarget.prototype.setPosition = function(newPosition){
-        MovingEntity.MovingEntity.prototype.setPosition.call(this, newPosition);
+        MovingEntity.prototype.setPosition.call(this, newPosition);
         
         this._hitbox.setPosition(newPosition);
         
@@ -49,7 +49,7 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     FourPointTarget.prototype._setPositionWithInterpolation = function(newPosition){
-        MovingEntity.MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
+        MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
         
         this._hitbox.setPosition(newPosition);
         
@@ -57,14 +57,14 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
     }
     
     FourPointTarget.prototype.reset = function(){
-        MovingEntity.MovingEntity.prototype.reset.call(this);
+        MovingEntity.prototype.reset.call(this);
         this._numGuardsActivated = 0;
         this._guardPrefs = [0, 0, 0, 0];
         MainTargetsPositions.removeTargetObj(this);
     }
     
     FourPointTarget.prototype.update = function(){
-        MovingEntity.MovingEntity.prototype.update.call(this);
+        MovingEntity.prototype.update.call(this);
         this._rotationAngle += this._rotationSpeed;
         this._handler.setAngle(this._rotationAngle);
         this._hitbox.rotateAllRegions(this._rotationSpeed);
@@ -100,11 +100,11 @@ define(['SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularH
         MainTargetsPositions.addTargetObj(this, this._position);
         this._hitbox.activateAllRegions();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "main"});
-        MovingEntity.MovingEntity.prototype.spawn.call(this, callback);
+        MovingEntity.prototype.spawn.call(this, callback);
     }
     
     FourPointTarget.prototype.receiveEvent = function(eventInfo){
-        MovingEntity.MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        MovingEntity.prototype.receiveEvent.call(this, eventInfo);
 
         if(eventInfo.eventData.entity === this){
             if(eventInfo.eventType === "entity_captured"){
