@@ -1,9 +1,8 @@
-define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, MovingEntity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm){
+define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm){
     
-    function SpikeEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        MovingEntity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
-        this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
+    function SpikeEnemy(canvasWidth, canvasHeight, gl, radius, position, EffectsManager, AudioManager){
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, radius, AudioManager);
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, radius * 1.5, new RingAlgorithm(position, radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
@@ -22,8 +21,8 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         this._spawnSoundEffect = AudioManager.getAudioHandler("enemy_spawn_sound_effect");
     }
     
-    //inherit from MovingEntity
-    SpikeEnemy.prototype = Object.create(MovingEntity.prototype);
+    //inherit from Entity
+    SpikeEnemy.prototype = Object.create(Entity.prototype);
     SpikeEnemy.prototype.constructor = SpikeEnemy;
     
     SpikeEnemy.prototype.setPosition = function(newPosition){
@@ -34,13 +33,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     }
     
     SpikeEnemy.prototype._setPositionWithInterpolation = function(newPosition){
-        MovingEntity.prototype._setPositionWithInterpolation.call(this, newPosition);
+        Entity.prototype._setPositionWithInterpolation.call(this, newPosition);
         this._hitbox.setPosition(newPosition);
         this._particlesHandler.setPosition(newPosition);
     }
     
     SpikeEnemy.prototype.reset = function(){
-        MovingEntity.prototype.reset.call(this);
+        Entity.prototype.reset.call(this);
         this._lightningStealTimer.reset();
         this._charge = 0;
         this._hitbox.resetAlgorithm();
@@ -48,13 +47,14 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
     } 
     
     SpikeEnemy.prototype.spawn = function(callback){
-        MovingEntity.prototype.spawn.call(this, callback);
+        Entity.prototype.spawn.call(this, callback);
         this._lightningStealTimer.start();
         EventSystem.publishEventImmediately("entity_spawned", {entity: this, type: "enemy"});
     } 
     
     SpikeEnemy.prototype.prepareForDrawing = function(interpolation){
-        MovingEntity.prototype.prepareForDrawing.call(this, interpolation);
+        Entity.prototype.prepareForDrawing.call(this, interpolation);
+        this._handler.setPosition( this._prevPosition.addTo((this._position.subtract(this._prevPosition)).multiplyWithScalar(interpolation)) ); 
         this._hitbox.prepareForDrawing();
         this._particlesHandler.update();
     }
@@ -110,7 +110,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MovingEntity', 'Cus
         
     SpikeEnemy.prototype.receiveEvent = function(eventInfo){
         var chargeCopy = this._charge; // Need this because the following line of code may reset it
-        MovingEntity.prototype.receiveEvent.call(this, eventInfo);
+        Entity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "lightning_strike"){
             // check to see if its been destroyed by lightning strike

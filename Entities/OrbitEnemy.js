@@ -1,17 +1,16 @@
 define(['CirclePhysicsBody', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'RingAlgorithm', 'MainTargetsPositions', 'Custom Utility/rotateCoord', 'Custom Utility/Timer'], function(CirclePhysicsBody, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, RingAlgorithm, MainTargetsPositions, rotateCoord, Timer){
     
-    function OrbitEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
-        this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius * 1.5, new RingAlgorithm(position, p_radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
+    function OrbitEnemy(canvasWidth, canvasHeight, gl, radius, position, EffectsManager, AudioManager){
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, radius, AudioManager);
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, radius * 1.5, new RingAlgorithm(position, radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestOrbitEnemy(false, gl, 20, position, {radius: [this._radius]});
-        this._particlesEmanatingHandler = EffectsManager.requestParticlesFlowingFromCenterEffect(false, gl, 7, 30, new Vector(0, 0), {maxLifetime: [80], radiusOfParticlesEmanating: [p_radius * 1.5], particlesColor: [1.0, 0.0, 0.0]});
+        this._particlesEmanatingHandler = EffectsManager.requestParticlesFlowingFromCenterEffect(false, gl, 7, 30, new Vector(0, 0), {maxLifetime: [80], radiusOfParticlesEmanating: [radius * 1.5], particlesColor: [1.0, 0.0, 0.0]});
         
         this._particlesDirectedHandlersPool = [];
         for(var i = 0; i < 4; i++){
-            this._particlesDirectedHandlersPool[i] = EffectsManager.requestDirectedParticlesEffect(false, gl, 20, 30, position, {randomLifetimesOn: [1.0], maxLifetime: [200], radiusOfSource: [p_radius / 3.0], particlesColor: [1.0, 0.0, 0.0]});
+            this._particlesDirectedHandlersPool[i] = EffectsManager.requestDirectedParticlesEffect(false, gl, 20, 30, position, {randomLifetimesOn: [1.0], maxLifetime: [200], radiusOfSource: [radius / 3.0], particlesColor: [1.0, 0.0, 0.0]});
             this._particlesDirectedHandlersPool[i].setTimeIncrementor(5);
         }
         

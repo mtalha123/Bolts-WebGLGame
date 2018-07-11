@@ -1,13 +1,14 @@
 define(['EventSystem'], function(EventSystem){
     
-    function Entity(canvasWidth, canvasHeight, gl, position, AudioManager){       
+    function Entity(canvasWidth, canvasHeight, gl, position, radius, AudioManager){       
         this._position = this._prevPosition = position; 
         this._hitbox = null;
         
         this._handler = null;
         this._alive = false;
+//        this._captured = false;
         this._type = undefined; // type of Entity this is. This will be overridden by specific entities.
-        this._radius = undefined;
+        this._radius = radius;
         this._scoreWorth = 1;
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;

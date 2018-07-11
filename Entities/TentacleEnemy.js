@@ -1,9 +1,8 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Custom Utility/Vector', 'EventSystem', 'SliceAlgorithm', 'MainTargetsPositions', 'Custom Utility/getQuadrant', 'Custom Utility/Timer'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, Vector, EventSystem, SliceAlgorithm, MainTargetsPositions, getQuadrant, Timer){  
     
-    function TentacleEnemy(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager){
-        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
-        this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
+    function TentacleEnemy(canvasWidth, canvasHeight, gl, radius, position, EffectsManager, AudioManager){
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, radius, AudioManager);
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, radius, new SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "enemy";
         
         this._handler = EffectsManager.requestTentacleEnemyHandler(false, gl, 20, position, {});
@@ -90,11 +89,13 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             if(indexOfATentacleHoldingLg != -1){
                 if(this._numTimesSliced === 2){
                     this._listTentaclesHoldLg[indexOfATentacleHoldingLg] = 0;
+                    var entityToRelease = this._listEntitiesCaptured[indexOfATentacleHoldingLg];
+                    this._listEntitiesCaptured[indexOfATentacleHoldingLg] = undefined;
                     this._handler.setYellowColorPrefs(this._listTentaclesHoldLg);
                     this._numTimesSliced = 0;
                     this._delayCapturingTimer.start();
                     this._canCapture = false;
-                    EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: this._listEntitiesCaptured[indexOfATentacleHoldingLg], position: this._position});
+                    EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: entityToRelease, position: this._position});
                 }
             }else{
                 var indexOfFirstAliveTentacle = this._listTentaclesAlive.indexOf(1);
@@ -115,16 +116,21 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     }
     
     TentacleEnemy.prototype.receiveEvent = function(eventInfo){        
+        // duplicate this._listEntitiesCaptured because the line of code after the for loop may reset this enemy, and access to the entities inside this._listEntitiesCaptured will be lost
+        var copyOfCapturedEntities = [];
+        for(var i = 0; i < this._listEntitiesCaptured.length; i++){
+            copyOfCapturedEntities[i] = this._listEntitiesCaptured[i];
+        }
+        
         Entity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventType === "lightning_strike"){
             // check to see if its been destroyed by lightning strike
             if(!this._alive){
                 // release all captured entities
-                for(var i = 0; i < this._listTentaclesHoldLg.length; i++){
-                    if(this._listTentaclesHoldLg[i] === 1){
-                        this._listTentaclesHoldLg[i] = 0;
-                        EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: this._listEntitiesCaptured[i], position: this._position});
+                for(var i = 0; i < copyOfCapturedEntities.length; i++){
+                    if(copyOfCapturedEntities[i]){
+                        EventSystem.publishEventImmediately("captured_entity_released_from_destruction_capture", {entity: copyOfCapturedEntities[i], position: this._position});
                     }
                 }
             }

@@ -1,17 +1,16 @@
 define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBoxWithAlgorithm', 'SliceAlgorithm', 'EventSystem', 'timingCallbacks', 'Custom Utility/Vector'], function(CirclePhysicsBody, SynchronizedTimers, Entity, CircularHitBoxWithAlgorithm, SliceAlgorithm, EventSystem, timingCallbacks, Vector){
 
-    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, p_radius, position, EffectsManager, AudioManager, TextManager){
-        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager);
-        this._radius = p_radius;
-        this._hitbox = new CircularHitBoxWithAlgorithm(position, p_radius, new SliceAlgorithm(position, p_radius, gl, canvasHeight, EffectsManager, AudioManager));
+    function BonusTargetOrbStreak(canvasWidth, canvasHeight, gl, radius, position, EffectsManager, AudioManager, TextManager){
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, radius, AudioManager);
+        this._hitbox = new CircularHitBoxWithAlgorithm(position, radius, new SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "bonus";
         this._scoreWorth = 2;
         
         this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
         this._numSlicesNeededToDestroy = 2;
-        this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [p_radius]});
+        this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
-        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(p_radius * 2, 0)), "Bonus", false);
+        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
