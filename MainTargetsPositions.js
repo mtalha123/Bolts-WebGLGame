@@ -2,6 +2,14 @@ define([''], function(){
     var allTargetObjs = [];
     
     function addTargetObj(target, position){
+        for(var i = 0; i < allTargetObjs.length; i++){
+            if(allTargetObjs[i].target === target){
+                // already exists, so just update position
+                allTargetObjs[i].position = position;
+                return;
+            }
+        }
+        
         allTargetObjs.push({target: target, position: position});
     }
     
