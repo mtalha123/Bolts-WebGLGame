@@ -10,49 +10,6 @@ void main(){
 //FRAGMENT SHADER
 precision mediump float;
 
-//vec2 computeQuadratic(float a, float b, float c){
-//    float discriminant, firstAnswer, secondAnswer;
-//
-//    discriminant = pow(b, 2.0) - (4.0 * a * c);
-//
-//    if(discriminant < 0.0){
-//        return vec2(-1.0);
-//    }
-//
-//    firstAnswer = (-b) + sqrt(discriminant);
-//    firstAnswer /= (2.0 * a);
-//
-//    secondAnswer = (-b) - sqrt(discriminant);
-//    secondAnswer /= (2.0 * a);
-//
-//    return vec2(firstAnswer, secondAnswer);                              
-//}
-//
-//
-//float getSlope(vec2 first, vec2 second){
-//	if((first.x - second.x) == 0.0){
-//    	return -1.0;
-//    }
-//   
-//	return (second.y - first.y) / (second.x - first.x);
-//}
-//
-//float findYIntercept(float slope, vec2 point){
-//	return point.y - (slope * point.x);
-//}
-//
-//vec4 getIntersectionPoints(float m, float y_int, vec2 center, float radius){
-//    float a = pow(m, 2.0) + 1.0;
-//    float b = (2.0 * y_int * m) - (2.0 * center.x) - (2.0 * m * center.y);
-//    float c = pow(y_int, 2.0) - (2.0 * y_int * center.y) + pow(center.y, 2.0) + pow(center.x, 2.0) - pow(radius, 2.0);
-//	vec2 roots = computeQuadratic(a, b, c);
-//    
-//    vec2 answerOne = vec2(roots.x, m * roots.x + y_int);
-//    vec2 answerTwo = vec2(roots.y, m * roots.y + y_int);
-//    
-//    return vec4(answerOne, answerTwo);
-//}
-
 float getReferenceAngle(float angleInRadians){
     if(angleInRadians >= ( (3.0 * PI) / 2.0) ){
         return (2.0 * PI) - angleInRadians;
