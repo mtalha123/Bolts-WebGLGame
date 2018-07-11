@@ -6,7 +6,9 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         this._width = 300;
         this._height = 300;
         this._attributes = {
-            vertexPosition: []
+            vertexPosition: {
+                value: []
+            }
         };
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
@@ -39,6 +41,10 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
             this._uniforms[uniform].location = gl.getUniformLocation(this._shaderProgram, uniform);
         }
         
+        for(var attribute in this._attributes){
+            this._attributes[attribute].location = gl.getAttribLocation(this._shaderProgram, attribute);
+        }
+        
         this._vertexBuffers = [gl.createBuffer()];
         
        // this._changedUniforms = [];
@@ -60,7 +66,7 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
     }
     
     Handler.prototype.getNumVertices = function(){
-        return this._attributes.vertexPosition.length / 2;
+        return this._attributes.vertexPosition.value.length / 2;
     }
     
     Handler.prototype.getShaderProgram = function(){
@@ -101,8 +107,8 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         for(var attribute in this._attributes){            
             var vertexBuffer = this._vertexBuffers[bufferIndex];
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._attributes[attribute]), gl.STATIC_DRAW);
-            var attribLocation = gl.getAttribLocation(this._shaderProgram, attribute);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._attributes[attribute].value), gl.STATIC_DRAW);
+            var attribLocation = this._attributes[attribute].location;
             gl.enableVertexAttribArray(attribLocation);
             if(attribute === "randVals"){
                 gl.vertexAttribPointer(attribLocation, 4, gl.FLOAT, false, 0, 0);

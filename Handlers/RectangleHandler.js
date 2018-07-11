@@ -51,7 +51,7 @@ define(['Handlers/Handler', 'Custom Utility/Vector', 'Custom Utility/getGLCoords
             vertices[a+1] /= this._canvasHeight; 
         }
         
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords(vertices);
+        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords(vertices);
     }
 
     return RectangleHandler;

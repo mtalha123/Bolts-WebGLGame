@@ -62,7 +62,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
         var width = (endCoord.subtract(startCoord)).getMagnitude() + (this._padding * 2);
         var height = this._padding * 2;
         
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(startCoord.getX() - this._padding, startCoord.getY() - this._padding, width, height, this._canvasWidth, this._canvasHeight) );
+        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(startCoord.getX() - this._padding, startCoord.getY() - this._padding, width, height, this._canvasWidth, this._canvasHeight) );
     }
     
     return LifebarHandler;

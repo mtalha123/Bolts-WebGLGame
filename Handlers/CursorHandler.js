@@ -60,7 +60,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         var y_t = getGLCoordsFromNormalizedShaderCoords([y / this._canvasHeight])[0];
         
         var radius_t = this._uniforms.radius.value[0];
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(x - radius_t - this._padding, y - radius_t - this._padding, (radius_t * 2) + (this._padding * 2), (radius_t * 2) + (this._padding * 2), this._canvasWidth, this._canvasHeight) );
+        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(x - radius_t - this._padding, y - radius_t - this._padding, (radius_t * 2) + (this._padding * 2), (radius_t * 2) + (this._padding * 2), this._canvasWidth, this._canvasHeight) );
     }
 
     return CursorHandler;

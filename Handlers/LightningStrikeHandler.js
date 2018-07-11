@@ -137,7 +137,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
             vertices[a+1] /= this._canvasHeight; 
         }
         
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords(vertices);
+        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords(vertices);
     }
     
     return LightningStrikeHandler;

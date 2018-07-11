@@ -119,7 +119,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
             borderVertices[i+1] /= this._canvasHeight;
         }
         
-        this._attributes.vertexPosition = getGLCoordsFromNormalizedShaderCoords(borderVertices);
+        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords(borderVertices);
     }
 
     LightningHandler.prototype.setLightningCoords = function(coords){
@@ -158,7 +158,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesNormalized', 'Custom Util
             vertices = vertices.concat(getGLCoordsFromNormalizedShaderCoords(currVertices));
         }
         
-        this._attributes.vertexPosition = vertices;
+        this._attributes.vertexPosition.value = vertices;
     }
     
     LightningHandler.prototype.doDisappearEffect = function(){

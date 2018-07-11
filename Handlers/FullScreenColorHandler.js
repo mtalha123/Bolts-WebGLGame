@@ -14,7 +14,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'timingCal
         this._gl = gl;
         
          //whole screen
-        this._attributes.vertexPosition = getVerticesUnNormalized(-1, -1, 2, 2); 
+        this._attributes.vertexPosition.value = getVerticesUnNormalized(-1, -1, 2, 2); 
     }
     
     //inherit from Handler

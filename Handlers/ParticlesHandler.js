@@ -1,7 +1,7 @@
 define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Utility/getGLCoordsFromNormalizedShaderCoords', 'Custom Utility/Timer', 'Custom Utility/Vector', 'timingCallbacks'], function(Handler, getVerticesUnNormalized, getGLCoordsFromNormalizedShaderCoords, Timer, Vector, timingCallbacks){
     
-    function ParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts){           
-        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts);    
+    function ParticlesHandler(shouldDraw, numParticles, canvasWidth, canvasHeight, gl, zOrder, position, opts){              
+        Handler.call(this, shouldDraw, zOrder, gl, canvasWidth, canvasHeight, opts); 
         this._numParticles = numParticles;
         this._timeIncrementor = 2;
         
@@ -13,8 +13,12 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 randVals = randVals.concat(fourRandVals);
             }
         }        
+
+        this._attributes.randVals = {
+            value: randVals,
+            location: gl.getAttribLocation(this._shaderProgram, "randVals")
+        };
         
-        this._attributes.randVals = randVals;
         this._vertexBuffers.push(gl.createBuffer());
         
         this.setPosition(position);
@@ -65,9 +69,9 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
         var centerY = this._uniforms.center.value[1];
         var radiusOfParticle = 0.02 * this._canvasHeight;
         
-        this._attributes.vertexPosition = [];
+        this._attributes.vertexPosition.value = [];
         for(var i = 0; i < this._numParticles; i++){
-            this._attributes.vertexPosition = this._attributes.vertexPosition.concat( getVerticesUnNormalized(centerX - radiusOfParticle, centerY - radiusOfParticle, radiusOfParticle * 2, radiusOfParticle * 2) );
+            this._attributes.vertexPosition.value = this._attributes.vertexPosition.value.concat( getVerticesUnNormalized(centerX - radiusOfParticle, centerY - radiusOfParticle, radiusOfParticle * 2, radiusOfParticle * 2) );
         }
     }
 
