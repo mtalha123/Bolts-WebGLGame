@@ -86,10 +86,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._generateVerticesFromCurrentState();
     }
     
-    TargetHandler.prototype.increaseLgGlowFactor = function(newGlowFactor){
-        this._uniforms.lgGlowFactor.value[0] += newGlowFactor;
-    }
-    
     TargetHandler.prototype.setNumBolts = function(numBolts){
         this._uniforms.numBolts.value = [numBolts];
     }    
