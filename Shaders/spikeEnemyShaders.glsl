@@ -1,8 +1,30 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+
+varying vec2 centerUV;
+varying float radiusUV;
+
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------    
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -27,46 +49,39 @@ vec4 getSpikeColor(vec2 uv, vec2 start, float angle, float radius){
 }
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
 uniform float numBolts;
 uniform sampler2D noise;
 
+varying vec2 centerUV;
+varying float radiusUV;
 
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
-   	vec4 color = vec4(1.0);
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    
-    //take aspect ratio into account
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
+    vec4 color = vec4(1.0);
     
-    uv = rotateCoord(uv, -0.01 * iGlobalTime, center);
-    float quadrantNum = getQuadrantNum(uv, center);
+    uv = rotateCoord(uv, -0.01 * iGlobalTime, centerUV);
+    float quadrantNum = getQuadrantNum(uv, centerUV);
     float angleToReverseRotate = (quadrantNum - 1.0) * RIGHT_ANGLE;
-    vec2 uv_t = rotateCoord(uv, -angleToReverseRotate, center);
+    vec2 uv_t = rotateCoord(uv, -angleToReverseRotate, centerUV);
     
-    vec2 closestPtToCircle = normalize(uv_t - center) * radius;
+    vec2 closestPtToCircle = normalize(uv_t - centerUV) * radiusUV;
     uv_t -= closestPtToCircle;
-    color = getSpikeColor(uv_t, center, PI/2.0, radius);
+    color = getSpikeColor(uv_t, centerUV, PI/2.0, radiusUV);
     
     
     /* Dealing with lg bolts */
     if(numBolts > 0.0){
-        uv = rotateCoord(uv, -0.04 * iGlobalTime * numBolts, center); // make lg spin faster, relative to how many bolts there are   
+        uv = rotateCoord(uv, -0.04 * iGlobalTime * numBolts, centerUV); // make lg spin faster, relative to how many bolts there are   
         vec4 lgContribution;
         float angleMultipleDeg = 360.0 / numBolts;
-        float UVAngleDeg = getUVAngleDeg(uv, center);
+        float UVAngleDeg = getUVAngleDeg(uv, centerUV);
         float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
-        vec2 rotatedCoord = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
-        vec2 lgStartCoord = center;
+        vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + radiusUV, centerUV.y), closestAngleMultiple, centerUV);
+        vec2 lgStartCoord = centerUV;
     
         float distToLg = genLightningAndGetDist(uv, lgStartCoord, rotatedCoord, 0.001, 0.002, 4.0, 0.0, noise, iGlobalTime, iResolution);
         if(distToLg == 0.0){

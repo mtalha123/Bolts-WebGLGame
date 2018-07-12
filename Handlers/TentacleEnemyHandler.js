@@ -45,7 +45,8 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         };
         
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TENTACLE_ENEMY);         
-        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);          
+        EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);  
+        this._radiusMultiplierForGenVertices = 7.0;
         this.setPosition(position);
         this._spawnParticlesHandler.setParticlesColor(1.0, 0.0, 0.0);
         this._destructionParticlesHandler.setParticlesColor(1.0, 0.2, 0.2);
@@ -54,12 +55,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     //inherit from Handler
     TentacleEnemyHandler.prototype = Object.create(EntityHandler.prototype);
     TentacleEnemyHandler.prototype.constructor = TentacleEnemyHandler; 
-    
-    TentacleEnemyHandler.prototype.setPosition = function(newPosition){
-        this._uniforms.center.value[0] = newPosition.getX();
-        this._uniforms.center.value[1] = newPosition.getY();
-        this._generateVerticesFromCurrentState();
-    }
     
     TentacleEnemyHandler.prototype.setYellowColorPrefs = function(prefs){
         // assign in this way to prevent pass by reference
@@ -107,14 +102,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
                 this._uniforms.completionsForTentacleGrabs.value[3] = 0.0;
             });             
         }                
-    }
-
-    TentacleEnemyHandler.prototype._generateVerticesFromCurrentState = function(){
-        var radius_t = this._uniforms.radius.value[0] * 7.0;
-        var centerX = this._uniforms.center.value[0];
-        var centerY = this._uniforms.center.value[1];
-
-        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
     }
     
     return TentacleEnemyHandler;

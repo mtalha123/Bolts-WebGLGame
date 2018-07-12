@@ -1,8 +1,35 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+uniform float circleGlowFactor;
+uniform float particleGlowFactor;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float circleGlowFactorUV;
+varying float particleGlowFactorUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    circleGlowFactorUV = circleGlowFactor / iResolution.y;
+    particleGlowFactorUV = particleGlowFactor / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -82,53 +109,45 @@ float getDistToParticle(vec2 uv, vec2 center, float radius, float iGlobalTime){
 
 uniform vec2 iResolution;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
-uniform float particleGlowFactor;
-uniform float circleGlowFactor;
 uniform float particlesBool;
+uniform float aspectRatio;
 uniform sampler2D noise;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float circleGlowFactorUV;
+varying float particleGlowFactorUV;
 
 void main()
 {
-	vec2 uv = gl_FragCoord.xy / iResolution.xy;    
-    float aspectRatio = iResolution.x / iResolution.y;
-    vec4 color = vec4(vec3(0.0), 0.0);    
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    float particleGlowFactor = particleGlowFactor / iResolution.y;
-    float circleGlowFactor = circleGlowFactor / iResolution.y;
-    
-    //take aspect ratio into account
+	vec2 uv = gl_FragCoord.xy / iResolution.xy; 
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
+    vec4 color = vec4(0.0);    
 
     float noiseVal;
-    float angle = getUVAngleDeg(uv, center);
-    float arcLength = radians(angle) * radius;
-    float halfCircumference = (PI * (radius * 2.0)) / 2.0;
+    float angle = getUVAngleDeg(uv, centerUV);
+    float arcLength = radians(angle) * radiusUV;
+    float halfCircumference = (PI * (radiusUV * 2.0)) / 2.0;
     if(angle <= 180.0){
-        noiseVal = cnoise(vec2(arcLength * 300.0 * radius, iGlobalTime / 8.5));
-        //noiseVal = texture2D( noise, vec2(arcLength * 10.0 * radius, iGlobalTime / 2000.0) ).r;
+        noiseVal = cnoise(vec2(arcLength * 300.0 * radiusUV, iGlobalTime / 8.5));
+        //noiseVal = texture2D( noise, vec2(arcLength * 10.0 * radiusUV, iGlobalTime / 2000.0) ).r;
     }else{
-        float leftOverArc = radians((angle - 180.0)) * radius; 
-        noiseVal = cnoise(vec2((halfCircumference - leftOverArc) * 300.0 * radius, iGlobalTime / 8.5));
+        float leftOverArc = radians((angle - 180.0)) * radiusUV; 
+        noiseVal = cnoise(vec2((halfCircumference - leftOverArc) * 300.0 * radiusUV, iGlobalTime / 8.5));
         
-        //noiseVal = texture2D( noise, vec2((halfCircumference - leftOverArc) * 10.0 * radius, iGlobalTime / 2000.0) ).r;
+        //noiseVal = texture2D( noise, vec2((halfCircumference - leftOverArc) * 10.0 * radiusUV, iGlobalTime / 2000.0) ).r;
     }
-    noiseVal *= 0.25 * radius;
-    vec2 closestPoint = center + (normalize(uv - center) * radius); 
-    vec2 uvToCenterDirVec = normalize(center - uv);
+    noiseVal *= 0.25 * radiusUV;
+    vec2 closestPoint = centerUV + (normalize(uv - centerUV) * radiusUV); 
+    vec2 uvToCenterDirVec = normalize(centerUV - uv);
     vec2 lightningPoint = closestPoint + (uvToCenterDirVec * noiseVal);
-    color += vec4(0.0, 0.3, 1.0, 1.0) * (1.0/distance(lightningPoint, uv)) * circleGlowFactor;
+    color += vec4(0.0, 0.3, 1.0, 1.0) * (1.0/distance(lightningPoint, uv)) * circleGlowFactorUV;
     
-    color += vec4(0.0, 0.1, 0.7, 1.0) * (1.0 - smoothstep(distance(center, lightningPoint) - 0.001, distance(center, lightningPoint), distance(uv, center))); 
+    color += vec4(0.0, 0.1, 0.7, 1.0) * (1.0 - smoothstep(distance(centerUV, lightningPoint) - 0.001, distance(centerUV, lightningPoint), distance(uv, centerUV))); 
     
     if(particlesBool == 1.0){
-        float distFromParticle = getDistToParticle(uv, center, radius / 2.0, iGlobalTime);    
-        float particleMult = (1.0 / distFromParticle) * particleGlowFactor;
+        float distFromParticle = getDistToParticle(uv, centerUV, radiusUV / 2.0, iGlobalTime);    
+        float particleMult = (1.0 / distFromParticle) * particleGlowFactorUV;
         color += vec4( (particleMult * vec3(1.0, 1.0, 0.0)) * 0.8, particleMult);
     }
     

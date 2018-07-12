@@ -1,8 +1,32 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+uniform float lgGlowFactor;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float lgGlowFactorUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    lgGlowFactorUV = lgGlowFactor / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -60,36 +84,29 @@ vec3 getCurrentGuardColor(float closestAngleMultiple, vec4 guardPref){
 }
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
 uniform vec4 guardPref;
-uniform float lgGlowFactor;
 uniform float angle;
 uniform float capturedBool;
 uniform sampler2D noise;
 
+varying vec2 centerUV;
+varying float radiusUV;
+varying float lgGlowFactorUV;
+
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
+    uv.x *= aspectRatio;
     vec4 color = vec4(0.0);    
     
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    float lgGlowFactor = lgGlowFactor / iResolution.y;
-    
-    //take aspect ratio into account
-    uv.x *= aspectRatio;
-    center.x *= aspectRatio;
-    
-    uv = rotateCoord(uv, -angle, center);
+    uv = rotateCoord(uv, -angle, centerUV);
     
     float angleMultipleDeg = 360.0 / 4.0;
-    float UVAngleDeg = getUVAngleDeg(uv, center);
+    float UVAngleDeg = getUVAngleDeg(uv, centerUV);
     float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );    
-	vec2 centerOfGuardPoint = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center); 
+	vec2 centerOfGuardPoint = rotateCoord(vec2(centerUV.x + radiusUV, centerUV.y), closestAngleMultiple, centerUV); 
     
     //handle guard points
     float distToCirclePiece = getDistToCirclePiece(uv, centerOfGuardPoint, 0.008, 0.04, 20.0, iGlobalTime, iResolution, aspectRatio);	
@@ -98,7 +115,7 @@ void main()
     color = vec4( guardColor * m, m );
     
     //handle lightning
-    color += genLightningAndGetColor(uv, center, centerOfGuardPoint, 0.0008, 0.009, 2.0, noise, iGlobalTime, iResolution, vec3(1.0, 1.0, 0.0), vec3(1.0, 1.0, 0.7), lgGlowFactor);
+    color += genLightningAndGetColor(uv, centerUV, centerOfGuardPoint, 0.0008, 0.009, 2.0, noise, iGlobalTime, iResolution, vec3(1.0, 1.0, 0.0), vec3(1.0, 1.0, 0.7), lgGlowFactorUV);
     
     if(capturedBool == 1.0){
         color.r = 1.0;

@@ -10,6 +10,10 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
                 value: []
             }
         };
+        this._uniforms.aspectRatio = {
+            type: "float",
+            value: [canvasWidth / canvasHeight],
+        };
         this._canvasWidth = canvasWidth;
         this._canvasHeight = canvasHeight;
         this._zOrder = zOrder;
@@ -46,11 +50,6 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         }
         
         this._vertexBuffers = [gl.createBuffer()];
-        
-       // this._changedUniforms = [];
-      //  for(var uniform in this._uniforms){
-     //       this._changedUniforms.push(uniform);
-     //   }
     }
     
     Handler.prototype.shouldDraw = function(shouldDrawOrNot){
@@ -120,48 +119,47 @@ define(['Custom Utility/getVerticesNormalized', 'Custom Utility/getGLCoordsFromN
         }
     }
     
-    Handler.prototype.setUpUniforms = function(gl){
+    Handler.prototype.setUpUniforms = function(gl){        
         for(var uniform in this._uniforms){
-     //   for(var i = 0; i < this._changedUniforms.length; i++){
             var uniformLocation = this._uniforms[uniform].location;
+            var uniformValue = this._uniforms[uniform].value;
+            
             switch(this._uniforms[uniform].type){
                 case "int":
-                    gl.uniform1iv(uniformLocation, this._uniforms[uniform].value);
+                    gl.uniform1iv(uniformLocation, uniformValue);
                     break;
                 case "float":
-                    gl.uniform1fv(uniformLocation, this._uniforms[uniform].value);
+                    gl.uniform1fv(uniformLocation, uniformValue);
                     break;
-                case "vec2":
-                    gl.uniform2fv(uniformLocation, this._uniforms[uniform].value);
+                case "vec2":                    
+                    gl.uniform2fv(uniformLocation, uniformValue);
                     break;
                 case "vec3":
-                    gl.uniform3fv(uniformLocation, this._uniforms[uniform].value);
+                    gl.uniform3fv(uniformLocation, uniformValue);
                     break;
                 case "vec4":
-                    gl.uniform4fv(uniformLocation, this._uniforms[uniform].value);
+                    gl.uniform4fv(uniformLocation, uniformValue);
                     break;
                 case "sampler2D":
-                    if(this._uniforms[uniform].value === 0){
+                    if(uniformValue === 0){
                         gl.activeTexture(gl.TEXTURE0);
-                    }else if(this._uniforms[uniform].value === 1){
+                    }else if(uniformValue === 1){
                         gl.activeTexture(gl.TEXTURE1);
-                    }else if(this._uniforms[uniform].value === 2){
+                    }else if(uniformValue === 2){
                         gl.activeTexture(gl.TEXTURE2);
-                    }else if(this._uniforms[uniform].value === 3){
+                    }else if(uniformValue === 3){
                         gl.activeTexture(gl.TEXTURE3);
-                    }else if(this._uniforms[uniform].value === 4){
+                    }else if(uniformValue === 4){
                         gl.activeTexture(gl.TEXTURE4);
-                    }else if(this._uniforms[uniform].value === 5){
+                    }else if(uniformValue === 5){
                         gl.activeTexture(gl.TEXTURE5);
                     }
                     
                     gl.bindTexture(gl.TEXTURE_2D, this._uniforms[uniform].texture);
-                    gl.uniform1i(uniformLocation, this._uniforms[uniform].value);
+                    gl.uniform1i(uniformLocation, uniformValue);
                     break;
             }
         }
-        
-        //this._changedUniforms = [];
     }
     
     return Handler;

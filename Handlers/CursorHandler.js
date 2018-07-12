@@ -6,7 +6,7 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
                 type: "vec2",
                 value: [canvasWidth, canvasHeight]
             },
-            mouseCoords: {
+            center: {
                 type: "vec2",
                 value: [position.getX(), position.getY()]
             },
@@ -38,8 +38,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     CursorHandler.prototype.constructor = CursorHandler; 
     
     CursorHandler.prototype.setPosition = function(newPosition){
-        this._uniforms.mouseCoords.value[0] = newPosition.getX();
-        this._uniforms.mouseCoords.value[1] = newPosition.getY();
+        this._uniforms.center.value[0] = newPosition.getX();
+        this._uniforms.center.value[1] = newPosition.getY();
 
         this._setVerticesFromCurrState();
     }
@@ -53,8 +53,8 @@ define(['Handlers/Handler', 'Custom Utility/getVerticesUnNormalized', 'Custom Ut
     }
     
     CursorHandler.prototype._setVerticesFromCurrState = function(){
-        var x = this._uniforms.mouseCoords.value[0];
-        var y = this._uniforms.mouseCoords.value[1];
+        var x = this._uniforms.center.value[0];
+        var y = this._uniforms.center.value[1];
 
         var x_t = getGLCoordsFromNormalizedShaderCoords([x / this._canvasWidth])[0];
         var y_t = getGLCoordsFromNormalizedShaderCoords([y / this._canvasHeight])[0];

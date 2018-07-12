@@ -1,16 +1,30 @@
 //VERTEX SHADER
+precision mediump float;
 
-//float map(float in_min, float in_max, float out_min, float out_max, float number) {
-//    return (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-//}
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+uniform float lgGlowFactor;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float lgGlowFactorUV;
 
 attribute vec2 vertexPosition;
-//uniform mediump vec2 iResolution;
 
 void main(){
-//    vec2 vPos = vertexPosition / iResolution;
-//    vPos.x = map(0.0, 1.0, -1.0, 1.0, vPos.x);
-//    vPos.y = map(0.0, 1.0, -1.0, 1.0, vPos.y);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    lgGlowFactorUV = lgGlowFactor / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
     
     gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
@@ -29,44 +43,37 @@ float getDistToCurve(vec2 uv, vec2 center, float radius, float uvAngleDeg, float
 }
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
 uniform float angle;
 uniform vec3 guardPref;
-uniform float lgGlowFactor;
 uniform float lgBool;
 uniform float autoRotationBool;
 uniform float capturedBool;
 uniform sampler2D noise;
 
+varying vec2 centerUV;
+varying float radiusUV;
+varying float lgGlowFactorUV;
+
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y; 
-    vec4 color = vec4(0.0); 
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    float lgGlowFactor = lgGlowFactor / iResolution.y;
-    
-    //take aspect ratio into account
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
+    vec4 color = vec4(0.0); 
     
     float angle = angle;
     if(autoRotationBool == 1.0){
         angle = iGlobalTime * -0.05;
     }
-    uv = rotateCoord(uv, -angle, center);
+    uv = rotateCoord(uv, -angle, centerUV);
     
     float angleMultipleDeg = 360.0 / 3.0;
-    float UVAngleDeg = getUVAngleDeg(uv, center);
+    float UVAngleDeg = getUVAngleDeg(uv, centerUV);
     float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
-	vec2 rotatedCoord = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
+	vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + radiusUV, centerUV.y), closestAngleMultiple, centerUV);
 	
-    float distToCurve = getDistToCurve(uv, center, radius, UVAngleDeg, closestAngleMultiple, 30.0);
+    float distToCurve = getDistToCurve(uv, centerUV, radiusUV, UVAngleDeg, closestAngleMultiple, 30.0);
     float smthVal = 1.0 - smoothstep(0.01 - 0.005, 0.01, distToCurve); 
     float invertedDist = 1.0 / (distToCurve - ((1.0 - smthVal) * (0.01 - 0.005)));
     float m = pow(invertedDist * 0.007, 1.3);
@@ -84,13 +91,13 @@ void main()
     color.a = m;
     
     //handle lightning
-    if(distance(uv, center) <= radius && lgBool == 1.0){
-//        float distToLg = genLightningAndGetDist(uv, center, rotatedCoord, 0.0002, 0.008, 2.0, noise, iGlobalTime, iResolution);
+    if(distance(uv, centerUV) <= radiusUV && lgBool == 1.0){
+//        float distToLg = genLightningAndGetDist(uv, centerUV, rotatedCoord, 0.0002, 0.008, 2.0, noise, iGlobalTime, iResolution);
 //        float m2 = (1.0 / distToLg) * 0.003;
 //        m2 = pow(m2, 1.3);
 //        color += vec4( m2 * vec3(1.0, 1.0, 0.0), m2);
         
-         color += pow( genLightningAndGetColor(uv, center, rotatedCoord, 0.0005, 0.009, 2.0, noise, iGlobalTime, iResolution, vec3(1.0, 1.0, 0.0), vec3(1.0, 1.0, 0.7), lgGlowFactor), vec4(1.3) );
+         color += pow( genLightningAndGetColor(uv, centerUV, rotatedCoord, 0.0005, 0.009, 2.0, noise, iGlobalTime, iResolution, vec3(1.0, 1.0, 0.0), vec3(1.0, 1.0, 0.7), lgGlowFactorUV), vec4(1.3) );
     }
 
     if(capturedBool == 1.0){

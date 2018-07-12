@@ -1,8 +1,29 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+
+varying vec2 centerUV;
+varying float radiusUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -10,28 +31,22 @@ void main(){
 precision mediump float;
 
 uniform vec2 iResolution;
-uniform vec2 center;
-uniform float radius;
+uniform float aspectRatio;
 uniform vec3 primaryColor;
 uniform vec3 secondaryColor;
 uniform float angleCompletion;
 
+varying vec2 centerUV;
+varying float radiusUV;
+
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    
-    //take aspect ratio into account
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
     
     float angleOfCompletion = angleCompletion * (2.0 * PI);   
-    float uvAngle = getUVAngle(uv, center);
-    vec2 pointOnRing = center + (normalize(uv - center) * radius);
+    float uvAngle = getUVAngle(uv, centerUV);
+    vec2 pointOnRing = centerUV + (normalize(uv - centerUV) * radiusUV);
     vec4 color;
     if(uvAngle >= angleOfCompletion){
         color = vec4(primaryColor, 1.0) * (1.0 / distance(pointOnRing, uv)) * 0.005;

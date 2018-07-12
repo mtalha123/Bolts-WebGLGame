@@ -44,15 +44,16 @@ precision mediump float;
 #define PI 3.1415926535897932384626433832795
 
 uniform vec2 iResolution;
-varying vec2 particleCenter;
+uniform float aspectRatio;
 uniform float iGlobalTime;
-varying float sizeFactor;
 uniform vec3 particlesColor;
+
+varying vec2 particleCenter;
+varying float sizeFactor;
 
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
     vec4 color = vec4(1.0);
     
     //normalize

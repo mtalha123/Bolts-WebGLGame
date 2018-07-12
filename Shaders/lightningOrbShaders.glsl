@@ -1,8 +1,35 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+uniform float lineLength;
+uniform float lgGlowFactor;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float lineLengthUV;
+varying float lgGlowFactorUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    lineLengthUV = lineLength / iResolution.y;
+    lgGlowFactorUV = lgGlowFactor / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -70,36 +97,29 @@ float getOverallLightningDist(vec2 uv, vec2 center, float radius, float numLight
 }
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
-uniform float lgGlowFactor;
-uniform float lineLength;
 uniform float lightningOn;
 uniform sampler2D noise;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float lineLengthUV;
+varying float lgGlowFactorUV;
 
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
+    uv.x *= aspectRatio;
+    
 	float numLightningStrands = 6.0;
     
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    float lineLength = lineLength / iResolution.y;
-    float lgGlowFactor = lgGlowFactor / iResolution.y;
-    
-    //take aspect ratio into account
-    uv.x *= aspectRatio;
-    center.x *= aspectRatio;
-    
-    vec2 closestPt = center + (normalize(uv - center) * radius);    
+    vec2 closestPt = centerUV + (normalize(uv - centerUV) * radiusUV);    
     float invertedDist = 1.0 / distance(uv, closestPt);    
    	float multiplier = invertedDist * 0.003;
    
     vec4 color;
-    if(distance(uv, center) <= radius){
+    if(distance(uv, centerUV) <= radiusUV){
 		color = vec4(1.0, 1.0, 1.0, 1.0);
     }else{
         //circle
@@ -107,7 +127,7 @@ void main()
         
         //lightning
         if(lightningOn == 1.0){
-            float m = (1.0 / getOverallLightningDist (uv, center, radius, numLightningStrands, lineLength, iGlobalTime, noise) ) * lgGlowFactor;
+            float m = (1.0 / getOverallLightningDist (uv, centerUV, radiusUV, numLightningStrands, lineLengthUV, iGlobalTime, noise) ) * lgGlowFactorUV;
             color += vec4(m * vec3(1.0, 1.0, 1.0), m);
         }
     }

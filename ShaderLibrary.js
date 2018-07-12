@@ -38,7 +38,7 @@ define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResou
             var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
             
             var currShaderSource = allShaderSources[shaderSource];
-            var indexBeginFragShader = currShaderSource.indexOf("precision mediump float;");
+            var indexBeginFragShader = currShaderSource.indexOf("precision mediump float;", 20);
             
             var vertexShaderSource = currShaderSource.substring(0, indexBeginFragShader);
             var fragmentShaderSource = currShaderSource.substring(indexBeginFragShader);

@@ -1,8 +1,29 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+
+varying vec2 centerUV;
+varying float radiusUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -35,17 +56,19 @@ float genTentacleAndGetDist(vec2 uv, vec2 start, vec2 end, float tentacleWidth, 
 }
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
 uniform sampler2D noise;
 uniform vec4 yellowColorPrefs;
 uniform vec4 tentaclesToShow;
 uniform vec4 completionsForTentacleGrabs;
 uniform vec2 tentaclesGrabPositions[4];
-uniform vec2 center;
-uniform float radius;
 float tentacleLength = 0.09;
 float numTentacles = 4.0;
 float fluctuation = 0.02;
+
+varying vec2 centerUV;
+varying float radiusUV;
 
 
 vec3 getTentacleColourContrib(vec2 uv, vec2 center, float radius, float closestAngleMultiple, float completion, vec2 tentacleGrabPos, float aspectRatio, vec3 color){
@@ -75,23 +98,15 @@ vec3 getTentacleColourContrib(vec2 uv, vec2 center, float radius, float closestA
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    
-    //take aspect ratio in account
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
     
     //orient tentacles
-    uv = rotateCoord(uv, -(PI / 4.0), center);
+    uv = rotateCoord(uv, -(PI / 4.0), centerUV);
     
     vec3 color = vec3(1.0, 0.0, 0.0), finalColor;
     
     float angleMultipleDeg = 360.0 / numTentacles;
-    float UVAngleDeg = getUVAngleDeg(uv, center);
+    float UVAngleDeg = getUVAngleDeg(uv, centerUV);
     float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
     float closestAngleMultipleDeg = degrees(closestAngleMultiple);
     
@@ -101,7 +116,7 @@ void main()
         }
         
         if(tentaclesToShow.r == 1.0){
-            finalColor = getTentacleColourContrib(uv, center, radius, closestAngleMultiple, completionsForTentacleGrabs.r, tentaclesGrabPositions[0], aspectRatio, color);
+            finalColor = getTentacleColourContrib(uv, centerUV, radiusUV, closestAngleMultiple, completionsForTentacleGrabs.r, tentaclesGrabPositions[0], aspectRatio, color);
         }
     }else if(closestAngleMultipleDeg == 90.0){
         if(yellowColorPrefs.g == 1.0){
@@ -109,7 +124,7 @@ void main()
         }
         
         if(tentaclesToShow.g == 1.0){
-            finalColor = getTentacleColourContrib(uv, center, radius, closestAngleMultiple, completionsForTentacleGrabs.g, tentaclesGrabPositions[1], aspectRatio, color);
+            finalColor = getTentacleColourContrib(uv, centerUV, radiusUV, closestAngleMultiple, completionsForTentacleGrabs.g, tentaclesGrabPositions[1], aspectRatio, color);
         }
     }else if(closestAngleMultipleDeg == 180.0){
         if(yellowColorPrefs.b == 1.0){
@@ -117,7 +132,7 @@ void main()
         }
         
         if(tentaclesToShow.b == 1.0){
-            finalColor = getTentacleColourContrib(uv, center, radius, closestAngleMultiple, completionsForTentacleGrabs.b, tentaclesGrabPositions[2], aspectRatio, color);
+            finalColor = getTentacleColourContrib(uv, centerUV, radiusUV, closestAngleMultiple, completionsForTentacleGrabs.b, tentaclesGrabPositions[2], aspectRatio, color);
         }
     }else if(closestAngleMultipleDeg == 270.0){
         if(yellowColorPrefs.a == 1.0){
@@ -125,16 +140,16 @@ void main()
         }
         
         if(tentaclesToShow.a == 1.0){
-           finalColor = getTentacleColourContrib(uv, center, radius, closestAngleMultiple, completionsForTentacleGrabs.a, tentaclesGrabPositions[3], aspectRatio, color);
+           finalColor = getTentacleColourContrib(uv, centerUV, radiusUV, closestAngleMultiple, completionsForTentacleGrabs.a, tentaclesGrabPositions[3], aspectRatio, color);
         }
     } 
     
     //make circle rim glow
-    float distToCircleEdge = distance( center + (normalize(uv - center) * (radius)), uv);     
+    float distToCircleEdge = distance( centerUV + (normalize(uv - centerUV) * (radiusUV)), uv);     
     finalColor += (1.0 / distToCircleEdge) * color * 0.004;
 
     //makes circle solid
-    if(distance(center, uv) <= radius){
+    if(distance(centerUV, uv) <= radiusUV){
         finalColor = color;
     }
     

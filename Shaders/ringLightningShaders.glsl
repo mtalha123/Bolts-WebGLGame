@@ -1,8 +1,29 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+
+varying vec2 centerUV;
+varying float radiusUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -71,45 +92,39 @@ float cnoise(vec2 P)
 } 
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
 uniform vec4 activatedQuads;
 float circleGlowFactor = 0.006;
 float fluctuation = 0.15;
 
+varying vec2 centerUV;
+varying float radiusUV;
+
 void main()
 {   
     
-    vec2 uv = gl_FragCoord.xy / iResolution.xy;    
-    float aspectRatio = iResolution.x / iResolution.y;
-    vec4 color = vec4(0.0);    
-
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-
-    //take aspect ratio into account
+    vec2 uv = gl_FragCoord.xy / iResolution.xy;        
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
+    vec4 color = vec4(0.0);
 
-    float uvQuadrant = getQuadrantNum(uv, center);
+    float uvQuadrant = getQuadrantNum(uv, centerUV);
     
     if( (uvQuadrant == 1.0 && activatedQuads.r == 1.0) || (uvQuadrant == 2.0 && activatedQuads.g == 1.0) || (uvQuadrant == 3.0 && activatedQuads.b == 1.0) || (uvQuadrant == 4.0 && activatedQuads.a == 1.0)){
         float noiseVal;
-        float angle = getUVAngleDeg(uv, center);
-        float arcLength = radians(angle) * radius;
-        float halfCircumference = (PI * (radius * 2.0)) / 2.0;
+        float angle = getUVAngleDeg(uv, centerUV);
+        float arcLength = radians(angle) * radiusUV;
+        float halfCircumference = (PI * (radiusUV * 2.0)) / 2.0;
         if(angle <= 180.0){
-            noiseVal = cnoise(vec2(arcLength * 700.0 * radius, iGlobalTime / 8.0));
+            noiseVal = cnoise(vec2(arcLength * 700.0 * radiusUV, iGlobalTime / 8.0));
          }else{
-            float leftOverArc = radians((angle - 180.0)) * radius; 
-            noiseVal = cnoise(vec2((halfCircumference - leftOverArc) * 700.0 * radius, iGlobalTime / 8.0));
+            float leftOverArc = radians((angle - 180.0)) * radiusUV; 
+            noiseVal = cnoise(vec2((halfCircumference - leftOverArc) * 700.0 * radiusUV, iGlobalTime / 8.0));
         }
 
-        noiseVal *= fluctuation * radius;
-        vec2 closestPoint = center + (normalize(uv - center) * radius); 
-        vec2 uvToCenterDirVec = normalize(center - uv);
+        noiseVal *= fluctuation * radiusUV;
+        vec2 closestPoint = centerUV + (normalize(uv - centerUV) * radiusUV); 
+        vec2 uvToCenterDirVec = normalize(centerUV - uv);
         vec2 lightningPoint = closestPoint + (uvToCenterDirVec * noiseVal);
         color += vec4(1.0, 1.0, 0.0, 1.0) * (1.0/distance(lightningPoint, uv)) * circleGlowFactor;
 

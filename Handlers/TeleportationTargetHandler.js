@@ -52,7 +52,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.TELEPORTATION_TARGET);
         this._timer = new Timer();
         this._timeForPortalToDisappear = 500;
-        
+        this._radiusMultiplierForGenVertices = 2.5;
         EntityHandler.call(this, shouldDraw, gl,  zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts);   
         
         this.setPosition(position);
@@ -61,12 +61,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     //inherit from EntityHandler
     TeleportationTargetHandler.prototype = Object.create(EntityHandler.prototype);
     TeleportationTargetHandler.prototype.constructor = TeleportationTargetHandler; 
-    
-    TeleportationTargetHandler.prototype.setPosition = function(newPosition){
-        this._uniforms.center.value[0] = newPosition.getX();
-        this._uniforms.center.value[1] = newPosition.getY();
-        this._generateVerticesFromCurrentState();
-    }
     
     TeleportationTargetHandler.prototype.disappear = function(dirVec){
         this._uniforms.appearing.value[0] = 0.0;        
@@ -111,14 +105,6 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     
     TeleportationTargetHandler.prototype.setCapturedToFalse = function(){
         this._uniforms.capturedBool.value = [0.0];
-    }
-    
-    TeleportationTargetHandler.prototype._generateVerticesFromCurrentState = function(){
-        var radius_t = this._uniforms.radius.value[0] * 2.5;
-        var centerX = this._uniforms.center.value[0];
-        var centerY = this._uniforms.center.value[1];
-
-        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
     }
     
     TeleportationTargetHandler.prototype.setNumBolts = function(numBolts){

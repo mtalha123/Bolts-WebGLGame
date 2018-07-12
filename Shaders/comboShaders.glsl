@@ -1,8 +1,32 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+uniform float spreadOfEdgeEffect;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float spreadOfEdgeEffectUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // --------------FOR FRAGMENT SHADER------------------
+
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    spreadOfEdgeEffectUV = spreadOfEdgeEffect / iResolution.y;
+    
+    //take into account aspect ratio
+    centerUV.x *= aspectRatio;
+
+    // ----------------------------------------------------
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -29,40 +53,37 @@ float anotherApproach(vec2 uv, vec2 center, float radius, float spreadOfEdgeEffe
 }
 
 uniform float iGlobalTime;
-uniform vec2 center;
+//uniform vec2 center;
 uniform float completion;
 uniform vec2 iResolution;
-uniform float radius;
-uniform float spreadOfEdgeEffect;
+uniform float aspectRatio;
+//uniform float radius;
+//uniform float spreadOfEdgeEffect;
 uniform sampler2D effectTexture;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float spreadOfEdgeEffectUV;
 
 void main()
 {
     vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    float spreadOfEdgeEffect = spreadOfEdgeEffect / iResolution.y;
-    
-    //take into account aspect ratio
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
+
     
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
     
-    float distToCenter = distance(uv, center);
+    float distToCenter = distance(uv, centerUV);
     float angleOfCompletion = (PI/ 2.0) +  ( (-2.0 * PI) * completion );
-    float uvAngle = getUVAngleDeg(uv, center) * (PI / 180.0);
+    float uvAngle = getUVAngleDeg(uv, centerUV) * (PI / 180.0);
     
     if(uvAngle > (PI / 2.0)){
     	uvAngle -= (2.0 * PI);
     }
     
-    if(distToCenter > radius){
+    if(distToCenter > radiusUV){
         if(!(uvAngle <= (PI / 2.0) && uvAngle >= angleOfCompletion)){
-            if(anotherApproach(uv, center, radius, spreadOfEdgeEffect, iGlobalTime / 10.0, effectTexture) == 0.0){
+            if(anotherApproach(uv, centerUV, radiusUV, spreadOfEdgeEffectUV, iGlobalTime / 10.0, effectTexture) == 0.0){
     	       color = vec4(1.0, 0.0, 0.4, 1.0); 
             }   
         }

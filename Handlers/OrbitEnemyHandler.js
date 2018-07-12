@@ -31,19 +31,5 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     OrbitEnemyHandler.prototype = Object.create(EntityHandler.prototype);
     OrbitEnemyHandler.prototype.constructor = OrbitEnemyHandler; 
     
-    OrbitEnemyHandler.prototype.setPosition = function(newPosition){
-        this._uniforms.center.value[0] = newPosition.getX();
-        this._uniforms.center.value[1] = newPosition.getY();
-        this._generateVerticesFromCurrentState();
-    }
-    
-    OrbitEnemyHandler.prototype._generateVerticesFromCurrentState = function(){
-        var radius_t = this._uniforms.radius.value[0] * 1.5;
-        var centerX = this._uniforms.center.value[0];
-        var centerY = this._uniforms.center.value[1];
-
-        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
-    }
-    
     return OrbitEnemyHandler;
 });

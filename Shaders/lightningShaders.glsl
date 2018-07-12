@@ -1,7 +1,27 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float glowFactor;
+uniform float fluctuation;
+uniform float lineWidth;
+
+varying float lineWidthUV;
+varying float fluctuationUV;
+varying float glowFactorUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
+    // --------------FOR FRAGMENT SHADER------------------
+    
+    //normalize
+    lineWidthUV = lineWidth / iResolution.y;
+    fluctuationUV = fluctuation / iResolution.y;
+    glowFactorUV = glowFactor / iResolution.y;
+    
+    // ----------------------------------------------------
+    
    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
@@ -13,10 +33,8 @@ const int NUM_COORDS = 5;
 
 uniform float iGlobalTime;
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float widthOfCoordsTexture;
-uniform float glowFactor;
-uniform float fluctuation;
-uniform float lineWidth;
 uniform vec3 boltColor;
 uniform vec3 glowColor;
 uniform float spikedLgBool;
@@ -24,16 +42,12 @@ uniform float completion;
 uniform sampler2D noise;
 uniform sampler2D coords;
 
+varying float lineWidthUV;
+varying float fluctuationUV;
+varying float glowFactorUV;
+
 void main(){
-	vec2 uv = gl_FragCoord.xy / iResolution.xy; 
-    float aspectRatio = iResolution.x / iResolution.y;
-    
-    //normalize
-    float lineWidthUV = lineWidth / iResolution.y; 
-    float fluctuationUV = fluctuation / iResolution.y;
-    float glowFactor = glowFactor / iResolution.y;
-    
-    //take into account aspect ratio    
+	vec2 uv = gl_FragCoord.xy / iResolution.xy;   
     uv.x *= aspectRatio;
         
     vec2 uv_t;
@@ -65,13 +79,14 @@ void main(){
     }
     
     if(spikedLgBool == 1.0){
-        lineWidthUV *= (1.0 - completion);
-        glowFactor *= (1.0 - completion);
+        
+        float lineWidthUV = lineWidthUV * (1.0 - completion);
+        float glowFactorUV = glowFactorUV * (1.0 - completion);
         
         float edgeBlurWidth = min(lineWidthUV, 0.005);
         float smthVal = 1.0 - smoothstep(lineWidthUV - edgeBlurWidth, lineWidthUV, distanceToPoint);  
         float invertedDist = 1.0 / (distanceToPoint - ((1.0 - smthVal) * (lineWidthUV - edgeBlurWidth)));
-        float glowMultiplier = invertedDist * glowFactor;
+        float glowMultiplier = invertedDist * glowFactorUV;
 
         finalColor = (smthVal * boltColor) + ((1.0 - smthVal) * glowColor * glowMultiplier); 
         alpha = glowMultiplier;

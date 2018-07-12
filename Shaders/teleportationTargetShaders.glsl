@@ -1,8 +1,30 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+
+varying vec2 centerUV;
+varying float radiusUV;
+
 attribute vec2 vertexPosition;
 
 void main(){
-   gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------  
+    
+    
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 
@@ -45,6 +67,7 @@ float getAngleBetweenVecs(vec2 a, vec2 b){
 }
 
 uniform vec2 iResolution;
+uniform float aspectRatio;
 uniform float iGlobalTime;
 uniform vec2 center;
 uniform float radius;
@@ -56,21 +79,16 @@ uniform float capturedBool;
 uniform float numBolts;
 uniform sampler2D noise;
 
+varying vec2 centerUV;
+varying float radiusUV;
+
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y; 
-    
-    //normalize
-    vec2 center = center.xy / iResolution.xy;
-    float radius = radius / iResolution.y;
-    
-    //take aspect ratio into account
     uv.x *= aspectRatio;
-    center.x *= aspectRatio;
     
     float iGlobalTime = iGlobalTime / 100.0;
-    float distToEdge = distance(center + (normalize(uv - center) * radius), uv);
+    float distToEdge = distance(centerUV + (normalize(uv - centerUV) * radiusUV), uv);
     float noiseVal1 = max(0.3, snoise(uv + vec2(iGlobalTime)));
     float noiseVal2 = max(0.3, snoise(uv + vec2(iGlobalTime + 5.0)));
     float noiseVal3 = max(0.3, snoise(uv + vec2(iGlobalTime + 10.0)));
@@ -79,17 +97,17 @@ void main()
     iGlobalTime *= 100.0;
     
     vec4 lightningContribution = vec4(0.0);
-    if(distance(uv, center) <= radius){
+    if(distance(uv, centerUV) <= radiusUV){
         /* Dealing with lightning */
         
         // rotating effect
-        uv = rotateCoord(uv, iGlobalTime / 15.0, center);
+        uv = rotateCoord(uv, iGlobalTime / 15.0, centerUV);
 
         float angleMultipleDeg = 360.0 / numBolts;
-        float UVAngleDeg = getUVAngleDeg(uv, center);
+        float UVAngleDeg = getUVAngleDeg(uv, centerUV);
         float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
-        vec2 rotatedCoord = rotateCoord(vec2(center.x + radius, center.y), closestAngleMultiple, center);
-        vec2 lgStartCoord = center;
+        vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + radiusUV, centerUV.y), closestAngleMultiple, centerUV);
+        vec2 lgStartCoord = centerUV;
         float lgLineWidth = 1.0 / iResolution.y;
         float fluctuation = 5.0 / iResolution.y;
         float lgGlowFactor = 3.0 / iResolution.y;
@@ -109,7 +127,7 @@ void main()
         lightningContribution.a = glowMultiplier;
         
         // undo rotating effect
-        uv = rotateCoord(uv, -(iGlobalTime / 15.0), center);
+        uv = rotateCoord(uv, -(iGlobalTime / 15.0), centerUV);
     }
 
     color += lightningContribution;
@@ -132,7 +150,7 @@ void main()
         }else if(dist > portalAmountToDrawOnSideDisappearing && getAngleBetweenVecs(portalLocation - uv, dirVec) < (PI / 2.0) && appearing == 1.0){ // if appearing
             color = vec4(0.0);
         }else{
-            if((length(projVec) > (radius * 1.3))){
+            if((length(projVec) > (radiusUV * 1.3))){
                 portalColor = vec4(0.0);
             }else{
                 float multFactor = (1.0 / dist) * 0.007;

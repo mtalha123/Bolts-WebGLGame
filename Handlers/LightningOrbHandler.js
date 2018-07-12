@@ -40,7 +40,7 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
         this._shaderProgram = ShaderLibrary.requestProgram(ShaderLibrary.LIGHTNING_ORB); 
         
         EntityHandler.call(this, shouldDraw, gl, zOrder, position, canvasWidth, canvasHeight, ShaderLibrary, opts); 
-        
+        this._radiusMultiplierForGenVertices = 2.5;
         this.setPosition(position);
     }
     
@@ -48,26 +48,12 @@ define(['Handlers/EntityHandler', 'Custom Utility/getVerticesNormalized', 'Custo
     LightningOrbHandler.prototype = Object.create(EntityHandler.prototype);
     LightningOrbHandler.prototype.constructor = LightningOrbHandler; 
     
-    LightningOrbHandler.prototype.setPosition = function(newPosition){
-        this._uniforms.center.value[0] = newPosition.getX();
-        this._uniforms.center.value[1] = newPosition.getY();
-        this._generateVerticesFromCurrentState();
-    }
-    
     LightningOrbHandler.prototype.turnOffLightning = function(){
         this._uniforms.lightningOn.value = [0.0];
     }
         
     LightningOrbHandler.prototype.turnOnLightning = function(){
         this._uniforms.lightningOn.value = [1.0];
-    }
-
-    LightningOrbHandler.prototype._generateVerticesFromCurrentState = function(){
-        var radius_t = this._uniforms.radius.value[0] + (this._uniforms.lineLength.value[0] * 2.5);
-        var centerX = this._uniforms.center.value[0];
-        var centerY = this._uniforms.center.value[1];
-
-        this._attributes.vertexPosition.value = getGLCoordsFromNormalizedShaderCoords( getVerticesNormalized(centerX - radius_t, centerY - radius_t, radius_t * 2, radius_t * 2, this._canvasWidth, this._canvasHeight) );
     }
     
     return LightningOrbHandler;

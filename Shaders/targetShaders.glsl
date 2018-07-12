@@ -1,7 +1,44 @@
 //VERTEX SHADER
+precision mediump float;
+
+uniform vec2 iResolution;
+uniform float aspectRatio;
+uniform vec2 center;
+uniform float radius;
+uniform float circleLineWidth;
+uniform float circleGlowFactor;
+uniform float fluctuation;
+uniform float lgLineWidth;
+uniform float lgGlowFactor;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float circleLineWidthUV;
+varying float circleGlowFactorUV;
+varying float fluctuationUV;
+varying float lgLineWidthUV;
+varying float lgGlowFactorUV;
+
+
 attribute vec2 vertexPosition;
 
 void main(){
+    // FOR FRAGMENT SHADER --------------------------------
+    
+    //normalize
+    centerUV = center.xy / iResolution.xy;
+    radiusUV = radius / iResolution.y;
+    lgLineWidthUV = lgLineWidth / iResolution.y;
+    fluctuationUV = fluctuation / iResolution.y;
+    circleLineWidthUV = circleLineWidth / iResolution.y;
+    circleGlowFactorUV = circleGlowFactor / iResolution.y;
+    lgGlowFactorUV = lgGlowFactor / iResolution.y;
+    
+    //take aspect ratio into account
+    centerUV.x *= aspectRatio;
+    
+    // ----------------------------------------------------
+    
    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
@@ -28,37 +65,27 @@ float getReferenceAngle(float angleInRadians){
 
 uniform vec2 iResolution;
 uniform float iGlobalTime;
-uniform vec2 center;
-uniform float radius;
-uniform float circleLineWidth;
-uniform float circleGlowFactor;
 uniform float fluctuation;
 uniform float completion;
-uniform float lgLineWidth;
 uniform float numBolts;
-uniform float lgGlowFactor;
 uniform float rotationBool;
 uniform float spaceInCenterBool;
 uniform float capturedBool;
+uniform float aspectRatio;
 uniform sampler2D noise;
+
+varying vec2 centerUV;
+varying float radiusUV;
+varying float circleLineWidthUV;
+varying float circleGlowFactorUV;
+varying float fluctuationUV;
+varying float lgLineWidthUV;
+varying float lgGlowFactorUV;
 
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    float aspectRatio = iResolution.x / iResolution.y;
-    
-    //normalize
-    vec2 centerUV = center.xy / iResolution.xy;
-    float radiusUV = radius / iResolution.y;
-    float lgLineWidthUV = lgLineWidth / iResolution.y;
-    float fluctuationUV = fluctuation / iResolution.y;
-    float circleLineWidthUV = circleLineWidth / iResolution.y;
-    float circleGlowFactor = circleGlowFactor / iResolution.y;
-    float lgGlowFactor = lgGlowFactor / iResolution.y;
-    
-    //take aspect ratio into account
     uv.x *= aspectRatio;
-    centerUV.x *= aspectRatio;
     
     if(rotationBool == 1.0){
         uv = rotateCoord(uv, -iGlobalTime * 0.01, centerUV);
@@ -92,7 +119,7 @@ void main()
         float edgeBlurWidth = min(lgLineWidthUV, 0.005);
         float smthVal = 1.0 - smoothstep(lgLineWidthUV - edgeBlurWidth, lgLineWidthUV, distToLg);  
         float invertedDist = 1.0 / (distToLg - ((1.0 - smthVal) * (lgLineWidthUV - edgeBlurWidth)));
-        float glowMultiplier = pow(invertedDist * lgGlowFactor, 1.5);
+        float glowMultiplier = pow(invertedDist * lgGlowFactorUV, 1.5);
         
         lightningContribution.rgb = (smthVal * solidColor) + ((1.0 - smthVal) * glowColor * glowMultiplier); 
         lightningContribution.a = glowMultiplier;
@@ -110,7 +137,7 @@ void main()
     float edgeBlurWidth = min(circleLineWidthUV, 0.005);
     float smthVal = 1.0 - smoothstep(circleLineWidthUV - edgeBlurWidth, circleLineWidthUV, distToCircle);  
     float invertedDist = 1.0 / (distToCircle - ((1.0 - smthVal) * (circleLineWidthUV - edgeBlurWidth)));
-    float glowMultiplier = pow(invertedDist * circleGlowFactor, 1.3);
+    float glowMultiplier = pow(invertedDist * circleGlowFactorUV, 1.3);
     finalColor = smthVal * solidColor + ((1.0 - smthVal) * glowColor * glowMultiplier);
     alpha = glowMultiplier;   
 
