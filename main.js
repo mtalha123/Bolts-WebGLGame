@@ -191,9 +191,11 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
     window.onfocus = function(){
         windowFocused = true;
         nextTick = Date.now();
+        backgroundMusicHandler.setVolume(0.3);
     }
     
     window.onblur = function(){
         windowFocused = false;
+        backgroundMusicHandler.setVolume(0.0);
     }    
 });
