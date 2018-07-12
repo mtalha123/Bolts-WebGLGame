@@ -112,6 +112,22 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MainEntity', 'Custo
     }
     
     TeleportationTarget.prototype.receiveEvent = function(eventInfo){
+        if(eventInfo.eventType === "lightning_strike"){
+            if(this._alive && this._visible){
+                var startCoord = eventInfo.eventData.start;
+                var endCoord = eventInfo.eventData.end;
+                var closestPointOnLgStrike = startCoord.addTo(this._position.subtract(startCoord).projectOnto(endCoord.subtract(startCoord)));
+                var dist = this._position.distanceTo(closestPointOnLgStrike);
+
+                if(dist < eventInfo.eventData.width){
+                    this.destroyAndReset(function(){});
+                    EventSystem.publishEventImmediately("entity_destroyed_by_lightning_strike", {entity: this, type: this._type});
+                }
+            }
+            
+            return;
+        }
+        
         MainEntity.prototype.receiveEvent.call(this, eventInfo);
         
         if(eventInfo.eventData.entity === this){
