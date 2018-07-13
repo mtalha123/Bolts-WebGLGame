@@ -62,6 +62,8 @@ void main()
     }else{
         color = vec4(lifeBarBackgroundColor * m, m);
     }
+    
+    color = vec4(pow(color.r, 1.3), pow(color.g, 1.3), pow(color.b, 1.3), pow(color.a, 1.3));
 
 	gl_FragColor = color;
 }
