@@ -120,10 +120,10 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         }else if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 6:
-                    this.setSpeed(0.02 * this._canvasHeight);
+                    this.setSpeed(0.015 * this._canvasHeight);
                     break;  
                 case 7:
-                    this.setSpeed(0.03 * this._canvasHeight);
+                    this.setSpeed(0.02 * this._canvasHeight);
                     this._timeUntilStealLightning = 1000;
                     break;
             }
