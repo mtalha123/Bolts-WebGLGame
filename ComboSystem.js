@@ -1,5 +1,5 @@
 define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(EventSystem, SynchronizedTimers, Vector){
-    var timeUntilComboOver = 2000;
+    var timeUntilComboOver = 3500;
     var comboTimer = SynchronizedTimers.getTimer();
     var numTargetsNeededHigherCombo = 1;
     var currentComboLevel = 1;
@@ -52,7 +52,7 @@ define(['EventSystem', 'SynchronizedTimers', 'Custom Utility/Vector'], function(
     }
     
     function resetCombo(){        
-        timeUntilComboOver = 2000;
+        timeUntilComboOver = 3500;
         comboTimer.reset();
         currentComboLevel = 1;
         numTargetsNeededHigherCombo = 1;
