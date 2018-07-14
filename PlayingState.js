@@ -201,11 +201,11 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 3){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);  
+                timeUntilNextMainTargetSpawns = 2000;
                 
             }else if(currentGameLevel === 4){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 25 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 2000;
                 
             }else if(currentGameLevel === 5){
                 
