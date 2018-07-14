@@ -106,7 +106,7 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
             }
         }else if(eventInfo.eventType === "entity_destroyed" && eventInfo.eventData.type === "bonus"){
             if(currNumCharges < numChargesNeeded){
-                currNumCharges++;
+                currNumCharges += eventInfo.eventData.lgStrikePoints;
                 
                 var particlesHandlerToUse = particlesFromDestroyedTargetHandlers[0];
                 for(var i = 0; i < particlesFromDestroyedTargetHandlers.length; i++){
@@ -116,12 +116,13 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
                     }
                 }
                 
-                particlesHandlerToUse.setPosition(eventInfo.eventData.entity.getPosition());
-                particlesHandlerToUse.setRadiusOfSource(eventInfo.eventData.entity.getRadius() * 2);
+                particlesHandlerToUse.setPosition(eventInfo.eventData.position);
+                particlesHandlerToUse.setRadiusOfSource(eventInfo.eventData.radius * 2);
                 particlesHandlerToUse.doEffect(function(){
                     glowingRingHandler.setCompletion(currNumCharges / numChargesNeeded);
 
-                    if(currNumCharges === numChargesNeeded){
+                    if(currNumCharges >= numChargesNeeded){
+                        currNumCharges = numChargesNeeded;
                         lgBoltIconHandler.setColor(1.0, 0.0, 0.4);
                         mouseAnimationTimer.start();
                     }

@@ -10,7 +10,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._numSlicesNeededToDestroy = 2;
         this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
-        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
+        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.04, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
@@ -40,7 +40,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreak.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(this._hitbox.processInput(mouseInputObj)){
             if(this._numSlicesNeededToDestroy === 1){
-                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus", lgStrikePoints: 1, position: this._position, radius: this._radius});
                 timingCallbacks.removeTimingEvents(this);
                 this.destroyAndReset(callback);
                 return true;

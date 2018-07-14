@@ -8,7 +8,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._handler = EffectsManager.requestBubblyOrbEffect(false, gl, 20, position, {radius: [radius]});
         this._particlesHandler = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
-        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
+        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.04, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
         
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
@@ -54,7 +54,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetBubblyOrb.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){        
         if(this._hitbox.processInput(mouseInputObj)){
             this.destroyAndReset(callback);
-            EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
+            EventSystem.publishEventImmediately("score_achieved", {amount: 1});
             return true;
         };
         

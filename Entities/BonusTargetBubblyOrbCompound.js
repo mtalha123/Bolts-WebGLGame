@@ -121,6 +121,7 @@
                     this._targetObjsThirdStage.push(this._currActivatedTargetObjs.splice(i, 1)[0]);
                     if(isLastTarget){
                         timingCallbacks.removeTimingEvents(this);
+                        EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus", lgStrikePoints: 3, position: currActivatedTargetObj.target.getPosition(), radius: currActivatedTargetObj.target.getRadius()});
                         return true;
                     }
                 }

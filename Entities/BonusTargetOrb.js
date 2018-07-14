@@ -1,7 +1,7 @@
 define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox', 'Custom Utility/Vector', 'SliceAlgorithm', 'Custom Utility/CircularHitBoxWithAlgorithm', 'Border', 'Custom Utility/Random', 'EventSystem', 'timingCallbacks'], function(SynchronizedTimers, Entity, CircularHitBox, Vector, SliceAlgorithm, CircularHitBoxWithAlgorithm, Border, Random, EventSystem, timingCallbacks){
 
     function BonusTargetOrb(canvasWidth, canvasHeight, gl, radius, position, EffectsManager, AudioManager, TextManager){
-        Entity.call(this, canvasWidth, canvasHeight, gl, position, AudioManager, TextManager);     
+        Entity.call(this, canvasWidth, canvasHeight, gl, position, radius, AudioManager, TextManager);     
 
         this._hitbox = new CircularHitBoxWithAlgorithm(position, radius, new SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [radius]});
@@ -14,7 +14,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._nextOrbSpawnPosition = new Vector(0, 0); 
         this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
-        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.03, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
+        this._bonusTextHandler = TextManager.requestTextHandler("Comic Sans MS", [255, 255, 255, 1.0], canvasHeight * 0.04, position.addTo(new Vector(radius * 2, 0)), "Bonus", false);
         EventSystem.register(this.receiveEvent, "game_lost", this);
     }
     
@@ -105,7 +105,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
                 }.bind(this));
                 
                 timingCallbacks.removeTimingEvents(this);
-                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus"});
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus", lgStrikePoints: 2, position: this._position, radius: this._radius});
                 return true;
             }
         }
