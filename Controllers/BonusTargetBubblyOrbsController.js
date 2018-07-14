@@ -32,7 +32,7 @@ define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border',
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 4:
+                case 5:
                     this._chanceOfSpawning = 30;
                     break;
             }
