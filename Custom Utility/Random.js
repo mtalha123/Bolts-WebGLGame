@@ -1,5 +1,4 @@
-define(['Third Party/seedrandom'], function(seedrandom){
- //   var rnd = seedrandom("123561", {global: true});
+define([], function(){
     
     return { 
        // Returns a random integer between min (included) and max (excluded)
