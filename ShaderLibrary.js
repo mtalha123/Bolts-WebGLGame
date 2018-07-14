@@ -1,4 +1,4 @@
-define(['Custom Utility/getTextResource', 'AssetManager'], function(getTextResource, AssetManager){
+define(['AssetManager'], function(AssetManager){
     var LIGHTNING = "LIGHTNING";
     var TARGET = "TARGET";
     var CURSOR = "CURSOR";
