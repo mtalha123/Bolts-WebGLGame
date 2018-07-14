@@ -192,10 +192,18 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
         windowFocused = true;
         nextTick = Date.now();
         backgroundMusicHandler.setVolume(0.3);
+        if(currentState === PausedState){
+            EventSystem.publishEventImmediately("game_resume");
+            currentState = PlayingState; 
+        }
     }
     
     window.onblur = function(){
         windowFocused = false;
         backgroundMusicHandler.setVolume(0.0);
+        if(currentState === PlayingState){
+            EventSystem.publishEventImmediately("game_pause");
+            currentState = PausedState;
+        }
     }    
 });
