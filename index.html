@@ -10,26 +10,6 @@
                 padding: 0;
             }
             
-/*
-            .container{
-                position: relative;
-            }
-            
-            .container #canvas{
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                z-index: 0;
-            }
-
-            .container #2dCanvas {
-                position: absolute; 
-                left: 0; 
-                top: 0;
-                z-index: 1;
-            }
-*/
-            
             canvas{
                 cursor: none;
             }
@@ -38,13 +18,6 @@
 	
 	
 	<body>  
-<!--
-        <div class="container">
-            <canvas id="canvas"></canvas>
-            <canvas id="2dCanvas"></canvas>
-        </div>
--->
-            
         <div style="display: block; position: absolute; width: 100%; height: 100%">
          <canvas id="canvas" style="position: absolute; left: 0; top: 0; z-index: 0; cursor:none; width: 100%; height: 100%;" ></canvas>
          <canvas id="2dCanvas" style="position: absolute; left: 0; top: 0; z-index: 1; pointer-events:none; width: 100%; height: 100%;"></canvas>
