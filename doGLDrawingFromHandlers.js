@@ -1,4 +1,4 @@
-define([''], function(){    
+define([], function(){    
     function doGLDrawingFromHandlers(gl, EffectsManager){
         var handlers = EffectsManager.getHandlers();
         var numVerticesDone = 0;

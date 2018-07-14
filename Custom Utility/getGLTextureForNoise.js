@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     function getGLTextureForNoise(gl, noiseData, width, height){
         var texture = gl.createTexture();
         var image = new Uint8Array(noiseData);

@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     var canvasWidth, canvasHeight;
     
     function initialize(p_canvasWidth, p_canvasHeight){

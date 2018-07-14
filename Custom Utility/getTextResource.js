@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     var loadTextResource = function (url, callback, optExtraInfo) {
         var request = new XMLHttpRequest();
         request.open('GET', url, true);

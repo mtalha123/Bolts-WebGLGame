@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     var loadAudioResource = function (url, callback) {
         var request = new XMLHttpRequest();
         request.open('GET', url, true);

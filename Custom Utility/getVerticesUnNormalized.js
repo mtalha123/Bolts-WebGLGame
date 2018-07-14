@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     function getVerticesUnNormalized(x, y, width, height){
         var vertices = [
             x + width, y,

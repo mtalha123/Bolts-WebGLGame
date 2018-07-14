@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     function getGLTextureForImage(gl, image){
         var texture = gl.createTexture();
 

@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     function getGLTextureToPassInfoFromRGBData(infoInRGB, gl){
         var texture = gl.createTexture();
         var image = new Uint8Array(infoInRGB);

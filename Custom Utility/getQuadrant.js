@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     function getQuadrant(point, center){        
         var angle;
         var point_t = point.subtract(center);

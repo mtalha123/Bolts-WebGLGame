@@ -1,4 +1,4 @@
-define([''], function(){
+define([], function(){
     var allTargetObjs = [];
     
     function addTargetObj(target, position){
