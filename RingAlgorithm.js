@@ -88,7 +88,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
         var returnArray = [];
         
         if(direction === COUNTER_CLOCKWISE){
-            for(var i = 0; i < NUM_QUADRANTS; i++){
+            for(var i = 0; i < NUM_QUADRANTS - 1; i++){
                 quadOfPoint++;
                 if(quadOfPoint === 5){
                     quadOfPoint = 1;
@@ -96,7 +96,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
                 returnArray.push(quadOfPoint);
             }
         }else{
-            for(var i = 0; i < NUM_QUADRANTS; i++){
+            for(var i = 0; i < NUM_QUADRANTS - 1; i++){
                 quadOfPoint--;
                 if(quadOfPoint === 0){
                     quadOfPoint = 4;
