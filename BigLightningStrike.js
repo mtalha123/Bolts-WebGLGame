@@ -136,6 +136,9 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
             lgBoltIconHandler.setColor(0.3, 0.3, 0.3);
             lgBoltIconHandler.resetTime();
             glowingRingHandler.setCompletion(0.0);
+            mouseIconUnclickedHandler.shouldDraw(false);
+            mouseIconClickedHandler.shouldDraw(false);
+            mouseAnimationTimer.reset();
         }
     }
     
