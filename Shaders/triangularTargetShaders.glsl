@@ -70,21 +70,21 @@ void main()
     
     float angleMultipleDeg = 360.0 / 3.0;
     float UVAngleDeg = getUVAngleDeg(uv, centerUV);
-    float closestAngleMultiple = radians( getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg)) );
-	vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + radiusUV, centerUV.y), closestAngleMultiple, centerUV);
+    float closestAngleMultiple = getClosestMultiple(int(UVAngleDeg), int(angleMultipleDeg));
+	vec2 rotatedCoord = rotateCoord(vec2(centerUV.x + radiusUV, centerUV.y), radians(closestAngleMultiple), centerUV);
 	
-    float distToCurve = getDistToCurve(uv, centerUV, radiusUV, UVAngleDeg, closestAngleMultiple, 30.0);
+    float distToCurve = getDistToCurve(uv, centerUV, radiusUV, UVAngleDeg, radians(closestAngleMultiple), 30.0);
     float smthVal = 1.0 - smoothstep(0.01 - 0.005, 0.01, distToCurve); 
     float invertedDist = 1.0 / (distToCurve - ((1.0 - smthVal) * (0.01 - 0.005)));
     float m = pow(invertedDist * 0.007, 1.3);
     vec3 guardColor = vec3(0.0, 0.3, 1.0);
-    if( (degrees(closestAngleMultiple) == 0.0 || degrees(closestAngleMultiple) == 360.0) && (guardPref.x == 1.0) ){
+    if( (closestAngleMultiple == 0.0 || closestAngleMultiple == 360.0) && (guardPref.x == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
-    if( degrees(closestAngleMultiple) == 120.0 && (guardPref.y == 1.0) ){
+    if( closestAngleMultiple == 120.0 && (guardPref.y == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
-    if( degrees(closestAngleMultiple) == 240.0 && (guardPref.z == 1.0) ){
+    if( closestAngleMultiple == 240.0 && (guardPref.z == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
     color.rgb = smthVal * vec3(1.0) + ((1.0 - smthVal) * guardColor * m);
