@@ -44,6 +44,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     var isDestroying = false;
     var isActivating = true;
     var score;
+    var bestScore;
     var radiusOfIndicators = 100;
     var lightningStrikeHandler;
     var lightningStrikeSoundEffect;
@@ -113,7 +114,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
             textHandler.setPosition(bestScoreBody.getPosition().addTo(new Vector(0, radiusOfIndicators / 3)));
             textHandler.draw();
             
-            textHandler.setText("--");
+            textHandler.setText(bestScore.toString());
             textHandler.setPosition(bestScoreBody.getPosition().subtract(new Vector(0, radiusOfIndicators / 3)));
             textHandler.draw();
             
@@ -155,6 +156,7 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         isDestroying = false;
         isActivating = true;
         score = p_score;
+        bestScore = parseInt(document.cookie.substring(6)); 
         
         restartButtonBody.setPosition(new Vector(canvasWidth / 2, canvasHeight + (canvasHeight / 3.3)));
         bestScoreBody.setPosition(new Vector(canvasWidth / 3, canvasHeight + (canvasHeight / 1.5)));

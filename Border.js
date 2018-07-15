@@ -130,9 +130,22 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
         if(currentCharge === 0){
             lightningStrikeHandler.doStrikeEffect(function(){});
             lightningStrikeSoundEffect.play();
-            EventSystem.publishEventImmediately("game_lost", {score: score});
             healthBarHandler.shouldDraw(false);
             scoreHandler.shouldDraw(false);
+            
+            // save score in cookie
+            var farDateInTheFuture = new Date("July 1, 2030 01:00:00");
+            if(document.cookie === ""){
+                // cookie doesn't exist
+                document.cookie = "score=" + score + "; expires=" + farDateInTheFuture.toUTCString();   
+            }else{
+                var previousBest = parseInt(document.cookie.substring(6)); 
+                if(score > previousBest){
+                    document.cookie = "score=" + score + "; expires=" + farDateInTheFuture.toUTCString();   
+                }
+            }
+            
+            EventSystem.publishEventImmediately("game_lost", {score: score});
         }                  
     }
     
