@@ -7,15 +7,7 @@
 
 
 requirejs.config({
-    baseUrl : "./",
-    paths : {
-        socketio: 'http://192.168.0.12:4000/socket.io/socket.io.js'
-    },
-    shim: {
-        'socketio': {
-            exports: "io" // what variable does the library export to the global scope?
-        }
-    }
+    baseUrl : "./"
 });
 
 
@@ -71,30 +63,39 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
     
     TextManager.initialize(context, canvasWidth, canvasHeight);
     
-    LoadingState.initialize(context, canvasWidth, canvasHeight, TextManager);
-    var currentState = LoadingState;
-    currentState.draw();
-    
     var windowFocused = true;
     
     var backgroundMusicHandler;
     
     // Additive blending
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    
+    var logo = new Image();
+    logo.src = "Assets/boltsLogo.png";
+    
+    var currentState;
 
-    AssetManager.loadAllAssets(gl, function(completion){
-        LoadingState.setCompletion(completion);
-    }, function(){
-        console.log("All assets loaded.");
-        AudioManager.initialize(AssetManager, function(){
-            console.log("All audio decoded.");
-            initialize();
-            backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
-            backgroundMusicHandler.play();
-            backgroundMusicHandler.setVolume(0.3);
-            currentState = StartingState;    
-        });
-    });
+    logo.onload = function(){      
+        LoadingState.initialize(context, canvasWidth, canvasHeight, logo, TextManager);
+        currentState = LoadingState;
+        
+        //calls the game loop(which then recursively calls itself via window.requestAnimationFrame())
+        gameLoop();
+        
+        AssetManager.loadAllAssets(gl, function(completion){
+            LoadingState.setCompletion(completion);
+        }, function(){
+        //        console.log("All assets loaded.");
+            AudioManager.initialize(AssetManager, function(){
+        //            console.log("All audio decoded.");
+                initialize();
+                backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
+                backgroundMusicHandler.play();
+                backgroundMusicHandler.setVolume(0.3);
+                currentState = StartingState;    
+            });
+        });    
+    }
     
     function gameLoop(){
         if(windowFocused){                
@@ -148,9 +149,6 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
         window.requestAnimationFrame(gameLoop);
         
     }
-    
-    //calls the game loop(which then recursively calls itself via window.requestAnimationFrame())
-    gameLoop();
     
 
     function draw(interpolation){
