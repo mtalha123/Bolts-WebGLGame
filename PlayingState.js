@@ -212,6 +212,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 5){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 700;
                 mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [25, fourPointTargetController], [25, triangularTargetController], [50, basicTargetsController]];
                 
             }else if(currentGameLevel === 6){
@@ -221,7 +222,7 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 7){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(25 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 700;
+                timeUntilNextMainTargetSpawns = 300;
                 mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [30, basicTargetsController], [30, triangularTargetController], [40, fourPointTargetController]];
                 
             }else if(currentGameLevel === 8){
@@ -232,12 +233,11 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 9){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 300;
+                timeUntilNextMainTargetSpawns = 200;
                 
             }else if(currentGameLevel === 10){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(60 * NUM_MILLISECONDS_IN_SECOND, 70 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 200;
                 mainTargetsChancesOfSpawning = [[20, fourPointTargetController], [20, basicTargetsController], [20, triangularTargetController], [40, teleportationTargetsController]];
                 
             }//else if(currentGameLevel === 11){

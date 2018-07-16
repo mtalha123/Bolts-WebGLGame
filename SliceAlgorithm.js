@@ -5,7 +5,7 @@ define(['Custom Utility/Vector', 'Custom Utility/rotateCoord'], function(Vector,
         this._radius = radius;
         this._handler = EffectsManager.requestLightningEffect(false, gl, 80, {lineWidth: [0.5], glowFactor: [7], spikedLgBool: [1.0], boltColor: [1.0, 0.0, 0.4], glowColor: [1.0, 0.1, 0.3], fluctuation: [35]}, [0, 0, 100, 100]);
         this._degreeLeeway = 55;
-        this._maxDist = canvasHeight * 0.7;
+        this._maxDist = canvasHeight * 0.5;
         this._straightArrowHandler = EffectsManager.requestStraightArrowHandler(false, gl, 200, canvasHeight * 0.5, {});
         this._sliceSoundEffect = AudioManager.getAudioHandler("achievement_algorithm_sound_effect");
     }
