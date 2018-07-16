@@ -2,7 +2,7 @@ define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utili
     
     function BonusTargetOrbsController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager, AudioManager, TextManager){
         EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
-        this._targetRadius = appMetaData.getCanvasHeight() * 0.02;
+        this._targetRadius = appMetaData.getCanvasHeight() * 0.03;
         this._spawnAttemptDelay = 4000;
         
         for(var i = 0; i < maxEntitiesToSpawn; i++){
@@ -31,7 +31,7 @@ define(['Entities/BonusTargetOrb', 'SynchronizedTimers', 'Border', 'Custom Utili
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 7:
+                case 3:
                     this._chanceOfSpawning = 20;
                     break;                
             }

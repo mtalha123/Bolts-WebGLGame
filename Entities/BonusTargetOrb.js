@@ -7,7 +7,7 @@ define(['SynchronizedTimers', 'Entities/Entity', 'Custom Utility/CircularHitBox'
         this._handler = EffectsManager.requestLightningOrbEffect(false, gl, 20, position, {radius: [radius]});
         this._particlesHandler = EffectsManager.requestDirectedParticlesEffect(false, gl, 50, 30, new Vector(0, 0), {randomLifetimesOn: [1.0], maxLifetime: [100], radiusOfSource: [radius * 1.5]});
         this._particlesDestDist = 0.1 * canvasHeight;
-        this._scoreWorth = 4;
+        this._scoreWorth = 8;
         this._currParticlesDirection = "LEFT";
         this._type = "bonus";        
         this._currentStage = 1;

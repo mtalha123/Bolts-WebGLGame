@@ -2,7 +2,7 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
     
     function BonusTargetOrbsStreakController(gl, appMetaData, maxEntitiesToSpawn, spawnChance, EffectsManager, AudioManager, TextManager){
         EntityControllerThatSpawns.call(this, appMetaData, spawnChance, maxEntitiesToSpawn); 
-        this._targetRadius = appMetaData.getCanvasHeight() * 0.05;
+        this._targetRadius = appMetaData.getCanvasHeight() * 0.07;
         this._areaToAchieveReductionAmount = 0.04 * this._targetAreaToAchieve;
         this._spawnAttemptDelay = 4000;
         
@@ -34,8 +34,8 @@ define(['Entities/BonusTargetOrbStreak', 'SynchronizedTimers', 'Border', 'Custom
 
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 4:
-                    this._chanceOfSpawning = 30;
+                case 2:
+                    this._chanceOfSpawning = 40;
                     break;
             }
         }

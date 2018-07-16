@@ -197,11 +197,13 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             if(currentGameLevel === 2){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 1500;
                 
             }else if(currentGameLevel === 3){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(15 * NUM_MILLISECONDS_IN_SECOND, 20 * NUM_MILLISECONDS_IN_SECOND);  
-                timeUntilNextMainTargetSpawns = 2000;
+                timeUntilNextMainTargetSpawns = 1000;
+                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [30, triangularTargetController], [70, basicTargetsController]];
                 
             }else if(currentGameLevel === 4){
                 
@@ -210,50 +212,45 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 5){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 1500;
-                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [10, triangularTargetController], [90, basicTargetsController]];
+                mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [25, fourPointTargetController], [25, triangularTargetController], [50, basicTargetsController]];
                 
             }else if(currentGameLevel === 6){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(25 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 1000;
-                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [20, triangularTargetController], [80, basicTargetsController]];
                 
             }else if(currentGameLevel === 7){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(25 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
                 timeUntilNextMainTargetSpawns = 700;
-                mainTargetsChancesOfSpawning = [[0, fourPointTargetController], [0, teleportationTargetsController], [30, triangularTargetController], [70, basicTargetsController]];
+                mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [30, basicTargetsController], [30, triangularTargetController], [40, fourPointTargetController]];
                 
             }else if(currentGameLevel === 8){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(20 * NUM_MILLISECONDS_IN_SECOND, 30 * NUM_MILLISECONDS_IN_SECOND);
-                mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [25, fourPointTargetController], [25, triangularTargetController], [50, basicTargetsController]];
+                mainTargetsChancesOfSpawning = [[20, teleportationTargetsController], [20, basicTargetsController], [20, triangularTargetController], [40, fourPointTargetController]];
                 
             }else if(currentGameLevel === 9){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
                 timeUntilNextMainTargetSpawns = 300;
-                mainTargetsChancesOfSpawning = [[0, teleportationTargetsController], [30, basicTargetsController], [30, triangularTargetController], [40, fourPointTargetController]];
                 
             }else if(currentGameLevel === 10){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(60 * NUM_MILLISECONDS_IN_SECOND, 70 * NUM_MILLISECONDS_IN_SECOND);
-                mainTargetsChancesOfSpawning = [[20, teleportationTargetsController], [20, basicTargetsController], [20, triangularTargetController], [40, fourPointTargetController]];
-                
-            }else if(currentGameLevel === 11){
-                
-                timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
                 timeUntilNextMainTargetSpawns = 200;
                 mainTargetsChancesOfSpawning = [[20, fourPointTargetController], [20, basicTargetsController], [20, triangularTargetController], [40, teleportationTargetsController]];
                 
-            }
+            }//else if(currentGameLevel === 11){
+                
+           //     timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
+                
+           // }
             
             gameLevelTimer.reset();
             gameLevelTimer.start();
             
             EventSystem.publishEvent("game_level_up", {level: currentGameLevel});
-            console.log("LEVEL: " + currentGameLevel);
+//            console.log("LEVEL: " + currentGameLevel);
         }
     }
     

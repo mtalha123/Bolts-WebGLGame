@@ -4,9 +4,9 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         Entity.call(this, canvasWidth, canvasHeight, gl, position, radius, AudioManager);
         this._hitbox = new CircularHitBoxWithAlgorithm(position, radius, new SliceAlgorithm(position, radius, gl, canvasHeight, EffectsManager, AudioManager));
         this._type = "bonus";
-        this._scoreWorth = 2;
+        this._scoreWorth = 5;
         
-        this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {});
+        this._handler = EffectsManager.requestLightningOrbWithStreakEffect(false, gl, 20, position, {radius: [radius]});
         this._numSlicesNeededToDestroy = 2;
         this._disintegratingParticles = EffectsManager.requestParticlesFlowingUpwardEffect(false, gl, 40, 100, position, {maxLifetime: [800], radiusOfSource: [radius]});
         this._spawnSoundEffect = AudioManager.getAudioHandler("bonus_target_spawn_sound_effect");
@@ -40,7 +40,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreak.prototype.runAchievementAlgorithmAndReturnStatus = function(mouseInputObj, callback){
         if(this._hitbox.processInput(mouseInputObj)){
             if(this._numSlicesNeededToDestroy === 1){
-                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus", lgStrikePoints: 1, position: this._position, radius: this._radius});
+                EventSystem.publishEventImmediately("entity_destroyed", {entity: this, type: "bonus", lgStrikePoints: 2, position: this._position, radius: this._radius});
                 timingCallbacks.removeTimingEvents(this);
                 this.destroyAndReset(callback);
                 return true;
