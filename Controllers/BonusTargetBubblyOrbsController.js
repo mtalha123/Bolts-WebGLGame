@@ -39,10 +39,5 @@ define(['Entities/BonusTargetBubblyOrbCompound', 'SynchronizedTimers', 'Border',
         }
     }
     
-    BonusTargetBubblyOrbsController.prototype.update = function(){
-       // console.log("entites pool length: " + this._entitiesPool.length);
-        EntityControllerThatSpawns.prototype.update.call(this);
-    }
-    
     return BonusTargetBubblyOrbsController;
 });
