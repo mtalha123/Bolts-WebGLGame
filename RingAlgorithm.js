@@ -19,8 +19,10 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
     }
     
     RingAlgorithm.prototype.processInput = function(mouseInputObj){
-        if(mouseInputObj.type === "left_mouse_down" || mouseInputObj.type === "left_mouse_held_down"){
-            var mousePos = new Vector(mouseInputObj.x, mouseInputObj.y);
+        var lastMouseState = mouseInputObj[mouseInputObj.length-1] || {type: undefined};
+        
+        if(lastMouseState.type === "left_mouse_down" || lastMouseState.type === "left_mouse_held_down"){
+            var mousePos = new Vector(lastMouseState.x, lastMouseState.y);
             
             // Determine if inside region
             var magnitude = (mousePos.subtract(this._position)).getMagnitude();

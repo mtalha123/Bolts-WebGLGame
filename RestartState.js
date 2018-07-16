@@ -131,9 +131,10 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     function update(){
         if(!isDestroying && !isActivating){
             var inputObj = InputEventsManager.getCurrentInputObj();
+            var lastMouseState = inputObj.mouseState[inputObj.mouseState.length-1] || {type: undefined};
 
-            if(inputObj.mouseState.type === "left_mouse_down" || inputObj.mouseState.type === "left_mouse_held_down"){
-                if(hitRegions.isInAnyRegion(new Vector(inputObj.mouseState.x, inputObj.mouseState.y))){
+            if(lastMouseState.type === "left_mouse_down" || lastMouseState.type === "left_mouse_held_down"){
+                if(hitRegions.isInAnyRegion(new Vector(lastMouseState.x, lastMouseState.y))){
                     isDestroying = true;
                     darkerScreenHandler.shouldDraw(false);
                     restartButtonHandler.doDestroyEffect(new Vector(canvasWidth / 2, canvasHeight / 3.3), function(){});

@@ -38,11 +38,8 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
             particlesFromDestroyedTargetHandlers[i] = EffectsManager.requestDirectedParticlesEffect(false, gl, 20, 300, new Vector(100, 100), {maxLifetime: [1000], radiusOfSource: [60], particlesColor: [1.0, 0.0, 0.4]});
             particlesFromDestroyedTargetHandlers[i].setDestination(startCoord);
         }
-        
-        EventSystem.register(receiveEvent, "right_mouse_down");
-        EventSystem.register(receiveEvent, "left_mouse_down");
-        EventSystem.register(receiveEvent, "right_mouse_held_down");
-        EventSystem.register(receiveEvent, "left_mouse_held_down");
+    
+        EventSystem.register(receiveEvent, "mouse_input_event");
         EventSystem.register(receiveEvent, "entity_destroyed");
         EventSystem.register(receiveEvent, "game_restart");
     }
@@ -73,36 +70,39 @@ define(['Border', 'Custom Utility/Vector', 'EventSystem', 'Border', 'timingCallb
         }
     }
     
-    function receiveEvent(eventInfo){
-        if(eventInfo.eventType === "left_mouse_down" || eventInfo.eventType === "left_mouse_held_down"){
-            if(readyToFire){
-                lgBoltCoverAreaHandler.shouldDraw(false);
-                lgBoltIconHandler.setColor(0.3, 0.3, 0.3);
-                lgBoltIconHandler.resetTime();
-                glowingRingHandler.setCompletion(0.0);
-                lgStrikeHandler.setLightningStrikeEndCoord(Cursor.getPosition());
-                lgStrikeHandler.doStrikeEffect();
-                readyToFire = false;
-                currNumCharges = 0;
-                lightningStrikeSoundEffect.play();
-                mouseAnimationTimer.reset();
-                mouseIconUnclickedHandler.shouldDraw(false);
-                mouseIconClickedHandler.shouldDraw(false);
-                EventSystem.publishEventImmediately("lightning_strike", {start: startCoord, end: Cursor.getPosition(), width: widthOfAreaCovered});
-            }
-        }else if(eventInfo.eventType === "right_mouse_down" || eventInfo.eventType === "right_mouse_held_down"){            
-            if(canActivate){
+    function receiveEvent(eventInfo){        
+        if(eventInfo.eventType === "mouse_input_event"){
+            var lastMouseState = eventInfo.eventData[eventInfo.eventData.length-1] || {type: undefined};
+            if(lastMouseState.type === "left_mouse_down" || lastMouseState.type === "left_mouse_held_down"){
                 if(readyToFire){
-                    readyToFire = false;
                     lgBoltCoverAreaHandler.shouldDraw(false);
-                }else if(currNumCharges === numChargesNeeded){
-                    readyToFire = true;
-                    lgBoltCoverAreaHandler.shouldDraw(true);
+                    lgBoltIconHandler.setColor(0.3, 0.3, 0.3);
+                    lgBoltIconHandler.resetTime();
+                    glowingRingHandler.setCompletion(0.0);
+                    lgStrikeHandler.setLightningStrikeEndCoord(Cursor.getPosition());
+                    lgStrikeHandler.doStrikeEffect();
+                    readyToFire = false;
+                    currNumCharges = 0;
+                    lightningStrikeSoundEffect.play();
+                    mouseAnimationTimer.reset();
+                    mouseIconUnclickedHandler.shouldDraw(false);
+                    mouseIconClickedHandler.shouldDraw(false);
+                    EventSystem.publishEventImmediately("lightning_strike", {start: startCoord, end: Cursor.getPosition(), width: widthOfAreaCovered});
                 }
-                canActivate = false;
-                timingCallbacks.addTimingEvents(this, 200, 1, function(){} , function(){
-                    canActivate = true;
-                });
+            }else if(lastMouseState.type === "right_mouse_down" || lastMouseState.type === "right_mouse_held_down"){            
+                if(canActivate){
+                    if(readyToFire){
+                        readyToFire = false;
+                        lgBoltCoverAreaHandler.shouldDraw(false);
+                    }else if(currNumCharges === numChargesNeeded){
+                        readyToFire = true;
+                        lgBoltCoverAreaHandler.shouldDraw(true);
+                    }
+                    canActivate = false;
+                    timingCallbacks.addTimingEvents(this, 200, 1, function(){} , function(){
+                        canActivate = true;
+                    });
+                }
             }
         }else if(eventInfo.eventType === "entity_destroyed" && eventInfo.eventData.type === "bonus"){
             if(currNumCharges < numChargesNeeded){

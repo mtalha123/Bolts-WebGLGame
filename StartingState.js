@@ -49,9 +49,10 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
     
     function update(){
         var inputObj = InputEventsManager.getCurrentInputObj();
-        
-        if(inputObj.mouseState.type === "left_mouse_down" || inputObj.mouseState.type === "left_mouse_held_down"){
-            if(hitRegions.isInAnyRegion(new Vector(inputObj.mouseState.x, inputObj.mouseState.y))){
+        var lastMouseState = inputObj.mouseState[inputObj.mouseState.length-1] || {type: undefined};
+
+        if(lastMouseState.type === "left_mouse_down" || lastMouseState.type === "left_mouse_held_down"){
+            if(hitRegions.isInAnyRegion(new Vector(lastMouseState.x, lastMouseState.y))){
                 startButtonHandler.shouldDraw(false);
                 startButtonHandler.doDestroyEffect(new Vector(canvasWidth / 2, canvasHeight / 2), function(){ });
                 lightningStrikeHandler.doStrikeEffect();

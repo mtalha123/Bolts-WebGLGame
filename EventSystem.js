@@ -3,14 +3,9 @@ define([], function(){
     var currentEventsQueue = [];
     
     var subscribers = {
-        mouse_move: [],
-        left_mouse_down: [],
-        right_mouse_down: [],
-        mouse_up: [],
-        left_mouse_held_down: [],
-        right_mouse_held_down: [],
         keydown: [],
         keyup: [],
+        mouse_input_event: [],
 
         entity_spawned: [],
         entity_destroyed: [],

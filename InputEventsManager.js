@@ -1,11 +1,13 @@
 define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, EventSystem, Vector){
     
     var inputObj = {
-        mouseState: {
-            type: undefined,
-            x: undefined,
-            y: undefined
-        },
+        mouseState: [
+//            {
+//                type: undefined,       This is how mouse 
+//                x: undefined,          event objects are going to be formatted
+//                y: undefined
+//            }
+        ],
         keyboardState: {
             type: undefined,
             key: undefined
@@ -44,14 +46,9 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
     }
     
     function notifyOfCurrentStateAndConsume(){
-        if(inputObj.mouseState.type){
-            EventSystem.publishEventImmediately(inputObj.mouseState.type, {x: inputObj.mouseState.x, y: inputObj.mouseState.y});
-    
-            inputObj.mouseState = {
-                type: undefined,
-                x: undefined,
-                y: undefined
-            };  
+        if(inputObj.mouseState.length){
+            EventSystem.publishEventImmediately("mouse_input_event", inputObj.mouseState);
+            inputObj.mouseState = [];  
         }
         
         if(inputObj.keyboardState.type){
@@ -65,15 +62,17 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
         }
     }
     
-    function handleMouseEvent(eventType, eventData){        
+    function handleMouseEvent(eventType, eventData){       
+        var type;
+        
         switch(eventType){
             case "mousedown":
                 if(eventData.button === 0){ // left click
                     Cursor.press();
-                    inputObj.mouseState.type = "left_mouse_down";
+                    type = "left_mouse_down";
                     leftMouseDown = true;
                 }else if(eventData.button === 2){ // right click
-                    inputObj.mouseState.type = "right_mouse_down";
+                    type = "right_mouse_down";
                     rightMouseDown = true;
                 }
                 
@@ -82,22 +81,26 @@ define(['Cursor', 'EventSystem', 'Custom Utility/Vector'], function(Cursor, Even
                 Cursor.release();
                 leftMouseDown = false;
                 rightMouseDown = false;
-                inputObj.mouseState.type = "mouse_up";
+                type = "mouse_up";
                 break;
             case "mousemove":
                 if(leftMouseDown){
-                    inputObj.mouseState.type = "left_mouse_held_down"; 
+                    type = "left_mouse_held_down"; 
                 }else if(rightMouseDown){
-                    inputObj.mouseState.type = "right_mouse_held_down";
+                    type = "right_mouse_held_down";
                 }else{
-                    inputObj.mouseState.type = "mouse_move";
+                    type = "mouse_move";
                 }
                 break;
         }
-        inputObj.mouseState.x = eventData.clientX;
-        inputObj.mouseState.y = appMetaData.getCanvasHeight() - eventData.clientY;
-        
-        Cursor.changePosition(new Vector(eventData.clientX, appMetaData.getCanvasHeight() - eventData.clientY));
+
+        var mousePos = new Vector(eventData.clientX, appMetaData.getCanvasHeight() - eventData.clientY);        
+        Cursor.changePosition(new Vector(mousePos.getX(), mousePos.getY()));
+        inputObj.mouseState.push({
+            type: type,
+            x: mousePos.getX(),
+            y: mousePos.getY()
+        });
     }
     
     function handleKeyboardEvent(eventType, eventData){

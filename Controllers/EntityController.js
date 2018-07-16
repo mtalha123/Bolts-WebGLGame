@@ -8,10 +8,7 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
         this._canvasWidth = appMetaData.getCanvasWidth();
         this._canvasHeight = appMetaData.getCanvasHeight();
         
-        EventSystem.register(this.receiveEvent, "mouse_move", this);
-        EventSystem.register(this.receiveEvent, "left_mouse_down", this);
-        EventSystem.register(this.receiveEvent, "mouse_up", this);
-        EventSystem.register(this.receiveEvent, "left_mouse_held_down", this); 
+        EventSystem.register(this.receiveEvent, "mouse_input_event", this); 
         EventSystem.register(this.receiveEvent, "game_restart", this);
         EventSystem.register(this.receiveEvent, "entity_captured", this);
         EventSystem.register(this.receiveEvent, "captured_entity_destroyed", this);
@@ -74,15 +71,11 @@ define(['SynchronizedTimers', 'Border', 'Custom Utility/Random', 'EventSystem'],
                     break;
                 }
             }
-        }else if(eventInfo.eventType === "mouse_move" || eventInfo.eventType === "left_mouse_down" || eventInfo.eventType === "mouse_up" || eventInfo.eventType === "left_mouse_held_down"){
-            var inputToBeProcessed = {};
-            inputToBeProcessed.mouseState = eventInfo.eventData;
-            inputToBeProcessed.mouseState.type = eventInfo.eventType;
-            
+        }else if(eventInfo.eventType === "mouse_input_event"){            
             for(var i = 0; i < this._entitiesActivated.length; i++){
                 var currEntity = this._entitiesActivated[i];
                 
-                if(currEntity.runAchievementAlgorithmAndReturnStatus(inputToBeProcessed.mouseState, function(){})){ 
+                if(currEntity.runAchievementAlgorithmAndReturnStatus(eventInfo.eventData, function(){})){ 
                     this._entitiesPool.push(this._entitiesActivated.splice(i, 1)[0]); 
                     i--;
                 }
