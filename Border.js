@@ -135,11 +135,18 @@ define(['EventSystem', 'Custom Utility/coordsToRGB', 'Custom Utility/Vector'], f
             
             // save score in cookie
             var farDateInTheFuture = new Date("July 1, 2030 01:00:00");
-            if(document.cookie === ""){
+            if(!document.cookie.includes("score=")){
                 // cookie doesn't exist
                 document.cookie = "score=" + score + "; expires=" + farDateInTheFuture.toUTCString();   
             }else{
-                var previousBest = parseInt(document.cookie.substring(6)); 
+                var indexOfScoreStart = document.cookie.indexOf("score=");
+                var indexOfScoreEnd = document.cookie.indexOf(",", indexOfScoreStart);
+                var previousBest;
+                if(indexOfScoreEnd === -1){
+                    previousBest = parseInt(document.cookie.substring(indexOfScoreStart + 6)); 
+                }else{
+                    previousBest = parseInt(document.cookie.substring(indexOfScoreStart + 6, indexOfScoreEnd));
+                }
                 if(score > previousBest){
                     document.cookie = "score=" + score + "; expires=" + farDateInTheFuture.toUTCString();   
                 }

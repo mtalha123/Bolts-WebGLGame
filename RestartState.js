@@ -156,7 +156,14 @@ define(['Custom Utility/CircularHitRegions', 'doGLDrawingFromHandlers', 'Custom 
         isDestroying = false;
         isActivating = true;
         score = p_score;
-        bestScore = parseInt(document.cookie.substring(6)); 
+        
+        var indexOfScoreStart = document.cookie.indexOf("score=");
+        var indexOfScoreEnd = document.cookie.indexOf(",", indexOfScoreStart);
+        if(indexOfScoreEnd === -1){
+            bestScore = parseInt(document.cookie.substring(indexOfScoreStart + 6)); 
+        }else{
+            bestScore = parseInt(document.cookie.substring(indexOfScoreStart + 6, indexOfScoreEnd));
+        }
         
         restartButtonBody.setPosition(new Vector(canvasWidth / 2, canvasHeight + (canvasHeight / 3.3)));
         bestScoreBody.setPosition(new Vector(canvasWidth / 3, canvasHeight + (canvasHeight / 1.5)));
