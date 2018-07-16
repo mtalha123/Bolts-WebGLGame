@@ -57,7 +57,7 @@ define(['Entities/SpikeEnemy', 'Border', 'Custom Utility/Random', 'Controllers/E
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 7:
+                case 6:
                     this._chanceOfSpawning = 30;
                     break;                
             }

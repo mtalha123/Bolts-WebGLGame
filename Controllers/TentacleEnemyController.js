@@ -31,8 +31,8 @@ define(['Entities/TentacleEnemy', 'Custom Utility/Random', 'Controllers/EntityCo
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 6:
-                    this._chanceOfSpawning = 30;
+                case 5:
+                    this._chanceOfSpawning = 40;
                     break;
                 
             }
