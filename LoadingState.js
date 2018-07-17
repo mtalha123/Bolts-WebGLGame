@@ -20,7 +20,7 @@ define(['Custom Utility/Vector'], function(Vector){
         
         var logoWidth = canvas.height * 0.7;
         var logoHeight = canvas.height * 0.7;
-        context.drawImage(logo, (canvas.width / 2) - (logoWidth / 2), (canvas.height / 5) - (logoHeight / 2), logoWidth, logoHeight);
+        context.drawImage(logo, (canvas.width / 2) - (logoWidth / 2), (canvas.height / 6) - (logoHeight / 2), logoWidth, logoHeight);
         
         context.strokeStyle = "rgb(0, 111, 255)";
         context.lineWidth = 5;
