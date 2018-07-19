@@ -26,7 +26,7 @@ define(['Custom Utility/Vector', 'Custom Utility/getQuadrant'], function(Vector,
             
             // Determine if inside region
             var magnitude = (mousePos.subtract(this._position)).getMagnitude();
-            if( (magnitude < (this._radius - (this._regionThickness / 2))) ||  (magnitude > (this._radius + (this._regionThickness / 2))) ){
+            if( (magnitude < (this._radius - (this._regionThickness))) ||  (magnitude > (this._radius + (this._regionThickness))) ){
                 this.reset();
                 return;
             }
