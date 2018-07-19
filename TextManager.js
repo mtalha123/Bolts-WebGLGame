@@ -56,6 +56,25 @@ define(['timingCallbacks', 'Custom Utility/Vector'], function(timingCallbacks, V
         });
     }
     
+    TextHandler.prototype.doFadeAsGetsBiggerEffect = function(){
+        var duration = 2000;
+        var normalSize = this._size;
+        var sizeIncrease = canvasHeight * 0.05;
+        this._shouldDraw = true;
+        
+        timingCallbacks.addTimingEvents(this, duration, 1, function(time){
+            var completion = time / duration;
+            this._size = normalSize + (completion * sizeIncrease);
+            this._color[3] = 1.0 - completion;
+        }, function(){
+            this._shouldDraw = false;
+            this._color[3] = 1.0;
+            this._size -= sizeIncrease;
+        });
+    }
+    
+    
+    
     function initialize(p_context, p_canvasWidth, p_canvasHeight){
         context = p_context;
         canvasWidth = p_canvasWidth;
