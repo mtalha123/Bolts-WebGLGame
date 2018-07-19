@@ -67,16 +67,18 @@ float getDistToCirclePiece(vec2 uv, vec2 center, float minRadius, float maxRadiu
 
 vec3 getCurrentGuardColor(float closestAngleMultiple, vec4 guardPref){
     vec3 guardColor = vec3(0.0, 0.3, 1.0);
-    if( (degrees(closestAngleMultiple) == 0.0 || degrees(closestAngleMultiple) == 360.0) && (guardPref.r == 1.0) ){
+    closestAngleMultiple = floor(degrees(closestAngleMultiple));
+    
+    if( (closestAngleMultiple == 0.0 || closestAngleMultiple == 360.0) && (guardPref.r == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
-    if( degrees(closestAngleMultiple) == 90.0 && (guardPref.g == 1.0) ){
+    if( closestAngleMultiple == 90.0 && (guardPref.g == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
-    if( degrees(closestAngleMultiple) == 180.0 && (guardPref.b == 1.0) ){
+    if( closestAngleMultiple == 180.0 && (guardPref.b == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
-    if( degrees(closestAngleMultiple) == 270.0 && (guardPref.a == 1.0) ){
+    if( closestAngleMultiple == 270.0 && (guardPref.a == 1.0) ){
         guardColor = vec3(1.0, 1.0, 0.0);
     }
     
