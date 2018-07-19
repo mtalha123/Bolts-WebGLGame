@@ -32,7 +32,7 @@ define(['Entities/OrbitEnemy', 'Custom Utility/Random', 'Controllers/EntityContr
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
                 case 4:
-                    this._chanceOfSpawning = 40;
+                    this._chanceOfSpawning = 35;
                     break;
                 
             }

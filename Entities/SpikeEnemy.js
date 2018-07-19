@@ -5,7 +5,7 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
         this._hitbox = new CircularHitBoxWithAlgorithm(position, radius * 1.5, new RingAlgorithm(position, radius * 2, canvasHeight * 0.2, gl, EffectsManager, AudioManager));
         this._type = "enemy";
         
-        this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {});
+        this._handler = EffectsManager.requestEnemySpikeEffect(false, gl, 20, position, {radius: [radius]});
         this._particlesHandler = EffectsManager.requestDirectedParticlesEffect(false, gl, 25, 30, position, {randomLifetimesOn: [1], maxLifetime: [100], radiusOfSource: [canvasHeight * 0.02], particlesColor: [1.0, 1.0, 0.7]});
         this._particlesHandler.setTimeIncrementor(6);
                 
@@ -119,10 +119,10 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
             }
         }else if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 7:
+                case 9:
                     this.setSpeed(0.015 * this._canvasHeight);
                     break;  
-                case 8:
+                case 10:
                     this.setSpeed(0.02 * this._canvasHeight);
                     this._timeUntilStealLightning = 1000;
                     break;
