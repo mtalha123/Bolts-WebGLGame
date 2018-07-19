@@ -91,7 +91,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
                 initialize();
                 backgroundMusicHandler = AudioManager.getAudioHandler("background_music", true);
                 backgroundMusicHandler.play();
-                backgroundMusicHandler.setVolume(0.3);
+                backgroundMusicHandler.setVolume(0.2);
                 currentState = StartingState;    
             });
         });    
@@ -189,7 +189,7 @@ require(['Custom Utility/Timer', 'Cursor', 'EventSystem', 'InputEventsManager', 
     window.onfocus = function(){
         windowFocused = true;
         nextTick = Date.now();
-        backgroundMusicHandler.setVolume(0.3);
+        backgroundMusicHandler.setVolume(0.2);
         if(currentState === PausedState){
             EventSystem.publishEventImmediately("game_resume");
             currentState = PlayingState; 
