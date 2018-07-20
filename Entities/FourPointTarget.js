@@ -113,12 +113,6 @@ define(['SynchronizedTimers', 'Entities/MainEntity', 'Custom Utility/CircularHit
                         this._rotationSpeed = 0.1;
                     }.bind(this));
                     break;
-                case 12:
-                    this._changeFunctionsToApplyNextSpawn.push(function(){
-                        this.setSpeed(0.022 * this._canvasHeight);
-                        this._rotationSpeed = 0.12;
-                    }.bind(this));
-                    break;
             }
         }
         
