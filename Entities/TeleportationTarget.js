@@ -144,16 +144,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MainEntity', 'Custo
         
         if(eventInfo.eventType === "game_level_up"){
             switch(eventInfo.eventData.level){
-                case 11:
+                case 10:
                     this._changeFunctionsToApplyNextSpawn.push(function(){
                         this.setSpeed(0.03 * this._canvasHeight);
                     }.bind(this));;
                     break;  
-                case 12:
-                    this._changeFunctionsToApplyNextSpawn.push(function(){
-                        this.setSpeed(0.035 * this._canvasHeight);
-                    }.bind(this));;
-                    break;
             }
         }
         
