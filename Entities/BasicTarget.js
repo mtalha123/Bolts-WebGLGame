@@ -32,6 +32,11 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MainEntity', 'Custo
         this._hitbox.resetAlgorithm();
         this._currSlicesDone = 0;
         this._handler.setCapturedToFalse();
+    }    
+    
+    BasicTarget.prototype.update = function(){
+        MainEntity.prototype.update.call(this);
+        this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
     }
     
     BasicTarget.prototype.spawn = function(callback){
@@ -51,7 +56,6 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/MainEntity', 'Custo
                 this.destroyAndReset(callback);
                 return true;
             }else{
-                this._handler.setNumBolts(this._numSlicesNeededToDestroy - this._currSlicesDone);
                 this._hitbox.resetAlgorithm();
             }
         }
