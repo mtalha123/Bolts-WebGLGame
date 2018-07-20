@@ -247,11 +247,12 @@ define(['Custom Utility/FPSCounter', 'Controllers/BasicTargetsController', 'Even
             }else if(currentGameLevel === 9){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(30 * NUM_MILLISECONDS_IN_SECOND, 40 * NUM_MILLISECONDS_IN_SECOND);
+                timeUntilNextMainTargetSpawns = 1000;
                 
             }else if(currentGameLevel === 10){
                 
                 timeUntilNextLevel = Random.getRandomIntInclusive(60 * NUM_MILLISECONDS_IN_SECOND, 70 * NUM_MILLISECONDS_IN_SECOND);
-                timeUntilNextMainTargetSpawns = 1000;
+                timeUntilNextMainTargetSpawns = 900;
                 
             }
             
