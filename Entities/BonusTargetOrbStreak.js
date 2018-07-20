@@ -76,7 +76,12 @@ define(['CirclePhysicsBody', 'SynchronizedTimers', 'Entities/Entity', 'Custom Ut
     BonusTargetOrbStreak.prototype.receiveEvent = function(eventInfo){
         Entity.prototype.receiveEvent.call(this, eventInfo);
         
-        if(eventInfo.eventType === "game_lost"){
+        if(eventInfo.eventType === "lightning_strike"){
+            // check to see if its been destroyed by lightning strike
+            if(!this._alive){
+                timingCallbacks.removeTimingEvents(this);
+            }
+        }else if(eventInfo.eventType === "game_lost"){
             timingCallbacks.removeTimingEvents(this);
             this._disintegratingParticles.reset();
         }
