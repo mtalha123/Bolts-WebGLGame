@@ -53,12 +53,9 @@ float anotherApproach(vec2 uv, vec2 center, float radius, float spreadOfEdgeEffe
 }
 
 uniform float iGlobalTime;
-//uniform vec2 center;
 uniform float completion;
 uniform vec2 iResolution;
 uniform float aspectRatio;
-//uniform float radius;
-//uniform float spreadOfEdgeEffect;
 uniform sampler2D effectTexture;
 
 varying vec2 centerUV;
